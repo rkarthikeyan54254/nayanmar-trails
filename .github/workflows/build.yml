@@ -5,6 +5,9 @@ on:
   push:
     branches: [main]
 
+permissions:
+  contents: read
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -16,3 +19,31 @@ jobs:
       - run: npm install
       - run: npm run verify:data
       - run: npm run build
+
+      - name: Capture desktop visual QA
+        shell: bash
+        run: |
+          mkdir -p artifacts
+          npx vite preview --host 127.0.0.1 --port 4173 > /tmp/nayanmar-vite.log 2>&1 &
+          SERVER_PID=$!
+          trap 'kill $SERVER_PID || true' EXIT
+          for i in {1..30}; do
+            if curl -fsS http://127.0.0.1:4173/ >/dev/null; then
+              break
+            fi
+            sleep 1
+          done
+          BROWSER="$(which google-chrome || which chromium || which chromium-browser || true)"
+          if [ -z "$BROWSER" ]; then
+            echo "No headless browser available"
+            exit 1
+          fi
+          "$BROWSER"             --headless             --no-sandbox             --disable-gpu             --disable-dev-shm-usage             --hide-scrollbars             --run-all-compositor-stages-before-draw             --virtual-time-budget=8000             --window-size=1600,1050             --screenshot=artifacts/nayanmar-home.png             http://127.0.0.1:4173/
+          test -s artifacts/nayanmar-home.png
+
+      - name: Upload visual QA artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: nayanmar-visual-qa
+          path: artifacts/nayanmar-home.png
+          if-no-files-found: error
