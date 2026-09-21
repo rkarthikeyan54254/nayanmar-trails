@@ -5,6 +5,7 @@ export interface Saint {
   ordinal: number;
   label: string;
   label_ta: string | null;
+  aliases?: string[];
   authority_scope: AuthorityScope;
 }
 
@@ -18,6 +19,7 @@ export interface Site {
   taluk: string | null;
   traditional_location_class: string | null;
   modern_name_nic: string | null;
+  temple_identification_status?: string | null;
   patikam_count: number;
   authority_scope: AuthorityScope;
 }
