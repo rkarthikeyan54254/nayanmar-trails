@@ -174,32 +174,6 @@ export default function SacredMap({
         },
       );
 
-      const firstSymbolLayer = map.getStyle().layers?.find((layer) => layer.type === 'symbol')?.id;
-      if (!map.getSource('terrain-dem')) {
-        map.addSource('terrain-dem', {
-          type: 'raster-dem',
-          tiles: ['https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png'],
-          tileSize: 256,
-          encoding: 'terrarium',
-          maxzoom: 15,
-        });
-        map.addLayer(
-          {
-            id: 'sacred-hillshade',
-            type: 'hillshade',
-            source: 'terrain-dem',
-            paint: {
-              'hillshade-shadow-color': '#071d18',
-              'hillshade-highlight-color': '#c6b174',
-              'hillshade-accent-color': '#41634f',
-              'hillshade-exaggeration': 0.36,
-              'hillshade-illumination-direction': 315,
-            },
-          },
-          firstSymbolLayer,
-        );
-      }
-
       map.addSource('district-coverage', {
         type: 'geojson',
         data: coverageCollection([]),
@@ -236,7 +210,6 @@ export default function SacredMap({
         layout: {
           'text-field': ['concat', ['get', 'label'], '  ·  ', ['to-string', ['get', 'count']]],
           'text-size': 9,
-          'text-font': ['Noto Sans Regular'],
           'text-offset': [0, 2.2],
           'text-anchor': 'top',
           'text-allow-overlap': false,
