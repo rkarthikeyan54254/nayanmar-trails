@@ -1,6 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
-import maplibregl, { Map as MapLibreMap } from 'maplibre-gl';
-import type { FeatureCollection, LineString, Point, Polygon } from 'geojson';
+import { useEffect, useMemo, useState } from 'react';
 import { GEO_SEEDS, TAMIL_NADU_SCHEMATIC } from './geometry';
 import type { PramanaExport, Saint, Site } from './types';
 
@@ -42,8 +40,6 @@ export default function App() {
   const [playing, setPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
   const [graphOpen, setGraphOpen] = useState(false);
-  const mapNode = useRef<HTMLDivElement | null>(null);
-  const mapRef = useRef<MapLibreMap | null>(null);
 
   useEffect(() => {
     fetch('/data/pramana-export-v1.json')
@@ -131,195 +127,9 @@ export default function App() {
     return () => window.clearInterval(timer);
   }, [playing, routeStops.length]);
 
-  useEffect(() => {
-    if (!mapNode.current || mapRef.current) return;
-    const map = new maplibregl.Map({
-      container: mapNode.current,
-      center: [79.05, 10.95],
-      zoom: 5.45,
-      minZoom: 5,
-      maxZoom: 10,
-      attributionControl: false,
-      style: {
-        version: 8,
-        sources: {},
-        layers: [{ id: 'background', type: 'background', paint: { 'background-color': '#061923' } }],
-      },
-    });
-    map.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'bottom-right');
-    map.on('click', (event) => {
-      if (!map.getLayer('sites')) return;
-      const features = map.queryRenderedFeatures(event.point, { layers: ['sites'] });
-      const id = features[0]?.properties?.id as string | undefined;
-      if (id) {
-        setSelectedSiteId(id);
-        setTab('visits');
-      }
-    });
-    map.on('mousemove', (event) => {
-      if (!map.getLayer('sites')) return;
-      const features = map.queryRenderedFeatures(event.point, { layers: ['sites'] });
-      map.getCanvas().style.cursor = features.length ? 'pointer' : '';
-    });
-    mapRef.current = map;
-    return () => {
-      map.remove();
-      mapRef.current = null;
-    };
-  }, []);
-
-  useEffect(() => {
-    const map = mapRef.current;
-    if (!map || !data) return;
-
-    const render = () => {
-      const land: FeatureCollection<Polygon> = {
-        type: 'FeatureCollection',
-        features: [{
-          type: 'Feature',
-          properties: {},
-          geometry: { type: 'Polygon', coordinates: [[...TAMIL_NADU_SCHEMATIC]] },
-        }],
-      };
-      const points: FeatureCollection<Point> = {
-        type: 'FeatureCollection',
-        features: GEO_SEEDS.map((seed) => {
-          const linked = siteLinks.get(`tevaram_site.${seed.siteId}`)?.length ?? 0;
-          return {
-            type: 'Feature',
-            geometry: { type: 'Point', coordinates: [seed.lng, seed.lat] },
-            properties: {
-              id: `tevaram_site.${seed.siteId}`,
-              siteId: seed.siteId,
-              name: seed.name,
-              linked,
-              independent: epigraphicSiteIds.has(seed.siteId) ? 1 : 0,
-            },
-          };
-        }),
-      };
-      const visible = routeStops.slice(0, Math.min(progress + 1, routeStops.length));
-      const path: FeatureCollection<LineString> = {
-        type: 'FeatureCollection',
-        features: visible.length > 1 ? [{
-          type: 'Feature',
-          properties: {},
-          geometry: { type: 'LineString', coordinates: visible.map((item) => [item.lng, item.lat]) },
-        }] : [],
-      };
-
-      const setSource = (id: string, collection: FeatureCollection) => {
-        const existing = map.getSource(id) as maplibregl.GeoJSONSource | undefined;
-        if (existing) existing.setData(collection);
-        else map.addSource(id, { type: 'geojson', data: collection });
-      };
-
-      setSource('land-source', land);
-      setSource('site-source', points);
-      setSource('route-source', path);
-
-      if (!map.getLayer('land')) {
-        map.addLayer({
-          id: 'land',
-          type: 'fill',
-          source: 'land-source',
-          paint: {
-            'fill-color': '#173f3a',
-            'fill-opacity': 0.64,
-            'fill-outline-color': '#9c9f72',
-          },
-        });
-      }
-      if (!map.getLayer('land-outline')) {
-        map.addLayer({
-          id: 'land-outline',
-          type: 'line',
-          source: 'land-source',
-          paint: { 'line-color': '#d7ad65', 'line-width': 1.4, 'line-opacity': 0.4 },
-        });
-      }
-      if (!map.getLayer('route')) {
-        map.addLayer({
-          id: 'route',
-          type: 'line',
-          source: 'route-source',
-          layout: { 'line-cap': 'round', 'line-join': 'round' },
-          paint: {
-            'line-color': '#ffc96d',
-            'line-width': 4,
-            'line-opacity': 0.94,
-            'line-dasharray': [1.6, 1.5],
-          },
-        });
-      }
-      if (!map.getLayer('halo')) {
-        map.addLayer({
-          id: 'halo',
-          type: 'circle',
-          source: 'site-source',
-          paint: {
-            'circle-radius': ['case', ['>', ['get', 'linked'], 0], 15, 8],
-            'circle-color': ['case', ['==', ['get', 'independent'], 1], '#70e1c9', '#f0b75b'],
-            'circle-opacity': 0.14,
-            'circle-blur': 0.7,
-          },
-        });
-      }
-      if (!map.getLayer('sites')) {
-        map.addLayer({
-          id: 'sites',
-          type: 'circle',
-          source: 'site-source',
-          paint: {
-            'circle-radius': ['case', ['==', ['get', 'independent'], 1], 8, ['>', ['get', 'linked'], 0], 6.5, 4],
-            'circle-color': ['case', ['==', ['get', 'independent'], 1], '#6fe2c9', ['>', ['get', 'linked'], 0], '#efb85f', '#728b88'],
-            'circle-stroke-color': '#ffe6ae',
-            'circle-stroke-width': 1.2,
-            'circle-opacity': ['case', ['>', ['get', 'linked'], 0], 1, 0.42],
-          },
-        });
-      }
-      if (!map.getLayer('labels')) {
-        map.addLayer({
-          id: 'labels',
-          type: 'symbol',
-          source: 'site-source',
-          minzoom: 5.15,
-          layout: {
-            'text-field': ['get', 'name'],
-            'text-size': 11,
-            'text-offset': [0, 1.25],
-            'text-anchor': 'top',
-          },
-          paint: {
-            'text-color': '#e9dec8',
-            'text-halo-color': '#061923',
-            'text-halo-width': 1.3,
-          },
-        });
-      }
-
-      map.setLayoutProperty('route', 'visibility', mode === 'all' || mode === 'edition' ? 'visible' : 'none');
-      const siteVisibility = mode === 'tradition' ? 'none' : 'visible';
-      for (const layer of ['halo', 'sites', 'labels']) map.setLayoutProperty(layer, 'visibility', siteVisibility);
-      const filter: maplibregl.FilterSpecification | null = mode === 'independent'
-        ? ['==', ['get', 'independent'], 1]
-        : null;
-      for (const layer of ['halo', 'sites', 'labels']) map.setFilter(layer, filter);
-    };
-
-    if (map.isStyleLoaded()) render();
-    else map.once('load', render);
-  }, [data, routeStops, progress, mode, siteLinks, epigraphicSiteIds]);
-
-  const activeStop = routeStops[Math.min(progress, Math.max(routeStops.length - 1, 0))];
-  useEffect(() => {
-    if (!activeStop || !mapRef.current || (!playing && progress === 0)) return;
-    mapRef.current.easeTo({ center: [activeStop.lng, activeStop.lat], zoom: 6.6, duration: 850 });
-  }, [activeStop, playing, progress]);
 
   if (!data) {
-    return <div className="loading"><div className="loading-mark">♜</div><div>Opening the Pramāṇa evidence atlas…</div></div>;
+    return <div className="loading"><div className="loading-mark"><GopuramIcon /></div><div>Opening the Pramāṇa evidence atlas…</div></div>;
   }
 
   const saintName = SAINT_EN[selectedSaintId] ?? saint?.label ?? 'Nayanmar';
@@ -329,7 +139,7 @@ export default function App() {
   return (
     <main className="app">
       <header className="topbar">
-        <div className="brand"><span className="gopuram">♜</span><div><strong>Nayanmar Trails</strong><small>DEVOTION CONNECTS LANDS · PRAMĀṆA EVIDENCE ATLAS</small></div></div>
+        <div className="brand"><span className="gopuram"><GopuramIcon /></span><div><strong>Nayanmar Trails</strong><small>DEVOTION CONNECTS LANDS · PRAMĀṆA EVIDENCE ATLAS</small></div></div>
         <nav>
           <button className="active">Explore</button>
           <button onClick={() => document.querySelector('.timeline')?.scrollIntoView({ behavior: 'smooth' })}>Timeline</button>
@@ -369,7 +179,7 @@ export default function App() {
 
       <section className="workspace">
         <aside className="panel saint-card">
-          <div className="portrait"><span>ॐ</span><i>{saint?.ordinal}</i></div>
+          <div className="portrait"><span><GopuramIcon /></span><i>{saint?.ordinal}</i></div>
           <small className="eyebrow">NAYANMAR {saint?.ordinal}</small>
           <h2>{saintName}</h2>
           <div className="tamil">{saint?.label_ta}</div>
@@ -387,7 +197,18 @@ export default function App() {
 
         <section className="panel map-card">
           <div className="map-pill"><span>{MODE_COPY[mode].title}</span><b>{routeStops.length} mapped evidence-linked stops</b></div>
-          <div ref={mapNode} className="map" />
+          <SacredMap
+            routeStops={routeStops}
+            selectedSiteId={selectedSiteId}
+            mode={mode}
+            progress={progress}
+            epigraphicSiteIds={epigraphicSiteIds}
+            siteLinks={siteLinks}
+            onSelect={(siteId) => {
+              setSelectedSiteId(siteId);
+              setTab('visits');
+            }}
+          />
           <div className="ocean east">BAY OF<br />BENGAL</div>
           <div className="ocean south">INDIAN OCEAN</div>
           <div className="compass">N<br />✦</div>
@@ -410,7 +231,7 @@ export default function App() {
             ))}
           </div>
           <div className="detail">
-            <div className="temple-head"><span>♜</span><div><h2>{selectedSite ? cleanLabel(selectedSite.label) : 'Select a site'}</h2><p>{selectedSite?.label_ta || selectedSite?.modern_name_nic || ''}</p></div></div>
+            <div className="temple-head"><span><GopuramIcon /></span><div><h2>{selectedSite ? cleanLabel(selectedSite.label) : 'Select a site'}</h2><p>{selectedSite?.label_ta || selectedSite?.modern_name_nic || ''}</p></div></div>
             {selectedSite && <>
               <div className="chips"><span>{selectedSite.site_id}</span><span>{selectedSite.patikam_count} total patikams</span><span>{selectedPatikams.length} by {saintName.split(' · ')[0]}</span></div>
               {tab === 'visits' && <Visits site={selectedSite} saintName={saintName} count={selectedPatikams.length} />}
@@ -418,8 +239,8 @@ export default function App() {
               {tab === 'chronology' && <Chronology />}
               {tab === 'evidence' && <Evidence site={selectedSite} data={data} />}
               <button className="focus" onClick={() => {
-                const seed = GEO_SEEDS.find((item) => item.siteId === selectedSite.site_id);
-                if (seed) mapRef.current?.easeTo({ center: [seed.lng, seed.lat], zoom: 8, duration: 750 });
+                setSelectedSiteId(selectedSite.id);
+                document.querySelector('.map-card')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
               }}>Focus on map →</button>
             </>}
           </div>
@@ -459,9 +280,162 @@ export default function App() {
         </div>
       </section>
 
-      <footer><strong>♜ Nayanmar Trails</strong><span>Separate product · versioned read-only Pramāṇa foundation</span><span>Source {data.meta.source_commit.slice(0, 10)}</span></footer>
+      <footer><strong><GopuramIcon /> Nayanmar Trails</strong><span>Separate product · versioned read-only Pramāṇa foundation</span><span>Source {data.meta.source_commit.slice(0, 10)}</span></footer>
     </main>
   );
+}
+
+
+function GopuramIcon({ className = '' }: { className?: string }) {
+  return <svg className={\`gopuram-icon \${className}\`} viewBox="0 0 64 64" aria-hidden="true">
+    <path d="M27 5h10l2.5 7H24.5L27 5Z" />
+    <path d="M21 14h22l3 8H18l3-8Z" />
+    <path d="M16 24h32l3 9H13l3-9Z" />
+    <path d="M11 35h42l3 10H8l3-10Z" />
+    <path d="M7 48h50v9H7z" />
+    <path d="M25 42h14v15H25z" className="door" />
+    <circle cx="24" cy="18" r="1.8" />
+    <circle cx="32" cy="18" r="1.8" />
+    <circle cx="40" cy="18" r="1.8" />
+    <circle cx="20" cy="29" r="1.8" />
+    <circle cx="28" cy="29" r="1.8" />
+    <circle cx="36" cy="29" r="1.8" />
+    <circle cx="44" cy="29" r="1.8" />
+  </svg>;
+}
+
+type SacredStop = {
+  siteId: string;
+  name: string;
+  nameTa: string;
+  lng: number;
+  lat: number;
+  playbackRank: number;
+  geometryStatus: 'modern_place_centroid_product_metadata';
+  entity?: Site;
+  hymnIds: string[];
+};
+
+function SacredMap({
+  routeStops,
+  selectedSiteId,
+  mode,
+  progress,
+  epigraphicSiteIds,
+  siteLinks,
+  onSelect,
+}: {
+  routeStops: SacredStop[];
+  selectedSiteId: string;
+  mode: EvidenceMode;
+  progress: number;
+  epigraphicSiteIds: Set<string>;
+  siteLinks: Map<string, string[]>;
+  onSelect: (siteId: string) => void;
+}) {
+  const width = 920;
+  const height = 570;
+  const bounds = { minLng: 76.75, maxLng: 80.55, minLat: 7.85, maxLat: 13.65 };
+  const project = (lng: number, lat: number) => {
+    const x = 60 + ((lng - bounds.minLng) / (bounds.maxLng - bounds.minLng)) * (width - 120);
+    const y = 40 + ((bounds.maxLat - lat) / (bounds.maxLat - bounds.minLat)) * (height - 80);
+    return [x, y] as const;
+  };
+  const landPoints = TAMIL_NADU_SCHEMATIC.map(([lng, lat]) => project(lng, lat).join(',')).join(' ');
+  const fullRoute = routeStops.map((stop) => project(stop.lng, stop.lat));
+  const activeRoute = routeStops.slice(0, Math.min(progress + 1, routeStops.length)).map((stop) => project(stop.lng, stop.lat));
+  const pathFor = (points: readonly (readonly [number, number])[]) =>
+    points.length < 2 ? '' : points.map(([x, y], index) => \`\${index ? 'L' : 'M'} \${x.toFixed(1)} \${y.toFixed(1)}\`).join(' ');
+  const isEditionVisible = mode === 'all' || mode === 'edition';
+  const isSiteVisible = mode !== 'tradition';
+
+  return <div className="map sacred-map" role="img" aria-label="Evidence-aware Tamil Nadu sacred geography">
+    <svg viewBox={\`0 0 \${width} \${height}\`} preserveAspectRatio="xMidYMid meet">
+      <defs>
+        <linearGradient id="landGradient" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor="#315f4c" />
+          <stop offset="0.52" stopColor="#173f3a" />
+          <stop offset="1" stopColor="#0b2b31" />
+        </linearGradient>
+        <radialGradient id="mapGlow" cx="55%" cy="43%" r="60%">
+          <stop offset="0" stopColor="#2e7166" stopOpacity=".32" />
+          <stop offset=".7" stopColor="#0b2d36" stopOpacity=".08" />
+          <stop offset="1" stopColor="#041923" stopOpacity="0" />
+        </radialGradient>
+        <filter id="routeGlow" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="4" result="blur" />
+          <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
+        </filter>
+        <filter id="templeGlow" x="-80%" y="-80%" width="260%" height="260%">
+          <feGaussianBlur stdDeviation="3.5" result="blur" />
+          <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
+        </filter>
+        <pattern id="contours" width="54" height="38" patternUnits="userSpaceOnUse">
+          <path d="M-5 24 C12 6 30 38 58 14" fill="none" stroke="#6f9a7b" strokeOpacity=".08" strokeWidth="1" />
+        </pattern>
+      </defs>
+
+      <rect width={width} height={height} fill="#061923" />
+      <rect width={width} height={height} fill="url(#mapGlow)" />
+      <g opacity=".8">
+        <path d="M90 70 C170 115 196 178 172 245 C145 320 126 402 166 500" fill="none" stroke="#1c6071" strokeOpacity=".22" strokeWidth="2" />
+        <path d="M800 70 C750 146 760 246 825 320 C865 368 882 435 860 505" fill="none" stroke="#1c6071" strokeOpacity=".18" strokeWidth="2" />
+      </g>
+
+      <polygon points={landPoints} fill="url(#landGradient)" stroke="#c19a58" strokeOpacity=".48" strokeWidth="2" />
+      <polygon points={landPoints} fill="url(#contours)" opacity=".9" />
+
+      <g className="terrain-lines" opacity=".28">
+        <path d="M180 145 C245 116 304 145 342 198 C374 243 392 330 355 410" />
+        <path d="M215 165 C270 144 319 171 351 220 C381 267 385 325 365 374" />
+        <path d="M250 186 C294 168 332 193 360 232" />
+      </g>
+      <g className="rivers" opacity=".42">
+        <path d="M300 316 C380 300 452 320 520 351 C579 378 635 372 716 351" />
+        <path d="M418 226 C465 244 515 260 579 252" />
+        <path d="M361 425 C426 407 492 419 558 449" />
+      </g>
+
+      {isEditionVisible && fullRoute.length > 1 && <>
+        <path className="route route-ghost" d={pathFor(fullRoute)} />
+        {activeRoute.length > 1 && <path className="route route-live" d={pathFor(activeRoute)} filter="url(#routeGlow)" />}
+      </>}
+
+      {isSiteVisible && GEO_SEEDS.map((seed) => {
+        const [x, y] = project(seed.lng, seed.lat);
+        const siteId = \`tevaram_site.\${seed.siteId}\`;
+        const linked = siteLinks.get(siteId)?.length ?? 0;
+        const independent = epigraphicSiteIds.has(seed.siteId);
+        if (mode === 'independent' && !independent) return null;
+        const selected = selectedSiteId === siteId;
+        const active = linked > 0;
+        return <g
+          key={seed.siteId}
+          className={\`temple-marker \${active ? 'linked' : ''} \${independent ? 'independent' : ''} \${selected ? 'selected' : ''}\`}
+          transform={\`translate(\${x} \${y})\`}
+          onClick={() => onSelect(siteId)}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(event) => { if (event.key === 'Enter' || event.key === ' ') onSelect(siteId); }}
+          aria-label={\`\${seed.name}, \${linked} linked patikams\`}
+        >
+          <circle className="marker-halo" r={selected ? 22 : active ? 16 : 11} />
+          <circle className="marker-core" r={selected ? 10 : active ? 8 : 6} />
+          <g transform="translate(-6 -7) scale(.19)" className="marker-gopuram"><GopuramIcon /></g>
+          {(active || selected) && <text y={selected ? 28 : 24} textAnchor="middle">{seed.name}</text>}
+          {independent && <path className="epigraphic-diamond" d="M0 -16 L5 -11 L0 -6 L-5 -11 Z" />}
+        </g>;
+      })}
+
+      <text className="region-label" x="487" y="292">TAMIL NADU</text>
+      <text className="sea-label" x="812" y="272">BAY OF BENGAL</text>
+      <text className="sea-label" x="630" y="532">INDIAN OCEAN</text>
+      <g className="north" transform="translate(847 62)">
+        <text textAnchor="middle" y="-12">N</text>
+        <path d="M0 -2 L5 10 L0 7 L-5 10 Z" />
+      </g>
+    </svg>
+  </div>;
 }
 
 function Badge({ kind, children }: { kind: 'tradition' | 'edition' | 'independent' | 'inference'; children: React.ReactNode }) {
