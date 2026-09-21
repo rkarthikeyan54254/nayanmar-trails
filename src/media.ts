@@ -9,9 +9,9 @@ const commons = (filename: string, width = 900) =>
   `https://commons.wikimedia.org/wiki/Special:Redirect/file/${encodeURIComponent(filename)}?width=${width}`;
 
 export const HERO_MEDIA: MediaCredit = {
-  src: commons('Gopuram of Sri Rangam Temple.jpg', 1600),
-  title: 'Gopuram of Sri Rangam Temple, Tiruchirappalli',
-  license: 'Public Domain',
+  src: commons('Brihadeshwara Temple, Thanjavur, Tamil Nadu, India.jpg', 1600),
+  title: 'Brihadeshwara Temple, Thanjavur',
+  license: 'CC BY-SA 3.0',
   source: 'Wikimedia Commons',
 };
 
