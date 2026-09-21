@@ -146,7 +146,7 @@ export default function SacredMap({
 
     const map = new maplibregl.Map({
       container: mapNode.current,
-      style: 'https://tiles.openfreemap.org/styles/liberty',
+      style: 'https://tiles.openfreemap.org/styles/fiord',
       center: [78.95, 10.85],
       zoom: 5.7,
       minZoom: 5.1,
@@ -270,7 +270,7 @@ export default function SacredMap({
         map.setLayoutProperty(
           'district-coverage-halo',
           'visibility',
-          mode === 'tradition' ? 'none' : 'visible',
+          mode === 'tradition' || mode === 'independent' ? 'none' : 'visible',
         );
       }
     };
