@@ -208,7 +208,7 @@ export default function App() {
           <button onClick={() => setTab('visits')}>Temples</button>
           <button onClick={() => setTab('hymns')}>Hymns</button>
           <button onClick={() => setGraphOpen(true)}>Routes</button>
-          <button onClick={() => setTab('evidence')}>Evidence</button>
+          <button onClick={() => setTab('evidence')}>Stories</button>
         </nav>
 
         <div className="header-search">
@@ -263,6 +263,19 @@ export default function App() {
           </select>
         </label>
 
+        <label className="secondary-filter">
+          <span>Century</span>
+          <select defaultValue="all"><option value="all">All centuries</option></select>
+        </label>
+        <label className="secondary-filter">
+          <span>Region</span>
+          <select defaultValue="tn"><option value="tn">Tamil Nadu</option></select>
+        </label>
+        <label className="secondary-filter">
+          <span>Shrine Type</span>
+          <select defaultValue="all"><option value="all">All temples</option></select>
+        </label>
+
         <div className="quick">
           {MUVAR.map((id) => (
             <button
@@ -298,7 +311,7 @@ export default function App() {
         <aside className="panel saint-card">
           <div className="saint-visual">
             <div className="saint-number">{saint?.ordinal}</div>
-            <div className="saint-gopuram"><GopuramIcon /></div>
+            <SaintPortrait />
             <div className="temple-silhouette"><GopuramIcon /></div>
           </div>
 
@@ -528,6 +541,51 @@ export default function App() {
         <span>Pramāṇa source {data.meta.source_commit.slice(0, 10)}</span>
       </footer>
     </main>
+  );
+}
+
+
+function SaintPortrait() {
+  return (
+    <svg className="saint-portrait" viewBox="0 0 220 230" aria-hidden="true">
+      <defs>
+        <linearGradient id="skin" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor="#d6a06d" />
+          <stop offset=".55" stopColor="#a9653f" />
+          <stop offset="1" stopColor="#6e3f2f" />
+        </linearGradient>
+        <linearGradient id="cloth" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor="#d99542" />
+          <stop offset="1" stopColor="#8d4e2a" />
+        </linearGradient>
+        <filter id="portraitGlow" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="7" result="blur" />
+          <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
+        </filter>
+      </defs>
+      <circle cx="108" cy="101" r="78" fill="#183d3d" opacity=".78" />
+      <path d="M58 196 C66 154 77 145 90 139 C97 136 103 132 105 127 C86 117 77 97 79 73 C81 49 96 34 115 32 C138 29 156 44 160 68 C164 90 156 113 139 126 C141 133 148 138 157 142 C172 150 184 166 191 199 Z" fill="url(#skin)" />
+      <path d="M75 60 C80 31 103 17 128 22 C151 27 161 46 158 69 C148 57 137 51 123 50 C104 49 91 55 75 60 Z" fill="#191b18" />
+      <path d="M112 20 C110 6 117 0 127 2 C140 4 145 13 140 28" fill="#151714" />
+      <path d="M145 72 C157 83 158 104 149 119 C142 132 131 138 119 139 C137 127 144 110 143 94 Z" fill="#2a211b" />
+      <path d="M89 86 Q105 75 121 84" stroke="#402a21" strokeWidth="4" fill="none" strokeLinecap="round" />
+      <path d="M126 84 Q141 76 151 86" stroke="#402a21" strokeWidth="4" fill="none" strokeLinecap="round" />
+      <circle cx="104" cy="88" r="3.5" fill="#17120f" />
+      <circle cx="138" cy="88" r="3.5" fill="#17120f" />
+      <path d="M122 88 C120 101 117 109 119 113" stroke="#7c4934" strokeWidth="3" fill="none" />
+      <path d="M105 119 Q122 128 138 118" stroke="#563126" strokeWidth="4" fill="none" strokeLinecap="round" />
+      <path d="M83 69 H151" stroke="#f2e4cf" strokeWidth="5" opacity=".95" />
+      <path d="M87 76 H148" stroke="#f2e4cf" strokeWidth="4" opacity=".93" />
+      <path d="M91 83 H145" stroke="#f2e4cf" strokeWidth="3" opacity=".9" />
+      <circle cx="119" cy="77" r="4" fill="#b53a2b" />
+      <path d="M63 195 C75 161 86 150 99 145 L120 173 L143 145 C160 153 174 168 185 196 Z" fill="url(#cloth)" />
+      <path d="M95 142 C101 159 109 174 120 184 C130 174 139 159 146 143" fill="none" stroke="#e8c78a" strokeWidth="4" />
+      <g fill="#3b2117">
+        <circle cx="101" cy="151" r="3" /><circle cx="108" cy="157" r="3" /><circle cx="115" cy="163" r="3" />
+        <circle cx="122" cy="164" r="3" /><circle cx="129" cy="159" r="3" /><circle cx="136" cy="152" r="3" />
+      </g>
+      <circle cx="110" cy="107" r="91" fill="none" stroke="#d8a651" strokeWidth="2" opacity=".55" filter="url(#portraitGlow)" />
+    </svg>
   );
 }
 
