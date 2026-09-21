@@ -764,6 +764,31 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:1px solid 
 .evidence-callout.muted{border-left-color:#647f80;background:rgba(82,103,105,.08)}
 .evidence-callout.muted svg{fill:#7d9690}
 .microcopy{color:#6d8580!important;font-size:6.5px}
+.locus-strip{
+  margin:7px 0;
+  padding:6px 7px;
+  border:1px solid rgba(78,156,165,.18);
+  border-radius:6px;
+  background:linear-gradient(135deg,rgba(15,60,69,.25),rgba(4,24,33,.22));
+}
+.locus-strip>small{
+  display:block;
+  margin-bottom:5px;
+  color:#6faebb;
+  font-size:5.7px;
+  letter-spacing:.16em;
+}
+.locus-strip>div{display:flex;gap:5px;flex-wrap:wrap}
+.locus-strip span{
+  display:flex;align-items:center;gap:4px;
+  padding:4px 5px;
+  border:1px solid rgba(211,166,89,.18);
+  border-radius:5px;
+  color:#d7c39c;
+  background:rgba(3,20,28,.55);
+  font-size:6.3px;
+}
+.locus-strip svg{width:11px;height:11px;fill:#d9a24a}
 .hymns{
   list-style:none;
   margin:7px 0;padding:0;
@@ -869,24 +894,89 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:1px solid 
   color:#59726d;
   font-size:5.4px;
 }
+.saint-registry{
+  margin:9px 0 0 53px;
+  display:grid;
+  grid-template-columns:105px 1fr;
+  gap:9px;
+  align-items:center;
+}
+.registry-copy{display:flex;flex-direction:column}
+.registry-copy b{color:#bfa46c;font:600 8px "Cormorant Garamond",serif}
+.registry-copy small{color:#607872;font-size:5.3px;margin-top:1px}
+.registry-dots{
+  min-width:0;
+  display:grid;
+  grid-template-columns:repeat(21,1fr);
+  gap:3px 4px;
+  align-items:center;
+}
+.registry-dots button{
+  width:4px;height:4px;padding:0;
+  justify-self:center;
+  border:0;border-radius:50%;
+  background:#467d78;
+  opacity:.62;
+  cursor:pointer;
+}
+.registry-dots button:nth-child(3n){background:#c49a4e}
+.registry-dots button:nth-child(5n){background:#708ab5}
+.registry-dots button.selected{
+  width:8px;height:8px;
+  opacity:1;
+  background:#f0b34c;
+  border:1px solid #ffe1a4;
+  box-shadow:0 0 8px rgba(238,177,70,.8);
+}
 .network{width:100%;height:93px;overflow:visible}
 .network line{stroke:#4c7475;stroke-width:1;opacity:.75}
 .network circle:not(.center){fill:#dda64b;stroke:#ffe0a0;stroke-width:1}
 .network .center{fill:#65ccb5;stroke:#d8fff5;stroke-width:1.2}
 .network text{fill:#829891;font-size:6.3px}
 .network .center-text{fill:#08232d;font-size:9px;font-weight:700}
-.density-list{display:flex;flex-direction:column;gap:5px;margin-top:8px}
-.density-row{
+.density-map{
+  height:105px;
   display:grid;
-  grid-template-columns:76px 1fr 18px;
-  gap:6px;align-items:center;
-  color:#8da19b;
-  font-size:6.5px;
+  grid-template-columns:1fr 19px;
+  align-items:center;
+  gap:5px;
 }
-.density-row>div{height:6px;border-radius:5px;overflow:hidden;background:#103440}
-.density-row i{display:block;height:100%;border-radius:5px;background:linear-gradient(90deg,#4da58e,#e1a348,#e27346)}
-.density-row b{color:#dcb66f;font-size:6.5px}
-.density-list>small{margin-top:2px;color:#5f7771;font-size:5.4px;line-height:1.35}
+.density-map svg{width:100%;height:100px;overflow:visible}
+.density-land{
+  fill:#173d38;
+  stroke:#75957d;
+  stroke-width:1.2;
+  opacity:.9;
+}
+.density-glow{fill:#f1a64c;opacity:.35}
+.density-hotspot{
+  fill:#e7a348;
+  stroke:#ffcf73;
+  stroke-width:.8;
+  opacity:.78;
+}
+.density-map text{
+  fill:#ffe6b3;
+  font:700 5.5px Inter,sans-serif;
+  pointer-events:none;
+}
+.density-caption{
+  height:88px;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  gap:3px;
+  color:#647b75;
+  font-size:4.7px;
+  writing-mode:vertical-rl;
+  transform:rotate(180deg);
+}
+.density-caption i{
+  width:6px;height:48px;
+  border-radius:5px;
+  background:linear-gradient(#e26842,#efb653,#5ba078);
+}
 .totals{display:grid;grid-template-columns:1fr 1fr;gap:6px;text-align:center}
 .totals .stat{padding:7px 3px}
 .totals .stat b{font-size:17px}
@@ -956,6 +1046,8 @@ footer svg{width:16px;height:16px;fill:#d9a84f}
   .play-row{grid-template-columns:42px 1fr}
   .now{grid-column:1/-1}
   .timeline-labels{display:none}
+  .saint-registry{margin-left:0;grid-template-columns:1fr}
+  .registry-dots{grid-template-columns:repeat(21,1fr)}
   .map-toolbar{width:calc(100% - 28px);font-size:6.4px}
   .map-toolbar-stats span:nth-child(2){display:none}
   .map-legend{width:190px}
