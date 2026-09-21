@@ -8,11 +8,18 @@ export type MediaCredit = {
 const commons = (filename: string, width = 900) =>
   `https://commons.wikimedia.org/wiki/Special:Redirect/file/${encodeURIComponent(filename)}?width=${width}`;
 
+export const HERO_MEDIA: MediaCredit = {
+  src: commons('Gopuram of Sri Rangam Temple.jpg', 1600),
+  title: 'Gopuram of Sri Rangam Temple, Tiruchirappalli',
+  license: 'Public Domain',
+  source: 'Wikimedia Commons',
+};
+
 export const SAINT_MEDIA: Record<string, MediaCredit> = {
   'nayanmar.20': {
-    src: commons('Appar (138) (Raja Raja Chola Art Gallery)-WUS02832.jpg', 760),
-    title: 'Appar bronze, Raja Raja Chola Art Gallery',
-    license: 'Public Domain / PDM',
+    src: commons('Appar, Chola period bronze, 12th century, Government Museum, Chennai (1) (37405562076).jpg', 760),
+    title: 'Appar, Chola-period bronze, Government Museum Chennai',
+    license: 'CC BY 2.0',
     source: 'Wikimedia Commons',
   },
   'nayanmar.27': {
