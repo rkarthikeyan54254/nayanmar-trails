@@ -170,9 +170,30 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:1px solid 
     linear-gradient(180deg,rgba(11,43,52,.74),rgba(5,28,37,.52)),
     radial-gradient(ellipse at 49% 110%,rgba(139,108,57,.26),transparent 56%);
 }
+.hero-photo{
+  position:absolute;
+  inset:-30% 0 auto 0;
+  width:100%;
+  height:180%;
+  object-fit:cover;
+  object-position:center 39%;
+  filter:sepia(.32) saturate(.78) contrast(1.08) brightness(.42);
+  opacity:.5;
+}
+.hero-photo-shade{
+  position:absolute;inset:0;z-index:0;
+  background:
+    linear-gradient(90deg,rgba(4,25,34,.58),rgba(5,29,38,.2) 38%,rgba(4,24,33,.45)),
+    linear-gradient(180deg,rgba(5,27,36,.23),rgba(4,23,31,.62));
+}
+.hero-credit{
+  position:absolute;z-index:4;right:8px;bottom:4px;
+  color:rgba(195,202,190,.43);
+  font-size:5px;
+}
 .hero::before{
   content:"";
-  position:absolute;inset:0;
+  position:absolute;inset:0;z-index:1;
   background:
     linear-gradient(160deg,transparent 0 12%,rgba(217,170,86,.08) 12.2% 12.5%,transparent 12.8% 32%,rgba(217,170,86,.045) 32.2% 32.5%,transparent 32.8%),
     radial-gradient(circle at 10% 90%,rgba(28,86,76,.48),transparent 24%),
@@ -180,7 +201,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:1px solid 
   pointer-events:none;
 }
 .hero-mountain{
-  position:absolute;
+  position:absolute;z-index:1;
   bottom:-26px;
   width:380px;height:120px;
   opacity:.3;
@@ -190,7 +211,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:1px solid 
 .hero-mountain-a{left:112px;transform:skewX(-8deg)}
 .hero-mountain-b{right:290px;transform:scaleX(-1) skewX(-10deg);opacity:.2}
 .hero-lamp{
-  position:absolute;left:195px;top:31px;
+  position:absolute;z-index:3;left:195px;top:31px;
   color:#f3b94f;
   font-size:30px;
   text-shadow:0 0 16px #f0ad3a;
