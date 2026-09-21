@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import type { ReactNode } from 'react';
-import { GEO_SEEDS } from './geometry';
+import { GEO_SEEDS, TAMIL_NADU_SCHEMATIC } from './geometry';
 import { DISTRICT_CENTROIDS, normalizeDistrict } from './coverage';
 import { HERO_MEDIA, SAINT_MEDIA, TEMPLE_MEDIA } from './media';
 import GopuramIcon from './GopuramIcon';
@@ -50,6 +50,18 @@ function authorityLabel(scope: string) {
 
 function cleanLabel(label: string) {
   return label.replace(/\s*\([^)]*\)/g, '').trim();
+}
+
+function modernShort(value: string | null | undefined) {
+  if (!value) return '';
+  let current = value.trim().replace(/^\([^)]*\)\s*/, '');
+  if (current.includes('[[')) current = current.split('[[')[0].trim();
+  const beforeParen = current.split('(')[0].trim();
+  return beforeParen || current;
+}
+
+function siteDisplayName(site: Site) {
+  return modernShort(site.modern_name_nic) || cleanLabel(site.label);
 }
 
 export default function App() {
@@ -297,8 +309,8 @@ export default function App() {
                 >
                   <GopuramIcon />
                   <span>
-                    {cleanLabel(item.label)}
-                    <small>{item.modern_name_nic || item.district || item.site_id}</small>
+                    {siteDisplayName(item)}
+                    <small>{cleanLabel(item.label)} · {item.district || item.site_id}</small>
                   </span>
                 </button>
               ))}
@@ -434,7 +446,7 @@ export default function App() {
                 }}
               >
                 <GopuramIcon />
-                <span>{cleanLabel(site.label)}</span>
+                <span>{siteDisplayName(site)}</span>
                 <small>{count}</small>
               </button>
             ))}
@@ -536,8 +548,8 @@ export default function App() {
               <div className="temple-shade" />
               <div className="temple-title">
                 <small>CURRENT TALAM</small>
-                <h2>{selectedSite ? cleanLabel(selectedSite.label) : 'Select a talam'}</h2>
-                <p>{selectedSite?.label_ta || selectedSite?.modern_name_nic || ''}</p>
+                <h2>{selectedSite ? siteDisplayName(selectedSite) : 'Select a talam'}</h2>
+                <p>{selectedSite ? `${cleanLabel(selectedSite.label)}${selectedSite.label_ta ? ` · ${selectedSite.label_ta}` : ''}` : ''}</p>
               </div>
               {templeMedia && (
                 <span className="temple-credit">{templeMedia.source} · {templeMedia.license}</span>
@@ -553,7 +565,13 @@ export default function App() {
                 </div>
 
                 {tab === 'visits' && (
-                  <Visits site={selectedSite} saintName={saintName} count={selectedPatikams.length} />
+                  <Visits
+                    site={selectedSite}
+                    saintName={saintName}
+                    count={selectedPatikams.length}
+                    patikamIds={selectedPatikams}
+                    patikamById={patikamById}
+                  />
                 )}
                 {tab === 'hymns' && (
                   <Hymns ids={selectedPatikams} patikamById={patikamById} />
@@ -643,6 +661,26 @@ export default function App() {
           <div className="timeline-labels">
             {routeStops.slice(0, 6).map((stop) => <span key={stop.siteId}>{stop.name}</span>)}
           </div>
+
+          <div className="saint-registry">
+            <div className="registry-copy">
+              <b>63-saint traditional registry</b>
+              <small>ordinal sequence · not historical dating</small>
+            </div>
+            <div className="registry-dots">
+              {data.saints
+                .slice()
+                .sort((a, b) => a.ordinal - b.ordinal)
+                .map((item) => (
+                  <button
+                    key={item.id}
+                    title={SAINT_EN[item.id] ?? item.label}
+                    className={item.id === selectedSaintId ? 'selected' : ''}
+                    onClick={() => setSelectedSaintId(item.id)}
+                  />
+                ))}
+            </div>
+          </div>
         </div>
 
         <div className="panel graph-mini">
@@ -722,10 +760,14 @@ function Visits({
   site,
   saintName,
   count,
+  patikamIds,
+  patikamById,
 }: {
   site: Site;
   saintName: string;
   count: number;
+  patikamIds: string[];
+  patikamById: Map<string, { tirumurai: number; patikam: number }>;
 }) {
   return (
     <div className="text">
@@ -734,6 +776,24 @@ function Visits({
         <b>{saintName}</b> is linked to <b>{count}</b> Tēvāram patikam
         {count === 1 ? '' : 's'} associated with this traditional talam in the current Pramāṇa graph.
       </p>
+
+      {patikamIds.length > 0 && (
+        <div className="locus-strip">
+          <small>TĒVĀRAM LOCI</small>
+          <div>
+            {patikamIds.slice(0, 3).map((id) => {
+              const item = patikamById.get(id);
+              return (
+                <span key={id}>
+                  <GopuramIcon />
+                  {item ? `T${item.tirumurai} · P${item.patikam}` : id.replace('tevaram.ifp.', '')}
+                </span>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
       <div className="evidence-callout">
         <GopuramIcon />
         <p>
@@ -868,17 +928,45 @@ function Network({
 }
 
 function DensityPanel({ points }: { points: CoveragePoint[] }) {
+  const width = 180;
+  const height = 118;
+  const bounds = { minLng: 76.7, maxLng: 80.55, minLat: 7.85, maxLat: 13.65 };
+  const project = (lng: number, lat: number) => {
+    const x = 22 + ((lng - bounds.minLng) / (bounds.maxLng - bounds.minLng)) * 122;
+    const y = 8 + ((bounds.maxLat - lat) / (bounds.maxLat - bounds.minLat)) * 101;
+    return [x, y] as const;
+  };
+  const polygon = TAMIL_NADU_SCHEMATIC
+    .map(([lng, lat]) => project(lng, lat).join(','))
+    .join(' ');
   const max = Math.max(...points.map((item) => item.count), 1);
+
   return (
-    <div className="density-list">
-      {points.map((point) => (
-        <div className="density-row" key={point.key}>
-          <span>{point.label}</span>
-          <div><i style={{ width: `${Math.max(8, (point.count / max) * 100)}%` }} /></div>
-          <b>{point.count}</b>
-        </div>
-      ))}
-      <small>Counts come from the 276-site Pramāṇa catalog after district-name normalization.</small>
+    <div className="density-map">
+      <svg viewBox={`0 0 ${width} ${height}`} role="img" aria-label="Pramāṇa talam density by modern catalog district">
+        <defs>
+          <filter id="densityGlow" x="-80%" y="-80%" width="260%" height="260%">
+            <feGaussianBlur stdDeviation="4" />
+          </filter>
+        </defs>
+        <polygon points={polygon} className="density-land" />
+        {points.map((point) => {
+          const [x, y] = project(point.lng, point.lat);
+          const radius = 4 + (point.count / max) * 10;
+          return (
+            <g key={point.key}>
+              <circle cx={x} cy={y} r={radius * 1.55} className="density-glow" filter="url(#densityGlow)" />
+              <circle cx={x} cy={y} r={radius} className="density-hotspot" />
+              <text x={x} y={y + 2} textAnchor="middle">{point.count}</text>
+            </g>
+          );
+        })}
+      </svg>
+      <div className="density-caption">
+        <span>district aggregate</span>
+        <i />
+        <span>higher corpus density</span>
+      </div>
     </div>
   );
 }
