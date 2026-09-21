@@ -26,7 +26,7 @@ function authorityLabel(scope: string) {
   if (scope === 'traditional_reference') return 'Traditional reference';
   if (scope === 'primary_text_metadata') return 'Primary text metadata';
   if (scope === 'epigraphic_primary') return 'Independent primary evidence';
-  return scope.replaceAll('_', ' ');
+  return scope.replace(/_/g, ' ');
 }
 
 function cleanLabel(label: string) {
