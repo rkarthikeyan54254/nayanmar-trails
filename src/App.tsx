@@ -238,6 +238,9 @@ export default function App() {
     routeStops.length <= 1 ? 0 : (progress / (routeStops.length - 1)) * 100;
   const saintMedia = SAINT_MEDIA[selectedSaintId];
   const templeMedia = selectedSite ? TEMPLE_MEDIA[selectedSite.id] : undefined;
+  const selectedGeoSeed = selectedSite
+    ? GEO_SEEDS.find((seed) => seed.siteId === selectedSite.site_id)
+    : undefined;
 
   return (
     <main className="app">
@@ -558,7 +561,7 @@ export default function App() {
                 <div className="temple-facts">
                   <Fact label="Traditional class" value={selectedSite.traditional_location_class || 'Not supplied'} />
                   <Fact label="Modern catalog" value={selectedSite.modern_name_nic || selectedSite.district || 'Not supplied'} />
-                  <Fact label="District" value={selectedSite.district || 'Not supplied'} />
+                  <Fact label="Map geometry" value={selectedGeoSeed ? 'Exact modern centroid exemplar' : 'District-level corpus context only'} />
                   <Fact label="Evidence class" value={authorityLabel(selectedSite.authority_scope)} />
                 </div>
 
