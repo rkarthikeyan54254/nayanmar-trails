@@ -41,40 +41,43 @@ function recolorBase(map: MapLibreMap) {
     const id = layer.id.toLowerCase();
     try {
       if (layer.type === 'background') {
-        map.setPaintProperty(layer.id, 'background-color', '#071c24');
+        map.setPaintProperty(layer.id, 'background-color', '#061923');
       } else if (layer.type === 'fill') {
         if (/water|ocean|lake|river/.test(id)) {
-          map.setPaintProperty(layer.id, 'fill-color', '#062b3b');
+          map.setPaintProperty(layer.id, 'fill-color', '#062b3a');
           map.setPaintProperty(layer.id, 'fill-opacity', 0.98);
         } else if (/park|wood|forest|landcover|landuse|natural/.test(id)) {
-          map.setPaintProperty(layer.id, 'fill-color', '#244a3d');
-          map.setPaintProperty(layer.id, 'fill-opacity', 0.52);
+          map.setPaintProperty(layer.id, 'fill-color', '#315b46');
+          map.setPaintProperty(layer.id, 'fill-opacity', 0.56);
         } else if (/building/.test(id)) {
-          map.setPaintProperty(layer.id, 'fill-color', '#283c38');
-          map.setPaintProperty(layer.id, 'fill-opacity', 0.42);
+          map.setPaintProperty(layer.id, 'fill-color', '#263a34');
+          map.setPaintProperty(layer.id, 'fill-opacity', 0.18);
         }
       } else if (layer.type === 'line') {
         if (/road|highway|street|motorway|trunk|primary|secondary/.test(id)) {
-          map.setPaintProperty(layer.id, 'line-color', '#6f6d54');
-          map.setPaintProperty(layer.id, 'line-opacity', 0.5);
+          map.setPaintProperty(layer.id, 'line-color', '#817652');
+          map.setPaintProperty(layer.id, 'line-opacity', 0.13);
+        } else if (/rail/.test(id)) {
+          map.setPaintProperty(layer.id, 'line-opacity', 0.05);
         } else if (/boundary/.test(id)) {
-          map.setPaintProperty(layer.id, 'line-color', '#b8a06b');
-          map.setPaintProperty(layer.id, 'line-opacity', 0.28);
+          map.setPaintProperty(layer.id, 'line-color', '#c4ad77');
+          map.setPaintProperty(layer.id, 'line-opacity', 0.24);
         } else if (/water|river/.test(id)) {
-          map.setPaintProperty(layer.id, 'line-color', '#3287a2');
-          map.setPaintProperty(layer.id, 'line-opacity', 0.6);
+          map.setPaintProperty(layer.id, 'line-color', '#3f9ab3');
+          map.setPaintProperty(layer.id, 'line-opacity', 0.68);
         }
       } else if (layer.type === 'symbol') {
-        if (/place|city|town|state|country/.test(id)) {
-          map.setPaintProperty(layer.id, 'text-color', '#d2c7ac');
+        if (/road|highway|transit|station|poi|shop|airport|rail|housenumber|village|suburb|neighbourhood/.test(id)) {
+          map.setLayoutProperty(layer.id, 'visibility', 'none');
+        } else if (/place|city|state|country/.test(id)) {
+          map.setPaintProperty(layer.id, 'text-color', '#d4c7a7');
           map.setPaintProperty(layer.id, 'text-halo-color', '#061923');
-          map.setPaintProperty(layer.id, 'text-halo-width', 1);
-        } else if (/road/.test(id)) {
-          map.setPaintProperty(layer.id, 'text-color', '#807d6e');
+          map.setPaintProperty(layer.id, 'text-halo-width', 1.2);
+          map.setPaintProperty(layer.id, 'text-opacity', 0.68);
         }
       }
     } catch {
-      // Style layers vary over time. Unsupported paint properties are non-fatal.
+      // The public basemap can evolve. Unsupported paint/layout changes are non-fatal.
     }
   }
 }
@@ -147,12 +150,12 @@ export default function SacredMap({
     const map = new maplibregl.Map({
       container: mapNode.current,
       style: 'https://tiles.openfreemap.org/styles/fiord',
-      center: [78.95, 10.85],
-      zoom: 5.7,
-      minZoom: 5.1,
+      center: [78.95, 10.8],
+      zoom: 6.05,
+      minZoom: 5.35,
       maxZoom: 11,
-      pitch: 28,
-      bearing: -4,
+      pitch: 4,
+      bearing: 0,
       attributionControl: false,
       antialias: true,
     });
@@ -163,9 +166,39 @@ export default function SacredMap({
     map.on('load', () => {
       recolorBase(map);
       map.fitBounds(
-        [[76.55, 7.55], [80.75, 13.65]],
-        { padding: { top: 45, right: 38, bottom: 45, left: 38 }, duration: 0 },
+        [[76.72, 7.85], [80.48, 13.48]],
+        {
+          padding: { top: 36, right: 34, bottom: 34, left: 34 },
+          duration: 0,
+          maxZoom: 6.25,
+        },
       );
+
+      const firstSymbolLayer = map.getStyle().layers?.find((layer) => layer.type === 'symbol')?.id;
+      if (!map.getSource('terrain-dem')) {
+        map.addSource('terrain-dem', {
+          type: 'raster-dem',
+          tiles: ['https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png'],
+          tileSize: 256,
+          encoding: 'terrarium',
+          maxzoom: 15,
+        });
+        map.addLayer(
+          {
+            id: 'sacred-hillshade',
+            type: 'hillshade',
+            source: 'terrain-dem',
+            paint: {
+              'hillshade-shadow-color': '#071d18',
+              'hillshade-highlight-color': '#c6b174',
+              'hillshade-accent-color': '#41634f',
+              'hillshade-exaggeration': 0.36,
+              'hillshade-illumination-direction': 315,
+            },
+          },
+          firstSymbolLayer,
+        );
+      }
 
       map.addSource('district-coverage', {
         type: 'geojson',
@@ -190,9 +223,29 @@ export default function SacredMap({
             40, '#e89e42',
             55, '#ffbf58',
           ],
-          'circle-opacity': 0.16,
+          'circle-opacity': 0.19,
           'circle-blur': 0.72,
           'circle-stroke-width': 0,
+        },
+      });
+      map.addLayer({
+        id: 'district-coverage-label',
+        type: 'symbol',
+        source: 'district-coverage',
+        filter: ['>=', ['get', 'count'], 10],
+        layout: {
+          'text-field': ['concat', ['get', 'label'], '  ·  ', ['to-string', ['get', 'count']]],
+          'text-size': 9,
+          'text-font': ['Noto Sans Regular'],
+          'text-offset': [0, 2.2],
+          'text-anchor': 'top',
+          'text-allow-overlap': false,
+        },
+        paint: {
+          'text-color': '#d6bf8d',
+          'text-halo-color': '#061923',
+          'text-halo-width': 1.2,
+          'text-opacity': 0.72,
         },
       });
 
@@ -201,15 +254,27 @@ export default function SacredMap({
         data: routeCollection([]),
       });
       map.addLayer({
+        id: 'route-ghost-glow',
+        type: 'line',
+        source: 'route-ghost',
+        layout: { 'line-cap': 'round', 'line-join': 'round' },
+        paint: {
+          'line-color': '#f0aa42',
+          'line-width': 9,
+          'line-opacity': 0.12,
+          'line-blur': 5,
+        },
+      });
+      map.addLayer({
         id: 'route-ghost-line',
         type: 'line',
         source: 'route-ghost',
         layout: { 'line-cap': 'round', 'line-join': 'round' },
         paint: {
-          'line-color': '#d4a04d',
-          'line-width': 2.2,
-          'line-opacity': 0.5,
-          'line-dasharray': [1.2, 2.1],
+          'line-color': '#eab052',
+          'line-width': 2.7,
+          'line-opacity': 0.72,
+          'line-dasharray': [1.3, 2],
         },
       });
 
@@ -260,18 +325,22 @@ export default function SacredMap({
       liveSource?.setData(routeCollection(activeStops));
 
       const routeVisible = mode === 'all' || mode === 'edition';
-      if (map.getLayer('route-ghost-line')) {
-        map.setLayoutProperty('route-ghost-line', 'visibility', routeVisible ? 'visible' : 'none');
+      for (const layerId of ['route-ghost-glow', 'route-ghost-line']) {
+        if (map.getLayer(layerId)) {
+          map.setLayoutProperty(layerId, 'visibility', routeVisible ? 'visible' : 'none');
+        }
       }
       if (map.getLayer('route-live-line')) {
         map.setLayoutProperty('route-live-line', 'visibility', routeVisible ? 'visible' : 'none');
       }
-      if (map.getLayer('district-coverage-halo')) {
-        map.setLayoutProperty(
-          'district-coverage-halo',
-          'visibility',
-          mode === 'tradition' || mode === 'independent' ? 'none' : 'visible',
-        );
+      for (const layerId of ['district-coverage-halo', 'district-coverage-label']) {
+        if (map.getLayer(layerId)) {
+          map.setLayoutProperty(
+            layerId,
+            'visibility',
+            mode === 'tradition' || mode === 'independent' ? 'none' : 'visible',
+          );
+        }
       }
     };
 
@@ -340,8 +409,8 @@ export default function SacredMap({
     if (!map || !active || progress === 0) return;
     map.easeTo({
       center: [active.lng, active.lat],
-      zoom: 7.2,
-      pitch: 35,
+      zoom: 7,
+      pitch: 12,
       duration: 900,
     });
   }, [progress, routeStops]);
