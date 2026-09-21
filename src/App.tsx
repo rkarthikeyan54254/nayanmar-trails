@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import type { ReactNode } from 'react';
 import { GEO_SEEDS } from './geometry';
 import { DISTRICT_CENTROIDS, normalizeDistrict } from './coverage';
-import { SAINT_MEDIA, TEMPLE_MEDIA } from './media';
+import { HERO_MEDIA, SAINT_MEDIA, TEMPLE_MEDIA } from './media';
 import GopuramIcon from './GopuramIcon';
 import SacredMap, { type CoveragePoint, type EvidenceMode, type MapStop } from './SacredMap';
 import type { PramanaExport, Saint, Site } from './types';
@@ -315,6 +315,8 @@ export default function App() {
       </header>
 
       <section className="hero">
+        <img className="hero-photo" src={HERO_MEDIA.src} alt="" />
+        <div className="hero-photo-shade" />
         <div className="hero-mountain hero-mountain-a" />
         <div className="hero-mountain hero-mountain-b" />
         <div className="hero-lamp">✦</div>
@@ -328,6 +330,7 @@ export default function App() {
           “Not just history,<br />but a living landscape of devotion.”
         </blockquote>
         <div className="hero-tower right"><GopuramIcon /></div>
+        <small className="hero-credit">{HERO_MEDIA.source} · {HERO_MEDIA.license}</small>
       </section>
 
       <section className="filters">
