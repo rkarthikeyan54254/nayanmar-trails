@@ -6,6 +6,7 @@ import { HERO_MEDIA, SAINT_MEDIA, TEMPLE_MEDIA } from './media';
 import GopuramIcon from './GopuramIcon';
 import SacredMap, { type CoveragePoint, type EvidenceMode, type MapStop } from './SacredMap';
 import type { Patikam, PramanaExport, Saint, Site } from './types';
+import { LocaleContext, T, tr, useLocale, type Locale } from './i18n';
 
 type DetailTab = 'hymns' | 'chronology' | 'visits' | 'evidence';
 
@@ -94,6 +95,29 @@ type SaivaLiterarySnapshot = {
   links: SaivaLiteraryLink[];
 };
 
+type SaintCuriosity = {
+  saint_id: string;
+  ordinal: number;
+  hook_en: string;
+  hook_ta: string;
+  authority_scope: string;
+  source_work: string;
+  presentation_policy: string;
+};
+
+type SaintCuriositySnapshot = {
+  meta: {
+    version: string;
+    purpose: string;
+    authority_scope: string;
+    source_repo: string;
+    source_commit: string;
+    source_basis: string;
+    language_policy: string;
+  };
+  stories: SaintCuriosity[];
+};
+
 type PlaybackStop = {
   id: string;
   name: string;
@@ -103,8 +127,68 @@ type PlaybackStop = {
 };
 
 const SAINT_EN: Record<string, string> = {
+  'nayanmar.01': 'Thirunilakanda Nayanar',
+  'nayanmar.02': 'Iyarpakai Nayanar',
+  'nayanmar.03': 'Ilaiyankudi Mara Nayanar',
+  'nayanmar.04': 'Meypporul Nayanar',
+  'nayanmar.05': 'Viranminda Nayanar',
+  'nayanmar.06': 'Amarnidhi Nayanar',
+  'nayanmar.07': 'Eripaththa Nayanar',
+  'nayanmar.08': 'Enathi Natha Nayanar',
+  'nayanmar.09': 'Kannappa Nayanar',
+  'nayanmar.10': 'Kunkiliyak Kalaya Nayanar',
+  'nayanmar.11': 'Manak Kanchara Nayanar',
+  'nayanmar.12': 'Arivattaya Nayanar',
+  'nayanmar.13': 'Anaya Nayanar',
+  'nayanmar.14': 'Murthi Nayanar',
+  'nayanmar.15': 'Muruga Nayanar',
+  'nayanmar.16': 'Rudra Pasupathi Nayanar',
+  'nayanmar.17': 'Thirunalaip Povar · Nandanar',
+  'nayanmar.18': 'Thirukkurippu Thondar',
+  'nayanmar.19': 'Chandesha Nayanar',
   'nayanmar.20': 'Appar · Tirunavukkarasar',
+  'nayanmar.21': 'Kulachirai Nayanar',
+  'nayanmar.22': 'Perumizhalai Kurumba Nayanar',
+  'nayanmar.23': 'Karaikkal Ammaiyar',
+  'nayanmar.24': 'Appudhi Adigal',
+  'nayanmar.25': 'Thiru Nilanakka Nayanar',
+  'nayanmar.26': 'Naminandi Adigal',
   'nayanmar.27': 'Sambandar',
+  'nayanmar.28': 'Eyarkon Kalikkamar',
+  'nayanmar.29': 'Thirumular',
+  'nayanmar.30': 'Dandi Adigal',
+  'nayanmar.31': 'Murkha Nayanar',
+  'nayanmar.32': 'Somasi Mara Nayanar',
+  'nayanmar.33': 'Sakkiya Nayanar',
+  'nayanmar.34': 'Sirappuli Nayanar',
+  'nayanmar.35': 'Siruthonda Nayanar',
+  'nayanmar.36': 'Cheraman Perumal Nayanar',
+  'nayanmar.37': 'Gana Natha Nayanar',
+  'nayanmar.38': 'Kootruva Nayanar',
+  'nayanmar.39': 'Pugazh Chola Nayanar',
+  'nayanmar.40': 'Narasinga Munaiyaraiyar',
+  'nayanmar.41': 'Adipaththa Nayanar',
+  'nayanmar.42': 'Kalikkamba Nayanar',
+  'nayanmar.43': 'Kaliya Nayanar',
+  'nayanmar.44': 'Satti Nayanar',
+  'nayanmar.45': 'Aiyadigal Kadavar Kon Nayanar',
+  'nayanmar.46': 'Kanampulla Nayanar',
+  'nayanmar.47': 'Kari Nayanar',
+  'nayanmar.48': 'Ninra Sir Nedumara Nayanar',
+  'nayanmar.49': 'Vayilar Nayanar',
+  'nayanmar.50': 'Munaiyaduvar Nayanar',
+  'nayanmar.51': 'Kazharsinga Nayanar',
+  'nayanmar.52': 'Idangazhi Nayanar',
+  'nayanmar.53': 'Seruthunai Nayanar',
+  'nayanmar.54': 'Pugazhthunai Nayanar',
+  'nayanmar.55': 'Kotpuli Nayanar',
+  'nayanmar.56': 'Pusalar Nayanar',
+  'nayanmar.57': 'Mangayarkkarasiyar',
+  'nayanmar.58': 'Nesa Nayanar',
+  'nayanmar.59': 'Kochengat Chola Nayanar',
+  'nayanmar.60': 'Thirunilakanda Yazhpanar',
+  'nayanmar.61': 'Sadaiya Nayanar',
+  'nayanmar.62': 'Isaignaniyar',
   'nayanmar.63': 'Sundarar · Arurar',
 };
 
@@ -170,10 +254,25 @@ function siteDisplayName(site: Site) {
   return mapped?.name || modernShort(site.modern_name_nic) || cleanLabel(site.label);
 }
 
+function localizedSiteName(site: Site, locale: Locale) {
+  if (locale === 'ta' && site.label_ta) return site.label_ta;
+  return siteDisplayName(site);
+}
+
+function localizedSaintName(saint: Saint | null, locale: Locale) {
+  if (!saint) return locale === 'ta' ? 'நாயன்மார்' : 'Nayanmar';
+  if (locale === 'ta' && saint.label_ta) return saint.label_ta;
+  return SAINT_EN[saint.id] ?? saint.label;
+}
+
 export default function App() {
   const [data, setData] = useState<PramanaExport | null>(null);
   const [tirumurai8, setTirumurai8] = useState<Tirumurai8Snapshot | null>(null);
   const [saivaPlaces, setSaivaPlaces] = useState<SaivaLiterarySnapshot | null>(null);
+  const [curiosities, setCuriosities] = useState<SaintCuriositySnapshot | null>(null);
+  const [locale, setLocale] = useState<Locale>(() =>
+    new URLSearchParams(window.location.search).get('lang') === 'ta' ? 'ta' : 'en',
+  );
   const [selectedSaintId, setSelectedSaintId] = useState(
     () => new URLSearchParams(window.location.search).get('saint') || 'nayanmar.20',
   );
@@ -234,14 +333,26 @@ export default function App() {
         if (!response.ok) throw new Error(`Saiva literary-place export HTTP ${response.status}`);
         return response.json() as Promise<SaivaLiterarySnapshot>;
       }),
+      fetch('/data/pramana-saint-curiosities-v1.json').then((response) => {
+        if (!response.ok) throw new Error(`Saint curiosity export HTTP ${response.status}`);
+        return response.json() as Promise<SaintCuriositySnapshot>;
+      }),
     ])
-      .then(([graph, t8, literaryPlaces]) => {
+      .then(([graph, t8, literaryPlaces, saintCuriosities]) => {
         setData(graph);
         setTirumurai8(t8);
         setSaivaPlaces(literaryPlaces);
+        setCuriosities(saintCuriosities);
       })
       .catch((error) => console.error('Unable to load Pramāṇa product exports', error));
   }, []);
+
+  useEffect(() => {
+    document.documentElement.lang = locale;
+    const url = new URL(window.location.href);
+    url.searchParams.set('lang', locale);
+    window.history.replaceState({}, '', url);
+  }, [locale]);
 
   const selectedIsManikkavasakar = selectedSaintId === MANIKKAVASAKAR_ID;
 
@@ -374,6 +485,7 @@ export default function App() {
           if (!seed) return null;
           return {
             ...seed,
+            name: locale === 'ta' ? (locus.label_ta || locus.display_name) : locus.display_name,
             playbackRank: locus.playback_rank,
             hymnIds: locus.section_numbers.map((section) => `tirumurai8.section.${section}`),
           };
@@ -383,13 +495,17 @@ export default function App() {
     }
 
     return GEO_SEEDS
-      .map((seed) => ({
-        ...seed,
-        hymnIds: siteLinks.get(`tevaram_site.${seed.siteId}`) ?? [],
-      }))
+      .map((seed) => {
+        const mappedSite = siteById.get(`tevaram_site.${seed.siteId}`);
+        return {
+          ...seed,
+          name: mappedSite ? localizedSiteName(mappedSite, locale) : seed.name,
+          hymnIds: siteLinks.get(`tevaram_site.${seed.siteId}`) ?? [],
+        };
+      })
       .filter((item) => item.hymnIds.length)
       .sort((a, b) => a.playbackRank - b.playbackRank);
-  }, [selectedIsManikkavasakar, siteLinks, tirumurai8]);
+  }, [locale, selectedIsManikkavasakar, siteById, siteLinks, tirumurai8]);
 
   const traditionalPlaybackStops = useMemo<PlaybackStop[]>(() => {
     if (!data || selectedIsManikkavasakar) return [];
@@ -410,18 +526,18 @@ export default function App() {
         if (!place) return [];
         const detail =
           edge.predicate === 'BIRTHPLACE_TRADITION'
-            ? 'Birthplace tradition'
+            ? tr(locale, 'Birthplace tradition')
             : edge.predicate === 'MUKTI_PLACE_TRADITION'
-              ? 'Mukti-place tradition'
-              : 'Related-place tradition';
+              ? tr(locale, 'Mukti-place tradition')
+              : tr(locale, 'Related-place tradition');
         return [{
           id: `${edge.predicate}:${place.id}`,
-          name: place.label_ta || place.label,
+          name: locale === 'ta' ? (place.label_ta || place.label) : place.label,
           detail,
           kind: 'traditional_place' as const,
         }];
       });
-  }, [data, selectedIsManikkavasakar, selectedSaintId, traditionalPlaceById]);
+  }, [data, locale, selectedIsManikkavasakar, selectedSaintId, traditionalPlaceById]);
 
   const playbackStops = useMemo<PlaybackStop[]>(() => {
     if (routeStops.length >= 2) {
@@ -546,6 +662,10 @@ export default function App() {
   const independentEdges =
     data?.edges.filter((edge) => edge.authority_scope === 'epigraphic_primary').length ?? 0;
 
+  const saintCuriosity = !selectedIsManikkavasakar
+    ? curiosities?.stories.find((item) => item.saint_id === selectedSaintId) ?? null
+    : null;
+
   const searchResults = useMemo(() => {
     if (!data || !query.trim()) {
       return { saints: [] as Saint[], sites: [] as Site[], manikkavasakar: false };
@@ -619,24 +739,23 @@ export default function App() {
     return () => window.clearInterval(timer);
   }, [playing, playbackStops.length]);
 
-  if (!data || !tirumurai8 || !saivaPlaces) {
+  if (!data || !tirumurai8 || !saivaPlaces || !curiosities) {
     return (
       <div className="loading">
         <div className="loading-mark"><GopuramIcon /></div>
-        <div>Opening Nayanmar Trails…</div>
+        <div>{tr(locale, 'Opening Nayanmar Trails…')}</div>
       </div>
     );
   }
 
   const saintName = selectedIsManikkavasakar
-    ? tirumurai8.author.display_label
-    : SAINT_EN[selectedSaintId] ?? saint?.label ?? 'Nayanmar';
-  const saintTamil = selectedIsManikkavasakar
-    ? tirumurai8.author.label_ta
-    : saint?.label_ta ?? '';
+    ? locale === 'ta' ? tirumurai8.author.label_ta : tirumurai8.author.display_label
+    : localizedSaintName(saint, locale);
   const saintRegistryLabel = selectedIsManikkavasakar
-    ? 'NAALVAR · TIRUMURAI 8'
-    : `NAYANMAR ${saint?.ordinal ?? ''}`;
+    ? tr(locale, 'NAALVAR · TIRUMURAI 8')
+    : locale === 'ta'
+      ? `நாயன்மார் ${saint?.ordinal ?? ''}`
+      : `NAYANMAR ${saint?.ordinal ?? ''}`;
   const saintNumberLabel = selectedIsManikkavasakar ? 'N4' : saint?.ordinal;
   const activePlaybackStop =
     playbackStops[Math.min(progress, Math.max(0, playbackStops.length - 1))];
@@ -650,21 +769,22 @@ export default function App() {
   const showTraditionalDetail = !selectedIsManikkavasakar && !playbackIsGeographic;
 
   return (
-    <main className="app">
+    <LocaleContext.Provider value={locale}>
+    <main className="app" data-locale={locale}>
       <header className="topbar">
         <div className="brand">
           <span className="brand-mark"><GopuramIcon /></span>
           <div>
             <strong>Nayanmar Trails</strong>
-            <small>DEVOTION CONNECTS LANDS</small>
+            <small><T>DEVOTION CONNECTS LANDS</T></small>
           </div>
         </div>
 
         <nav>
-          <button className="active">Explore</button>
-          <button onClick={() => document.querySelector('.timeline')?.scrollIntoView({ behavior: 'smooth' })}>Journeys</button>
-          <button onClick={() => setTab('visits')}>Sthalams</button>
-          <button onClick={() => setTab('hymns')}>Tēvāram</button>
+          <button className="active"><T>Explore</T></button>
+          <button onClick={() => document.querySelector('.timeline')?.scrollIntoView({ behavior: 'smooth' })}><T>Journeys</T></button>
+          <button onClick={() => setTab('visits')}><T>Sthalams</T></button>
+          <button onClick={() => setTab('hymns')}><T>Tēvāram</T></button>
           <button
             onClick={() => {
               if (showTraditionalDetail) {
@@ -673,19 +793,36 @@ export default function App() {
                 setGraphOpen(true);
               }
             }}
-            title={showTraditionalDetail ? 'Explore the traditional-place sequence below' : 'Open sthalam connections'}
+            title={tr(locale, showTraditionalDetail ? 'Explore the traditional-place sequence below' : 'Open sthalam connections')}
           >
-            Connections
+            <T>Connections</T>
           </button>
-          <button onClick={() => setSourcesOpen(true)}>Sources</button>
+          <button onClick={() => setSourcesOpen(true)}><T>Sources</T></button>
         </nav>
+
+        <div className="language-switcher" aria-label={tr(locale, 'Language')}>
+          <button
+            className={locale === 'en' ? 'active' : ''}
+            onClick={() => setLocale('en')}
+            aria-pressed={locale === 'en'}
+          >
+            EN
+          </button>
+          <button
+            className={locale === 'ta' ? 'active' : ''}
+            onClick={() => setLocale('ta')}
+            aria-pressed={locale === 'ta'}
+          >
+            தமிழ்
+          </button>
+        </div>
 
         <div className="header-search">
           <span className="search-glyph">⌕</span>
           <input
             value={query}
             onChange={(event) => setQuery(event.target.value)}
-            placeholder="Search Nayanmars, sthalams, or places…"
+            placeholder={tr(locale, 'Search Nayanmars, sthalams, or places…')}
           />
           {query && (
             <div className="search-results">
@@ -699,8 +836,8 @@ export default function App() {
                 >
                   <GopuramIcon />
                   <span>
-                    {SAINT_EN[item.id] ?? item.label}
-                    <small>Nayanmar {item.ordinal}</small>
+                    {localizedSaintName(item, locale)}
+                    <small>{locale === 'ta' ? `நாயன்மார் ${item.ordinal}` : `Nayanmar ${item.ordinal}`}</small>
                   </span>
                 </button>
               ))}
@@ -713,8 +850,8 @@ export default function App() {
                 >
                   <GopuramIcon />
                   <span>
-                    Manikkavasakar
-                    <small>Naalvar · Tirumurai 8 · not numbered among the 63</small>
+                    {locale === 'ta' ? tirumurai8.author.label_ta : 'Manikkavasakar'}
+                    <small>{tr(locale, 'Naalvar · Tirumurai 8 · not numbered among the 63')}</small>
                   </span>
                 </button>
               )}
@@ -729,20 +866,20 @@ export default function App() {
                 >
                   <GopuramIcon />
                   <span>
-                    {siteDisplayName(item)}
-                    <small>{cleanLabel(item.label)} · {item.district || item.site_id}</small>
+                    {localizedSiteName(item, locale)}
+                    <small>{locale === 'ta' ? (item.district || item.site_id) : `${cleanLabel(item.label)} · ${item.district || item.site_id}`}</small>
                   </span>
                 </button>
               ))}
               {!searchResults.saints.length && !searchResults.sites.length && !searchResults.manikkavasakar && (
-                <em>No matching saint or sthalam</em>
+                <em>{tr(locale, 'No matching saint or sthalam')}</em>
               )}
             </div>
           )}
         </div>
 
         <div className="header-motto">
-          Ancient Paths<br /><b>Living Today</b>
+          Ancient Paths<br /><b><T>Living Today</T></b>
         </div>
       </header>
 
@@ -754,19 +891,21 @@ export default function App() {
         <div className="hero-lamp">✦</div>
         <div className="hero-tower left"><GopuramIcon /></div>
         <div className="hero-copy">
-          <span>ANCIENT PATHS · LIVING DEVOTION</span>
-          <h1>Follow the Nayanmars across sacred Tamil Nadu</h1>
+          <span><T>ANCIENT PATHS · LIVING DEVOTION</T></span>
+          <h1><T>Follow the Nayanmars across sacred Tamil Nadu</T></h1>
           <p>Explore sthalams, Tēvāram pathigams, saint traditions and the sacred geography that connects them.</p>
         </div>
         <blockquote className="hero-quote">
-          “Not just history,<br />but a living landscape of devotion.”
+          {locale === 'ta'
+            ? <>“வரலாறு மட்டும் அல்ல;<br />உயிருடன் வாழும் பக்தி நிலப்பரப்பு.”</>
+            : <>“Not just history,<br />but a living landscape of devotion.”</>}
         </blockquote>
         <div className="hero-tower right"><GopuramIcon /></div>
         <small className="hero-credit">{HERO_MEDIA.source} · {HERO_MEDIA.license}</small>
       </section>
 
       <section className="filters">
-        <Filter label="Saint">
+        <Filter label={tr(locale, 'Saint')}>
           <select
             value={selectedSaintId}
             onChange={(event) => {
@@ -774,16 +913,16 @@ export default function App() {
               setGraphOpen(false);
             }}
           >
-            <optgroup label="Naalvar">
-              <option value="nayanmar.20">Appar · Tirunavukkarasar</option>
-              <option value="nayanmar.27">Sambandar</option>
-              <option value="nayanmar.63">Sundarar · Arurar</option>
-              <option value={MANIKKAVASAKAR_ID}>Manikkavasakar · Tirumurai 8</option>
+            <optgroup label={tr(locale, 'Naalvar')}>
+              <option value="nayanmar.20">{localizedSaintName(saintById.get('nayanmar.20') ?? null, locale)}</option>
+              <option value="nayanmar.27">{localizedSaintName(saintById.get('nayanmar.27') ?? null, locale)}</option>
+              <option value="nayanmar.63">{localizedSaintName(saintById.get('nayanmar.63') ?? null, locale)}</option>
+              <option value={MANIKKAVASAKAR_ID}>{locale === 'ta' ? tirumurai8.author.label_ta : 'Manikkavasakar · Tirumurai 8'}</option>
             </optgroup>
-            <optgroup label="63 Nayanmar registry">
+            <optgroup label={tr(locale, '63 Nayanmar registry')}>
               {data.saints.map((item) => (
                 <option key={item.id} value={item.id}>
-                  {item.ordinal}. {SAINT_EN[item.id] ?? item.label}
+                  {item.ordinal}. {localizedSaintName(item, locale)}
                 </option>
               ))}
             </optgroup>
@@ -791,7 +930,7 @@ export default function App() {
         </Filter>
 
         <div className="naalvar-switcher" aria-label="Naalvar quick selection">
-          <span>Naalvar</span>
+          <span><T>Naalvar</T></span>
           {NAALVAR.map((id) => (
             <button
               key={id}
@@ -801,20 +940,22 @@ export default function App() {
                 setGraphOpen(false);
               }}
             >
-              {id === MANIKKAVASAKAR_ID ? 'Manikkavasakar' : SAINT_EN[id]?.split(' · ')[0]}
+              {id === MANIKKAVASAKAR_ID
+                ? (locale === 'ta' ? tirumurai8.author.label_ta : 'Manikkavasakar')
+                : localizedSaintName(saintById.get(id) ?? null, locale).split(' · ')[0]}
             </button>
           ))}
         </div>
 
         <div className="mode-pills" aria-label="Map view">
-          <span className="mode-label">View</span>
+          <span className="mode-label"><T>View</T></span>
           {(Object.keys(MODE_COPY) as EvidenceMode[]).map((item) => (
             <button
               key={item}
               className={mode === item ? 'active' : ''}
               onClick={() => setMode(item)}
             >
-              {MODE_COPY[item].label}
+              {tr(locale, MODE_COPY[item].label)}
             </button>
           ))}
         </div>
@@ -847,39 +988,55 @@ export default function App() {
           <div className="saint-heading">
             <small>{saintRegistryLabel}</small>
             <h2>{saintName}</h2>
-            <div className="tamil">{saintTamil}</div>
           </div>
 
           <div className="identity-line">
             <GopuramIcon />
-            {selectedIsManikkavasakar
+            {tr(locale, selectedIsManikkavasakar
               ? 'Naalvar · Tirumurai 8 companion'
-              : '63-Nayanmar traditional identity'}
+              : '63-Nayanmar traditional identity')}
           </div>
 
           <div className="saint-story-source">
-            <small>{selectedIsManikkavasakar ? 'DEVOTIONAL WORKS' : 'STORY TRADITION'}</small>
+            <small>{selectedIsManikkavasakar ? tr(locale, 'DEVOTIONAL WORKS') : tr(locale, 'STORY TRADITION')}</small>
             <b>
               {selectedIsManikkavasakar
-                ? 'Tiruvācakam · Tirukkōvaiyār'
-                : periyaPuranamTitle || 'Periya Puranam tradition'}
+                ? (locale === 'ta' ? 'திருவாசகம் · திருக்கோவையார்' : 'Tiruvācakam · Tirukkōvaiyār')
+                : (locale === 'ta' ? (periyaPuranamTitle || tr(locale, 'Periya Puranam tradition')) : 'Periya Puranam tradition')}
             </b>
           </div>
+
+          {saintCuriosity && (
+            <div className="saint-curiosity">
+              <div className="saint-curiosity-head">
+                <small>{tr(locale, 'WHY THIS NAYANMAR IS REMEMBERED')}</small>
+                <span>{tr(locale, 'A story from tradition')}</span>
+              </div>
+              <p>{locale === 'ta' ? saintCuriosity.hook_ta : saintCuriosity.hook_en}</p>
+              <div className="saint-curiosity-source">
+                <b>{locale === 'ta' ? (periyaPuranamTitle || tr(locale, 'Periya Puranam tradition')) : 'Periya Puranam tradition'}</b>
+                <small>{tr(locale, 'Traditional narrative — not presented as independently verified biography.')}</small>
+              </div>
+              <button onClick={() => setSourcesOpen(true)}>
+                {tr(locale, 'Read the source trail')} →
+              </button>
+            </div>
+          )}
 
           <div className="stat-grid">
             {selectedIsManikkavasakar ? (
               <>
-                <Stat value={tirumurai8.works.tiruvacakam.sections} label="Tiruvācakam sections" />
-                <Stat value={tirumurai8.works.tiruvacakam.source_units} label="source units" />
-                <Stat value={tirumurai8.works.tirukkovaiyar.source_order_units} label="Tirukkōvaiyār units" />
-                <Stat value={routeStops.length} label="mapped textual loci" />
+                <Stat value={tirumurai8.works.tiruvacakam.sections} label={tr(locale, 'Tiruvācakam sections')} />
+                <Stat value={tirumurai8.works.tiruvacakam.source_units} label={tr(locale, 'source units')} />
+                <Stat value={tirumurai8.works.tirukkovaiyar.source_order_units} label={tr(locale, 'Tirukkōvaiyār units')} />
+                <Stat value={routeStops.length} label={tr(locale, 'mapped textual loci')} />
               </>
             ) : (
               <>
-                <Stat value={authoredPatikams.length} label="Tēvāram pathigams" />
-                <Stat value={siteLinks.size} label="sung sthalams" />
-                <Stat value={episodeCount} label="Periya Puranam chapter" />
-                <Stat value={playbackStops.length} label="journey stops" />
+                <Stat value={authoredPatikams.length} label={tr(locale, 'Tēvāram pathigams')} />
+                <Stat value={siteLinks.size} label={tr(locale, 'sung sthalams')} />
+                <Stat value={episodeCount} label={tr(locale, 'Periya Puranam chapter')} />
+                <Stat value={playbackStops.length} label={tr(locale, 'journey stops')} />
               </>
             )}
           </div>
@@ -887,18 +1044,18 @@ export default function App() {
           <div className="major-temples">
             <div className="section-title">
               <h3>
-                {showTraditionalDetail
+                {tr(locale, showTraditionalDetail
                   ? 'Traditional place claims'
                   : selectedIsManikkavasakar
                     ? 'Tirumurai 8 textual loci'
-                    : 'Major sthalams'}
+                    : 'Major sthalams')}
               </h3>
               <span>
                 {showTraditionalDetail
                   ? traditionalPlaybackStops.length
                   : selectedIsManikkavasakar
                     ? tirumurai8.loci.length
-                    : siteLinks.size} total
+                    : siteLinks.size} {tr(locale, 'total')}
               </span>
             </div>
             {showTraditionalDetail ? (
@@ -921,7 +1078,7 @@ export default function App() {
               ))
             ) : (
               topLinkedSites.slice(0, 6).map(({ site, count }) => {
-                const primary = siteDisplayName(site);
+                const primary = localizedSiteName(site, locale);
                 const canonical = cleanLabel(site.label);
                 return (
                   <button
@@ -934,7 +1091,7 @@ export default function App() {
                     <GopuramIcon />
                     <span className="major-talam-copy">
                       <b>{primary}</b>
-                      {canonical.toLowerCase() !== primary.toLowerCase() && <em>{canonical}</em>}
+                      {locale === 'en' && canonical.toLowerCase() !== primary.toLowerCase() && <em>{canonical}</em>}
                     </span>
                     <small>{count}</small>
                   </button>
@@ -953,18 +1110,18 @@ export default function App() {
 
           <div className="journey-progress">
             <div>
-              <b>Playback progress</b>
+              <b><T>Playback progress</T></b>
               <span>{playbackStops.length ? Math.min(progress + 1, playbackStops.length) : 0} / {playbackStops.length}</span>
             </div>
             <div className="mini-track"><i style={{ width: `${progressPct}%` }} /></div>
           </div>
 
           <div className="authority-box">
-            <b>{selectedIsManikkavasakar ? 'How to read this journey' : MODE_COPY[mode].short}</b>
+            <b>{selectedIsManikkavasakar ? 'How to read this journey' : tr(locale, MODE_COPY[mode].short)}</b>
             <p>
               {selectedIsManikkavasakar
                 ? 'The plotted Tirumurai 8 locations are textual-locus waypoints. The line between them is a visual guide, not a claimed historical itinerary.'
-                : MODE_COPY[mode].body}
+                : tr(locale, MODE_COPY[mode].body)}
             </p>
           </div>
         </aside>
@@ -973,15 +1130,15 @@ export default function App() {
           <div className="map-toolbar">
             <div className="map-toolbar-left">
               <GopuramIcon />
-              <span>{saintName.split(' · ')[0]} · {selectedIsManikkavasakar ? 'Tirumurai 8' : MODE_COPY[mode].short}</span>
+              <span>{saintName.split(' · ')[0]} · {selectedIsManikkavasakar ? tr(locale, 'Tirumurai 8') : tr(locale, MODE_COPY[mode].short)}</span>
             </div>
             <div className="map-toolbar-stats">
               <span>
                 <b>{selectedIsManikkavasakar ? tirumurai8.loci.length : playbackIsGeographic ? siteLinks.size : traditionalPlaybackStops.length}</b>
-                {selectedIsManikkavasakar ? ' textual loci' : playbackIsGeographic ? ' linked sthalams' : ' traditional places'}
+                {' '}{tr(locale, selectedIsManikkavasakar ? 'textual loci' : playbackIsGeographic ? 'linked sthalams' : 'traditional places')}
               </span>
-              <span><b>{saintDistrictCoverage.length}</b> mapped districts</span>
-              <span><b>{routeStops.length}</b> mapped sthalams</span>
+              <span><b>{saintDistrictCoverage.length}</b><T>mapped districts</T></span>
+              <span><b>{routeStops.length}</b><T>mapped sthalams</T></span>
             </div>
           </div>
 
@@ -1001,15 +1158,15 @@ export default function App() {
           />
 
           <div className="map-legend">
-            <b>Map legend</b>
-            <span><i className="legend-tower"><GopuramIcon /></i> mapped sthalam location (modern centroid)</span>
+            <b><T>Map legend</T></b>
+            <span><i className="legend-tower"><GopuramIcon /></i><T>mapped sthalam location (modern centroid)</T></span>
             {playbackIsGeographic ? (
-              <span><i className="legend-route" /> reconstructed line between known Tēvāram-linked sthalams</span>
+              <span><i className="legend-route" /><T>reconstructed line between known Tēvāram-linked sthalams</T></span>
             ) : (
-              <span><i className="legend-tradition" /> traditional place sequence plays below without invented coordinates</span>
+              <span><i className="legend-tradition" /><T>traditional place sequence plays below without invented coordinates</T></span>
             )}
-            <span><i className="legend-coverage" /> selected-saint sthalam density by modern district</span>
-            <span><i className="legend-independent" /> independent inscriptional support</span>
+            <span><i className="legend-coverage" /><T>selected-saint sthalam density by modern district</T></span>
+            <span><i className="legend-independent" /><T>independent inscriptional support</T></span>
           </div>
 
           <div className="map-source-note">
@@ -1018,10 +1175,16 @@ export default function App() {
 
           {!playbackIsGeographic && traditionalPlaybackStops.length > 0 && (
             <div className="map-fallback-note">
-              <Badge kind="tradition">TRADITION PLAYBACK</Badge>
-              <b>{traditionalPlaybackStops.length} traditional places are associated with {saintName}</b>
+              <Badge kind="tradition"><T>TRADITION PLAYBACK</T></Badge>
+              <b>
+                {locale === 'ta'
+                  ? `${traditionalPlaybackStops.length} மரபுத் தலங்கள் ${saintName} உடன் தொடர்புபடுத்தப்படுகின்றன`
+                  : `${traditionalPlaybackStops.length} traditional places are associated with ${saintName}`}
+              </b>
               <p>
-                Use the journey strip below to explore them. A geographic route is not drawn until reviewed locations are available.
+                {locale === 'ta'
+                  ? 'அவற்றை ஆராய கீழே உள்ள பயணப் பட்டையைப் பயன்படுத்துங்கள். ஆய்வு செய்யப்பட்ட இடங்கள் கிடைக்கும் வரை புவியியல் பாதை வரையப்படாது.'
+                  : 'Use the journey strip below to explore them. A geographic route is not drawn until reviewed locations are available.'}
               </p>
             </div>
           )}
@@ -1037,11 +1200,11 @@ export default function App() {
                   className={tab === item ? 'active' : ''}
                   onClick={() => setTab(item)}
                 >
-                  {item === 'visits'
+                  {tr(locale, item === 'visits'
                     ? 'Tradition'
                     : item === 'chronology'
                       ? 'Journey'
-                      : 'Sources'}
+                      : 'Sources')}
                 </button>
               ))
             ) : (
@@ -1051,13 +1214,13 @@ export default function App() {
                   className={tab === item ? 'active' : ''}
                   onClick={() => setTab(item)}
                 >
-                  {item === 'visits'
+                  {tr(locale, item === 'visits'
                     ? selectedIsManikkavasakar ? 'Sthalams' : 'Overview'
                     : item === 'hymns'
                       ? selectedIsManikkavasakar ? 'Tirumurai 8' : 'Tēvāram'
                       : item === 'chronology'
                         ? 'Journey'
-                        : 'Sources'}
+                        : 'Sources')}
                 </button>
               ))
             )}
@@ -1081,9 +1244,9 @@ export default function App() {
                   )}
                   <div className="temple-shade" />
                   <div className="temple-title">
-                    <small>CURRENT STHALAM</small>
-                    <h2>{selectedSite ? siteDisplayName(selectedSite) : 'Select a sthalam'}</h2>
-                    <p>{selectedSite ? `${cleanLabel(selectedSite.label)}${selectedSite.label_ta ? ` · ${selectedSite.label_ta}` : ''}` : ''}</p>
+                    <small><T>CURRENT STHALAM</T></small>
+                    <h2>{selectedSite ? localizedSiteName(selectedSite, locale) : (locale === 'ta' ? 'ஒரு தலத்தைத் தேர்ந்தெடுக்கவும்' : 'Select a sthalam')}</h2>
+                    <p>{selectedSite && locale === 'en' ? cleanLabel(selectedSite.label) : ''}</p>
                   </div>
                   {templeMedia && (
                     <span className="temple-credit">{templeMedia.source} · {templeMedia.license}</span>
@@ -1203,8 +1366,8 @@ export default function App() {
               <h3>{playbackKind} playback</h3>
               <p>
                 {playbackIsGeographic
-                  ? <>Follow the selected sthalams in an exploratory sequence. <b>The line is not a claimed ancient road.</b></>
-                  : <>Explore birthplace, related-place and mukti-place traditions. <b>No route is invented between them.</b></>}
+                  ? <><T>Follow the selected sthalams in an exploratory sequence.</T><b><T>The line is not a claimed ancient road.</T></b></>
+                  : <><T>Explore birthplace, related-place and mukti-place traditions.</T><b><T>No route is invented between them.</T></b></>}
               </p>
             </div>
             <Badge kind={playbackIsGeographic ? 'inference' : 'tradition'}>
@@ -1255,8 +1418,8 @@ export default function App() {
                 </>
               ) : (
                 <>
-                  <b>No journey stops yet</b>
-                  <small>No mapped sthalams or traditional place references are available for this selection.</small>
+                  <b><T>No journey stops yet</T></b>
+                  <small><T>No mapped sthalams or traditional place references are available for this selection.</T></small>
                 </>
               )}
             </div>
@@ -1270,8 +1433,8 @@ export default function App() {
 
           <div className="saint-registry">
             <div className="registry-copy">
-              <b>Naalvar + 63-saint registry</b>
-              <small>Manikkavasakar is Naalvar, not a 64th Nayanmar</small>
+              <b><T>Naalvar + 63-saint registry</T></b>
+              <small><T>Manikkavasakar is Naalvar, not a 64th Nayanmar</T></small>
             </div>
             <div className="registry-stack">
               <div className="naalvar-mini">
@@ -1308,10 +1471,10 @@ export default function App() {
           <div className="panel tradition-mini">
             <div className="section-title">
               <div>
-                <h3>Traditional Place Claims</h3>
+                <h3><T>Traditional Place Claims</T></h3>
                 <span>{traditionalPlaybackStops.length} traditional references</span>
               </div>
-              <Badge kind="tradition">TRADITION</Badge>
+              <Badge kind="tradition"><T>TRADITION</T></Badge>
             </div>
             <div className="tradition-mini-list">
               {traditionalPlaybackStops.slice(0, 4).map((stop, index) => (
@@ -1331,7 +1494,7 @@ export default function App() {
                 </button>
               ))}
             </div>
-            <p>Shown as claims, not coordinates or a reconstructed road.</p>
+            <p><T>Shown as claims, not coordinates or a reconstructed road.</T></p>
           </div>
         ) : (
           <div className="panel graph-mini">
@@ -1344,7 +1507,7 @@ export default function App() {
                     : `${siteLinks.size} linked sthalams`}
                 </span>
               </div>
-              <button className="graph-expand" onClick={() => setGraphOpen(true)}>Expand ↗</button>
+              <button className="graph-expand" onClick={() => setGraphOpen(true)}><T>Expand ↗</T></button>
             </div>
             <button className="graph-preview-button" onClick={() => setGraphOpen(true)} aria-label="Open expanded connection graph">
               <Network
@@ -1358,8 +1521,8 @@ export default function App() {
 
         <div className="panel density-card">
           <div className="section-title">
-            <h3>Sthalam Density</h3>
-            <span>276 Tēvāram sthalams</span>
+            <h3><T>Sthalam Density</T></h3>
+            <span><T>276 Tēvāram sthalams</T></span>
           </div>
           <DensityPanel points={districtCoverage.slice(0, 6)} />
         </div>
@@ -1399,10 +1562,11 @@ export default function App() {
 
       <footer>
         <strong><GopuramIcon /> Nayanmar Trails</strong>
-        <button className="footer-source-link" onClick={() => setSourcesOpen(true)}>Sources & methodology</button>
+        <button className="footer-source-link" onClick={() => setSourcesOpen(true)}><T>Sources & methodology</T></button>
         <span>Map © OpenFreeMap / OpenMapTiles / OpenStreetMap</span>
       </footer>
     </main>
+    </LocaleContext.Provider>
   );
 }
 
@@ -1464,7 +1628,7 @@ function LiterarySthalamHighlight({
     <button className="literary-place-highlight" onClick={onExplore}>
       <span className="literary-place-icon"><GopuramIcon /></span>
       <span>
-        <small>TIRUVĀCAKAM LITERARY STHALAM</small>
+        <small><T>TIRUVĀCAKAM LITERARY STHALAM</T></small>
         <b>{place.label}</b>
         <em>{place.label_ta}</em>
         <strong>
@@ -1490,29 +1654,32 @@ function TraditionalPlaceDetail({
   total: number;
   tab: DetailTab;
 }) {
+  const locale = useLocale();
   return (
     <div className="traditional-detail">
       <div className="traditional-visual">
         <div className="traditional-symbol"><GopuramIcon /></div>
         <div>
-          <small>TRADITIONAL PLACE REFERENCE</small>
-          <h2>{stop?.name || 'No place selected'}</h2>
-          <p>{stop?.detail || 'No current traditional-place claim.'}</p>
+          <small><T>TRADITIONAL PLACE REFERENCE</T></small>
+          <h2>{stop?.name || (locale === 'ta' ? 'தலம் தேர்ந்தெடுக்கப்படவில்லை' : 'No place selected')}</h2>
+          <p>{stop?.detail || (locale === 'ta' ? 'தற்போதைய மரபுத் தலக் குறிப்பு இல்லை.' : 'No current traditional-place claim.')}</p>
         </div>
       </div>
 
       {tab === 'visits' && (
         <div className="text">
-          <Badge kind="tradition">TRADITION</Badge>
+          <Badge kind="tradition"><T>TRADITION</T></Badge>
           <p>
-            This site records <b>{total}</b> traditional place claim{total === 1 ? '' : 's'} for <b>{saintName}</b>.
-            This playback keeps those claims visible without inventing modern coordinates or a travel route.
+            {locale === 'ta'
+              ? <>இந்தத் தளம் <b>{saintName}</b> குறித்து <b>{total}</b> மரபுத் தலக் குறிப்புகளைப் பதிவு செய்கிறது. நவீன இடமுறைகள் அல்லது பயணப் பாதையை கற்பனை செய்யாமல் அவை இங்கே காட்டப்படுகின்றன.</>
+              : <>This site records <b>{total}</b> traditional place claim{total === 1 ? '' : 's'} for <b>{saintName}</b>. This playback keeps those claims visible without inventing modern coordinates or a travel route.</>}
           </p>
           <div className="evidence-callout muted">
             <GopuramIcon />
             <p>
-              The selected item is a traditional association. It is not automatically a modern temple identification,
-              exact geographic point, or independently verified historical event.
+              {locale === 'ta'
+                ? 'தேர்ந்தெடுக்கப்பட்ட பதிவு ஒரு மரபுத் தொடர்பு. அது தானாகவே நவீன கோயில் அடையாளம், துல்லிய புவியியல் புள்ளி அல்லது தனித்த வரலாற்றுச் சான்றாக மாறாது.'
+                : 'The selected item is a traditional association. It is not automatically a modern temple identification, exact geographic point, or independently verified historical event.'}
             </p>
           </div>
         </div>
@@ -1520,27 +1687,25 @@ function TraditionalPlaceDetail({
 
       {tab === 'chronology' && (
         <div className="text">
-          <Badge kind="inference">NO ASSERTED JOURNEY CHRONOLOGY</Badge>
-          <p>
-            Birthplace, related-place and mukti-place traditions are ordered only as a reading sequence.
-            Nayanmar Trails does not infer the historical path between them.
-          </p>
+          <Badge kind="inference"><T>NO ASSERTED JOURNEY CHRONOLOGY</T></Badge>
+          <p>{locale === 'ta'
+            ? 'பிறப்பிடம், தொடர்புத் தலம், முக்தித் தலம் ஆகிய மரபுகள் வாசிப்பு வரிசைக்காக மட்டுமே ஒழுங்குபடுத்தப்பட்டுள்ளன. அவற்றுக்கிடையிலான வரலாற்றுப் பாதையை நாயன்மார் பாதைகள் ஊகிக்காது.'
+            : 'Birthplace, related-place and mukti-place traditions are ordered only as a reading sequence. Nayanmar Trails does not infer the historical path between them.'}</p>
         </div>
       )}
 
       {tab === 'evidence' && (
         <div className="text">
-          <Badge kind="tradition">TRADITIONAL SOURCE</Badge>
-          <p>
-            No map marker is shown until a reviewed location is attached
-            or another explicitly qualified location mapping.
-          </p>
+          <Badge kind="tradition"><T>TRADITIONAL SOURCE</T></Badge>
+          <p>{locale === 'ta'
+            ? 'ஆய்வு செய்யப்பட்ட இடம் அல்லது வெளிப்படையாகத் தகுதிப்படுத்தப்பட்ட இட வரைபடம் இணைக்கப்படும் வரை வரைபடக் குறியீடு காட்டப்படாது.'
+            : 'No map marker is shown until a reviewed location is attached or another explicitly qualified location mapping.'}</p>
         </div>
       )}
 
       <div className="traditional-detail-footer">
-        <span>{total} tradition claim{total === 1 ? '' : 's'}</span>
-        <span>0 invented coordinates</span>
+        <span>{locale === 'ta' ? `${total} மரபுக் குறிப்புகள்` : `${total} tradition claim${total === 1 ? '' : 's'}`}</span>
+        <span>{locale === 'ta' ? '0 கற்பனை இடமுறைகள்' : '0 invented coordinates'}</span>
       </div>
     </div>
   );
@@ -1556,7 +1721,7 @@ function Tirumurai8LocusDetail({
   if (!locus) {
     return (
       <div className="text">
-        <Badge kind="edition">NO MAPPED TIRUMURAI 8 LOCUS</Badge>
+        <Badge kind="edition"><T>NO MAPPED TIRUMURAI 8 LOCUS</T></Badge>
         <p>
           This sthalam is part of the broader Tēvāram catalogue, but the pinned Tirumurai 8 product snapshot does not map a Manikkavasakar textual locus here.
         </p>
@@ -1566,10 +1731,10 @@ function Tirumurai8LocusDetail({
 
   return (
     <div className="text">
-      <Badge kind="edition">TIRUVĀCAKAM STHALAM</Badge>
+      <Badge kind="edition"><T>TIRUVĀCAKAM STHALAM</T></Badge>
       {view === 'visits' ? (
         <p>
-          This view is a <b>textual-locus mapping</b>, not a claim of a historically verified temple visit or a travel sequence for Manikkavasakar.
+          This view is a <b><T>textual-locus mapping</T></b>, not a claim of a historically verified temple visit or a travel sequence for Manikkavasakar.
         </p>
       ) : (
         <p>
@@ -1578,7 +1743,7 @@ function Tirumurai8LocusDetail({
       )}
 
       <div className="locus-strip">
-        <small>TIRUVĀCAKAM SECTIONS</small>
+        <small><T>TIRUVĀCAKAM SECTIONS</T></small>
         <div>
           {locus.section_numbers.map((section, index) => (
             <span key={section} title={locus.section_titles_ta[index]}>
@@ -1624,7 +1789,7 @@ function Tirumurai8Chronology({
 
   return (
     <div className="text">
-      <Badge kind="inference">JOURNEY NOTE</Badge>
+      <Badge kind="inference"><T>JOURNEY NOTE</T></Badge>
       <p>
         The Tiruvācakam/Tirukkōvaiyār corpus preserves section order, but section order is not treated as Manikkavasakar&apos;s historical itinerary.
       </p>
@@ -1635,7 +1800,7 @@ function Tirumurai8Chronology({
 
       {place && links.length > 0 && (
         <section className="literary-place-detail">
-          <small>BEYOND THE PLOTTED LOCI</small>
+          <small><T>BEYOND THE PLOTTED LOCI</T></small>
           <h3>{place.label}</h3>
           <div className="tamil">{place.label_ta}</div>
           <p>
@@ -1685,7 +1850,7 @@ function Tirumurai8Evidence({
       </p>
       {locus ? (
         <div className="inscription">
-          <Badge kind="edition">TEXTUAL LOCUS</Badge>
+          <Badge kind="edition"><T>TEXTUAL LOCUS</T></Badge>
           <b>{locus.display_name}</b>
           <p>{locus.locus_basis}</p>
         </div>
@@ -1723,29 +1888,29 @@ function SthalamOverview({
 }) {
   return (
     <div className="text sthalam-overview">
-      <Badge kind="edition">STHALAM OVERVIEW</Badge>
+      <Badge kind="edition"><T>STHALAM OVERVIEW</T></Badge>
       <p className="detail-lead">
-        <b>{siteDisplayName(site)}</b> is associated with <b>{totalPathigams}</b> Tēvāram pathigam
+        <b>{siteDisplayName(site)}</b><T>is associated with</T><b>{totalPathigams}</b> Tēvāram pathigam
         {totalPathigams === 1 ? '' : 's'} across <b>{saintBreakdown.length}</b> saint
         {saintBreakdown.length === 1 ? '' : 's'} in the current catalogue.
-        {selectedCount > 0 && <> <b>{saintName}</b> contributes <b>{selectedCount}</b>.</>}
+        {selectedCount > 0 && <> <b>{saintName}</b><T>contributes</T><b>{selectedCount}</b>.</>}
       </p>
 
       <div className="visitor-info-grid">
         <div>
-          <small>MODERN LOCATION</small>
+          <small><T>MODERN LOCATION</T></small>
           <b>{site.district || 'Location not supplied'}</b>
           <span>{site.taluk ? `${site.taluk} taluk` : site.modern_name_nic || ''}</span>
         </div>
         <div>
-          <small>SACRED REGION</small>
+          <small><T>SACRED REGION</T></small>
           <b>{site.traditional_location_class?.replace(/^according to PK:\s*/i, '') || 'Not supplied'}</b>
           <span>{cleanLabel(site.label)}</span>
         </div>
       </div>
 
       <section className="sung-here">
-        <small>SUNG HERE</small>
+        <small><T>SUNG HERE</T></small>
         <div>
           {saintBreakdown.map(({ saintId, saint, count }) => (
             <span key={saintId}>
@@ -1757,7 +1922,7 @@ function SthalamOverview({
       </section>
 
       <section className="tirumurai-spread">
-        <small>TIRUMURAI</small>
+        <small><T>TIRUMURAI</T></small>
         <div>
           {tirumuraiBreakdown.map(([tirumurai, count]) => (
             <span key={tirumurai}>T{tirumurai} <b>{count}</b></span>
@@ -1769,7 +1934,7 @@ function SthalamOverview({
         <section className="contextual-hymn">
           <div className="detail-section-head">
             <div>
-              <Badge kind="tradition">TRADITIONAL CHRONOLOGY</Badge>
+              <Badge kind="tradition"><T>TRADITIONAL CHRONOLOGY</T></Badge>
               <h3>Kōḷaṟu Pathigam · 2.085</h3>
             </div>
             <small>{contextualHymn.formal_tevaram_sthalam_classification}</small>
@@ -1786,7 +1951,7 @@ function SthalamOverview({
 
       {site.temple_identification_status && (
         <p className="reader-note">
-          <b>Place note:</b> {identificationLabel(site.temple_identification_status)}
+          <b><T>Place note:</T></b> {identificationLabel(site.temple_identification_status)}
         </p>
       )}
     </div>
@@ -1824,17 +1989,17 @@ function ThevaramDetails({
                   <b>Tirumurai {item.tirumurai} · Pathigam {item.patikam}</b>
                   <small>{displaySaintName(author)}</small>
                 </div>
-                {selected && <span className="you-are-here">selected saint</span>}
+                {selected && <span className="you-are-here"><T>selected saint</T></span>}
               </li>
             );
           })}
         </ul>
       ) : (
-        <p>No Tēvāram pathigam is linked to this sthalam in the current catalogue.</p>
+        <p><T>No Tēvāram pathigam is linked to this sthalam in the current catalogue.</T></p>
       )}
 
       <p className="reader-note">
-        Pathigam numbering follows the edition catalogue used by this site. Source and edition details are available under <b>Sources</b>.
+        Pathigam numbering follows the edition catalogue used by this site. Source and edition details are available under <b><T>Sources</T></b>.
       </p>
     </div>
   );
@@ -1866,7 +2031,7 @@ function JourneyContext({
 
       {active && (
         <div className="journey-current">
-          <small>CURRENT STOP</small>
+          <small><T>CURRENT STOP</T></small>
           <b>{active.name}</b>
           <span>{active.detail}</span>
         </div>
@@ -1900,41 +2065,41 @@ function SourceDetails({ site, data }: { site: Site; data: PramanaExport }) {
     <div className="text source-details">
       <div className="detail-section-head">
         <div>
-          <Badge kind="edition">SOURCES</Badge>
-          <h3>How this sthalam is documented</h3>
+          <Badge kind="edition"><T>SOURCES</T></Badge>
+          <h3><T>How this sthalam is documented</T></h3>
         </div>
       </div>
 
       <div className="source-card">
-        <small>TĒVĀRAM CATALOGUE</small>
+        <small><T>TĒVĀRAM CATALOGUE</T></small>
         <b>{authorityLabel(site.authority_scope)}</b>
         <p>
           The sthalam name, catalogue identifier and pathigam associations are preserved from the Tēvāram edition catalogue.
         </p>
         {catalogueUrl && (
-          <a href={catalogueUrl} target="_blank" rel="noreferrer">Open catalogue entry ↗</a>
+          <a href={catalogueUrl} target="_blank" rel="noreferrer"><T>Open catalogue entry ↗</T></a>
         )}
       </div>
 
       {inscriptions.length ? (
         inscriptions.map((item) => (
           <div className="source-card historical" key={item.id}>
-            <small>HISTORICAL RECORD</small>
+            <small><T>HISTORICAL RECORD</T></small>
             <b>{item.label}</b>
             <p>{item.historical_scope}</p>
           </div>
         ))
       ) : (
         <div className="source-card muted">
-          <small>HISTORICAL RECORD</small>
-          <b>No linked inscription in this release</b>
+          <small><T>HISTORICAL RECORD</T></small>
+          <b><T>No linked inscription in this release</T></b>
           <p>This does not imply that the sthalam lacks historical records; only that none is attached in the current dataset.</p>
         </div>
       )}
 
       {site.temple_identification_status && (
         <p className="reader-note">
-          <b>Identification note:</b> {identificationLabel(site.temple_identification_status)}
+          <b><T>Identification note:</T></b> {identificationLabel(site.temple_identification_status)}
         </p>
       )}
     </div>
@@ -1967,8 +2132,8 @@ function SourcesModal({
       >
         <header className="sources-modal-head">
           <div>
-            <small>SOURCES · METHOD · PROVENANCE</small>
-            <h2>Where Nayanmar Trails gets its information</h2>
+            <small><T>SOURCES · METHOD · PROVENANCE</T></small>
+            <h2><T>Where Nayanmar Trails gets its information</T></h2>
             <p>
               The site is designed for exploration first. This page explains the source chain behind the map, Tēvāram catalogue and historical notes.
             </p>
@@ -1978,14 +2143,14 @@ function SourcesModal({
 
         <div className="sources-intro">
           <div>
-            <b>What Pramāṇa contributes</b>
+            <b><T>What Pramāṇa contributes</T></b>
             <p>
               Pramāṇa is the versioned evidence layer behind Nayanmar Trails. Its value is not branding on every screen:
               it keeps textual tradition, edition metadata, inference and independent historical evidence from being silently merged.
             </p>
           </div>
           <div className="sources-version">
-            <span>Dataset</span>
+            <span><T>Dataset</T></span>
             <b>{data.meta.export_version}</b>
             <small>source {data.meta.source_commit.slice(0, 10)}</small>
           </div>
@@ -1995,8 +2160,8 @@ function SourcesModal({
           <article>
             <span>01</span>
             <div>
-              <small>TĒVĀRAM CATALOGUE</small>
-              <h3>798 numbered pathigams · 276 sthalams</h3>
+              <small><T>TĒVĀRAM CATALOGUE</T></small>
+              <h3><T>798 numbered pathigams · 276 sthalams</T></h3>
               <p>
                 Saint ↔ pathigam ↔ sthalam relationships are carried from the edition-aligned Tēvāram catalogue.
                 Numbering remains edition-qualified where sources differ.
@@ -2007,8 +2172,8 @@ function SourcesModal({
           <article>
             <span>02</span>
             <div>
-              <small>PROJECT MADURAI</small>
-              <h3>Source-preserved Tēvāram text layer</h3>
+              <small><T>PROJECT MADURAI</T></small>
+              <h3><T>Source-preserved Tēvāram text layer</T></h3>
               <p>
                 Project Madurai provides the public-text family used for the Tēvāram beta corpus.
                 Known HTML gaps and numbering differences remain explicit rather than being silently repaired.
@@ -2019,8 +2184,8 @@ function SourcesModal({
           <article>
             <span>03</span>
             <div>
-              <small>PERIYA PURANAM</small>
-              <h3>Saint story and identity links</h3>
+              <small><T>PERIYA PURANAM</T></small>
+              <h3><T>Saint story and identity links</T></h3>
               <p>
                 Periya Puranam episode metadata connects individual Nayanmars with their traditional hagiographic chapters.
                 These are devotional-literary sources, not automatically historical proof.
@@ -2031,8 +2196,8 @@ function SourcesModal({
           <article>
             <span>04</span>
             <div>
-              <small>DHARMA INSCRIPTIONS</small>
-              <h3>Independent historical records</h3>
+              <small><T>DHARMA INSCRIPTIONS</T></small>
+              <h3><T>Independent historical records</T></h3>
               <p>
                 Where a reviewed inscription is linked to a mapped site, Nayanmar Trails marks it separately as an
                 independent historical record rather than treating it as the same thing as a literary tradition.
@@ -2043,8 +2208,8 @@ function SourcesModal({
           <article>
             <span>05</span>
             <div>
-              <small>TIRUMURAI 8</small>
-              <h3>Manikkavasakar as Naalvar</h3>
+              <small><T>TIRUMURAI 8</T></small>
+              <h3><T>Manikkavasakar as Naalvar</T></h3>
               <p>
                 Tiruvācakam and Tirukkōvaiyār are carried through a separate beta snapshot
                 ({tirumurai8.works.tiruvacakam.sections} Tiruvācakam sections; {tirumurai8.works.tirukkovaiyar.source_order_units} Tirukkōvaiyār units).
@@ -2055,15 +2220,15 @@ function SourcesModal({
         </div>
 
         <div className="method-strip">
-          <div><b>Text-linked</b><span>What the editions associate with a sthalam.</span></div>
-          <div><b>Tradition</b><span>Birthplace, related-place and mukti-place traditions.</span></div>
-          <div><b>Historical</b><span>Independent inscriptional records where currently linked.</span></div>
-          <div><b>Journey line</b><span>An exploratory reconstruction between known endpoints, never a claimed ancient road.</span></div>
+          <div><b><T>Text-linked</T></b><span><T>What the editions associate with a sthalam.</T></span></div>
+          <div><b><T>Tradition</T></b><span><T>Birthplace, related-place and mukti-place traditions.</T></span></div>
+          <div><b><T>Historical</T></b><span><T>Independent inscriptional records where currently linked.</T></span></div>
+          <div><b><T>Journey line</T></b><span><T>An exploratory reconstruction between known endpoints, never a claimed ancient road.</T></span></div>
         </div>
 
         <footer className="sources-modal-footer">
           <span>Read the site as a heritage explorer; open Sources whenever you want the provenance underneath it.</span>
-          <button onClick={onClose}>Back to exploration</button>
+          <button onClick={onClose}><T>Back to exploration</T></button>
         </footer>
       </section>
     </div>
@@ -2133,7 +2298,7 @@ function ConnectionModal({
 
           <aside className="graph-ranking">
             <div className="graph-ranking-head">
-              <small>TOP CONNECTIONS</small>
+              <small><T>TOP CONNECTIONS</T></small>
               <b>{sites.length ? 'Select a sthalam to inspect it' : 'No mapped sthalam connections'}</b>
             </div>
             <div className="graph-ranking-list">
@@ -2279,9 +2444,9 @@ function DensityPanel({ points }: { points: CoveragePoint[] }) {
         })}
       </svg>
       <div className="density-caption">
-        <span>district aggregate</span>
+        <span><T>district aggregate</T></span>
         <i />
-        <span>more sthalams</span>
+        <span><T>more sthalams</T></span>
       </div>
     </div>
   );
