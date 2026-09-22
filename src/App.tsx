@@ -254,8 +254,96 @@ function siteDisplayName(site: Site) {
   return mapped?.name || modernShort(site.modern_name_nic) || cleanLabel(site.label);
 }
 
+const TA_ADMIN_NAMES: Record<string, string> = {
+  'tiruvallur': 'திருவள்ளூர்',
+  'thiruvallur': 'திருவள்ளூர்',
+  'chennai': 'சென்னை',
+  'chengalpattu': 'செங்கல்பட்டு',
+  'kanchipuram': 'காஞ்சிபுரம்',
+  'vellore': 'வேலூர்',
+  'ranipet': 'ராணிப்பேட்டை',
+  'tirupattur': 'திருப்பத்தூர்',
+  'tiruvannamalai': 'திருவண்ணாமலை',
+  'villupuram': 'விழுப்புரம்',
+  'kallakurichi': 'கள்ளக்குறிச்சி',
+  'cuddalore': 'கடலூர்',
+  'mayiladuthurai': 'மயிலாடுதுறை',
+  'nagapattinam': 'நாகப்பட்டினம்',
+  'tiruvarur': 'திருவாரூர்',
+  'thanjavur': 'தஞ்சாவூர்',
+  'tiruchirappalli': 'திருச்சிராப்பள்ளி',
+  'trichy': 'திருச்சிராப்பள்ளி',
+  'perambalur': 'பெரம்பலூர்',
+  'ariyalur': 'அரியலூர்',
+  'pudukkottai': 'புதுக்கோட்டை',
+  'madurai': 'மதுரை',
+  'sivaganga': 'சிவகங்கை',
+  'ramanathapuram': 'இராமநாதபுரம்',
+  'virudhunagar': 'விருதுநகர்',
+  'thoothukudi': 'தூத்துக்குடி',
+  'tuticorin': 'தூத்துக்குடி',
+  'tirunelveli': 'திருநெல்வேலி',
+  'tenkasi': 'தென்காசி',
+  'kanyakumari': 'கன்னியாகுமரி',
+  'coimbatore': 'கோயம்புத்தூர்',
+  'tiruppur': 'திருப்பூர்',
+  'erode': 'ஈரோடு',
+  'namakkal': 'நாமக்கல்',
+  'salem': 'சேலம்',
+  'dharmapuri': 'தர்மபுரி',
+  'krishnagiri': 'கிருஷ்ணகிரி',
+  'nilgiris': 'நீலகிரி',
+  'ambattur': 'அம்பத்தூர்',
+  'chidambaram': 'சிதம்பரம்',
+  'sirkazhi': 'சீர்காழி',
+  'kumbakonam': 'கும்பகோணம்',
+  'rameswaram': 'இராமேச்சுரம்',
+};
+
+const TA_SACRED_REGIONS: Record<string, string> = {
+  'tontai natu': 'தொண்டை நாடு',
+  'natu natu': 'நடுநாடு',
+  'chola natu': 'சோழ நாடு',
+  'cola natu': 'சோழ நாடு',
+  'pantiya natu': 'பாண்டிய நாடு',
+  'pandya natu': 'பாண்டிய நாடு',
+  'konku natu': 'கொங்கு நாடு',
+  'malai natu': 'மலைநாடு',
+};
+
+function latinKey(value: string) {
+  return value
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^A-Za-z ]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .toLowerCase();
+}
+
+function localizedAdministrativeName(value: string | null | undefined, locale: Locale) {
+  if (!value || locale !== 'ta') return value || '';
+  return TA_ADMIN_NAMES[latinKey(value)] ?? value;
+}
+
+function localizedSacredRegion(value: string | null | undefined, locale: Locale) {
+  if (!value) return '';
+  const cleaned = value
+    .replace(/^according to PK:\s*/i, '')
+    .replace(/\s*\([A-Z]{2}\d+\)\s*$/, '')
+    .trim();
+  if (locale !== 'ta') return cleaned;
+  return TA_SACRED_REGIONS[latinKey(cleaned)] ?? cleaned;
+}
+
 function localizedSiteName(site: Site, locale: Locale) {
-  if (locale === 'ta' && site.label_ta) return site.label_ta;
+  if (locale === 'ta') {
+    if (site.label_ta) return site.label_ta;
+    const mapped = GEO_SEEDS.find((seed) => seed.siteId === site.site_id);
+    if (mapped?.nameTa) return mapped.nameTa;
+    const tamilAlias = site.aliases?.find((alias) => /[\u0B80-\u0BFF]/.test(alias));
+    if (tamilAlias) return cleanLabel(tamilAlias);
+  }
   return siteDisplayName(site);
 }
 
