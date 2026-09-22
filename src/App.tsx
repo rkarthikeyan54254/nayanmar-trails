@@ -2158,7 +2158,7 @@ function SthalamOverview({
         <small><T>TIRUMURAI</T></small>
         <div>
           {tirumuraiBreakdown.map(([tirumurai, count]) => (
-            <span key={tirumurai}>{locale === 'ta' ? `தி ${tirumurai}` : `T${tirumurai}`} <b>{count}</b></span>
+            <span key={tirumurai}>{locale === 'ta' ? `திருமுறை ${tirumurai}` : `T${tirumurai}`} <b>{count}</b></span>
           ))}
         </div>
       </section>
