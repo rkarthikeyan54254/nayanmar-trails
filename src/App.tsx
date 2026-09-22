@@ -9,6 +9,58 @@ import type { PramanaExport, Saint, Site } from './types';
 
 type DetailTab = 'hymns' | 'chronology' | 'visits' | 'evidence';
 
+const MANIKKAVASAKAR_ID = 'tirumurai8.manikkavacakar';
+const MUVAR = ['nayanmar.20', 'nayanmar.27', 'nayanmar.63'];
+const NAALVAR = [...MUVAR, MANIKKAVASAKAR_ID];
+
+type Tirumurai8Locus = {
+  id: string;
+  site_id: string;
+  site_entity_id: string;
+  display_name: string;
+  label_ta: string;
+  section_numbers: number[];
+  section_titles_ta: string[];
+  locus_basis: string;
+  authority_scope: string;
+  playback_rank: number;
+};
+
+type Tirumurai8Snapshot = {
+  meta: {
+    source_commit: string;
+    release_id: string;
+    beta_ready: boolean;
+    playback_policy: string;
+  };
+  author: {
+    id: string;
+    label: string;
+    display_label: string;
+    label_ta: string;
+    group: string;
+    registry_note: string;
+  };
+  works: {
+    tiruvacakam: { sections: number; source_units: number };
+    tirukkovaiyar: { source_order_units: number };
+  };
+  authority: {
+    text: string;
+    historical: string;
+    independent_textual_verification: string;
+  };
+  loci: Tirumurai8Locus[];
+};
+
+type PlaybackStop = {
+  id: string;
+  name: string;
+  detail: string;
+  kind: 'exact_text_locus' | 'traditional_place';
+  siteId?: string;
+};
+
 const MUVAR = ['nayanmar.20', 'nayanmar.27', 'nayanmar.63'];
 
 const SAINT_EN: Record<string, string> = {
