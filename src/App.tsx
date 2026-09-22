@@ -5,7 +5,7 @@ import { DISTRICT_CENTROIDS, normalizeDistrict } from './coverage';
 import { HERO_MEDIA, SAINT_MEDIA, TEMPLE_MEDIA } from './media';
 import GopuramIcon from './GopuramIcon';
 import SacredMap, { type CoveragePoint, type EvidenceMode, type MapStop } from './SacredMap';
-import type { PramanaExport, Saint, Site } from './types';
+import type { Patikam, PramanaExport, Saint, Site } from './types';
 
 type DetailTab = 'hymns' | 'chronology' | 'visits' | 'evidence';
 
@@ -1527,138 +1527,222 @@ function Tirumurai8Evidence({
   );
 }
 
-function Visits({
+function displaySaintName(saint: Saint | null | undefined) {
+  if (!saint) return 'Unknown saint';
+  return SAINT_EN[saint.id] ?? cleanLabel(saint.label);
+}
+
+function SthalamOverview({
   site,
   saintName,
-  count,
-  patikamIds,
-  patikamById,
+  selectedCount,
+  totalPathigams,
+  saintBreakdown,
+  tirumuraiBreakdown,
 }: {
   site: Site;
   saintName: string;
-  count: number;
-  patikamIds: string[];
-  patikamById: Map<string, { tirumurai: number; patikam: number }>;
+  selectedCount: number;
+  totalPathigams: number;
+  saintBreakdown: Array<{ saintId: string; saint: Saint | null; count: number }>;
+  tirumuraiBreakdown: Array<[number, number]>;
 }) {
   return (
-    <div className="text">
-      <Badge kind="edition">EDITION METADATA</Badge>
-      <p>
-        <b>{saintName}</b> is linked to <b>{count}</b> Tēvāram patikam
-        {count === 1 ? '' : 's'} associated with this traditional talam in the current Pramāṇa graph.
+    <div className="text sthalam-overview">
+      <Badge kind="edition">STHALAM OVERVIEW</Badge>
+      <p className="detail-lead">
+        <b>{siteDisplayName(site)}</b> is associated with <b>{totalPathigams}</b> Tēvāram pathigam
+        {totalPathigams === 1 ? '' : 's'} across <b>{saintBreakdown.length}</b> saint
+        {saintBreakdown.length === 1 ? '' : 's'} in the current catalogue.
+        {selectedCount > 0 && <> <b>{saintName}</b> contributes <b>{selectedCount}</b>.</>}
       </p>
 
-      {patikamIds.length > 0 && (
-        <div className="locus-strip">
-          <small>TĒVĀRAM LOCI</small>
-          <div>
-            {patikamIds.slice(0, 3).map((id) => {
-              const item = patikamById.get(id);
-              return (
-                <span key={id}>
-                  <GopuramIcon />
-                  {item ? `T${item.tirumurai} · P${item.patikam}` : id.replace('tevaram.ifp.', '')}
-                </span>
-              );
-            })}
-          </div>
+      <div className="visitor-info-grid">
+        <div>
+          <small>MODERN LOCATION</small>
+          <b>{site.district || 'Location not supplied'}</b>
+          <span>{site.taluk ? \`\${site.taluk} taluk\` : site.modern_name_nic || ''}</span>
         </div>
-      )}
-
-      <div className="evidence-callout">
-        <GopuramIcon />
-        <p>
-          This establishes a text/edition association. It does not by itself prove the precise modern temple identity or historical road travelled.
-        </p>
+        <div>
+          <small>SACRED REGION</small>
+          <b>{site.traditional_location_class?.replace(/^according to PK:\\s*/i, '') || 'Not supplied'}</b>
+          <span>{cleanLabel(site.label)}</span>
+        </div>
       </div>
+
+      <section className="sung-here">
+        <small>SUNG HERE</small>
+        <div>
+          {saintBreakdown.map(({ saintId, saint, count }) => (
+            <span key={saintId}>
+              <b>{displaySaintName(saint).split(' · ')[0]}</b>
+              <em>{count} pathigam{count === 1 ? '' : 's'}</em>
+            </span>
+          ))}
+        </div>
+      </section>
+
+      <section className="tirumurai-spread">
+        <small>TIRUMURAI</small>
+        <div>
+          {tirumuraiBreakdown.map(([tirumurai, count]) => (
+            <span key={tirumurai}>T{tirumurai} <b>{count}</b></span>
+          ))}
+        </div>
+      </section>
+
       {site.temple_identification_status && (
-        <p className="microcopy">
-          <b>Identification:</b> {identificationLabel(site.temple_identification_status)}
+        <p className="reader-note">
+          <b>Place note:</b> {identificationLabel(site.temple_identification_status)}
         </p>
       )}
     </div>
   );
 }
 
-function Hymns({
-  ids,
-  patikamById,
+function ThevaramDetails({
+  items,
+  saintById,
+  selectedSaintId,
 }: {
-  ids: string[];
-  patikamById: Map<string, { tirumurai: number; patikam: number }>;
+  items: Patikam[];
+  saintById: Map<string, Saint>;
+  selectedSaintId: string;
 }) {
   return (
     <div className="text">
-      <Badge kind="edition">TĒVĀRAM LOCI</Badge>
-      {ids.length ? (
-        <ul className="hymns">
-          {ids.slice(0, 8).map((id) => {
-            const item = patikamById.get(id);
+      <div className="detail-section-head">
+        <div>
+          <Badge kind="edition">TĒVĀRAM</Badge>
+          <h3>{items.length} pathigam{items.length === 1 ? '' : 's'} at this sthalam</h3>
+        </div>
+        <small>Tirumurai 1–7</small>
+      </div>
+
+      {items.length ? (
+        <ul className="hymns thevaram-list">
+          {items.map((item) => {
+            const author = saintById.get(item.author_saint_id);
+            const selected = item.author_saint_id === selectedSaintId;
             return (
-              <li key={id}>
+              <li key={item.id} className={selected ? 'selected-author' : ''}>
                 <GopuramIcon />
                 <div>
-                  <b>{id.replace('tevaram.ifp.', 'Tēvāram ')}</b>
-                  <small>
-                    {item
-                      ? `Tirumurai ${item.tirumurai} · Patikam ${item.patikam}`
-                      : 'Edition locus'}
-                  </small>
+                  <b>Tirumurai {item.tirumurai} · Pathigam {item.patikam}</b>
+                  <small>{displaySaintName(author)}</small>
                 </div>
+                {selected && <span className="you-are-here">selected saint</span>}
               </li>
             );
           })}
         </ul>
       ) : (
-        <p>No patikam by the selected saint is linked to this talam.</p>
+        <p>No Tēvāram pathigam is linked to this sthalam in the current catalogue.</p>
       )}
-    </div>
-  );
-}
 
-function Chronology() {
-  return (
-    <div className="text">
-      <Badge kind="inference">FAIL-CLOSED CHRONOLOGY</Badge>
-      <p>
-        The current Pramāṇa Nayanmar graph does <b>not</b> assert a complete visit sequence or a precise historical chronology.
+      <p className="reader-note">
+        Pathigam numbering follows the edition catalogue used by this site. Source and edition details are available under <b>Sources</b>.
       </p>
-      <div className="evidence-callout">
-        <GopuramIcon />
-        <p>
-          Playback therefore remains explicitly labeled product inference until a versioned chronology export exists.
-        </p>
-      </div>
     </div>
   );
 }
 
-function Evidence({ site, data }: { site: Site; data: PramanaExport }) {
+function JourneyContext({
+  saintName,
+  stops,
+  activeIndex,
+  geographic,
+}: {
+  saintName: string;
+  stops: PlaybackStop[];
+  activeIndex: number;
+  geographic: boolean;
+}) {
+  const active = stops[Math.min(activeIndex, Math.max(0, stops.length - 1))];
+  return (
+    <div className="text journey-context">
+      <Badge kind={geographic ? 'inference' : 'tradition'}>
+        {geographic ? 'JOURNEY VIEW' : 'TRADITIONAL PLACES'}
+      </Badge>
+      <h3>{saintName}</h3>
+      <p>
+        {geographic
+          ? \`Explore \${stops.length} mapped Tēvāram-linked sthalams for this saint.\`
+          : \`Explore \${stops.length} traditional place references connected with this saint.\`}
+      </p>
+
+      {active && (
+        <div className="journey-current">
+          <small>CURRENT STOP</small>
+          <b>{active.name}</b>
+          <span>{active.detail}</span>
+        </div>
+      )}
+
+      <div className="journey-stop-list">
+        {stops.slice(0, 8).map((stop, index) => (
+          <span key={stop.id} className={index === activeIndex ? 'active' : ''}>
+            <i>{index + 1}</i>
+            <b>{stop.name}</b>
+          </span>
+        ))}
+      </div>
+
+      <p className="reader-note">
+        {geographic
+          ? 'The sequence is an exploratory presentation of known endpoints, not a dated historical itinerary.'
+          : 'Traditional place claims are shown without inventing precise coordinates or a historical route.'}
+      </p>
+    </div>
+  );
+}
+
+function SourceDetails({ site, data }: { site: Site; data: PramanaExport }) {
   const inscriptions = data.inscriptions.filter(
     (item) => item.ifp_site_id === site.site_id,
   );
+  const catalogueUrl = site.evidence?.find((item) => item.locator.startsWith('http'))?.locator;
 
   return (
-    <div className="text">
-      <Badge kind="edition">{authorityLabel(site.authority_scope).toUpperCase()}</Badge>
-      <p>
-        This talam node is presented as <b>{authorityLabel(site.authority_scope)}</b>.
-      </p>
+    <div className="text source-details">
+      <div className="detail-section-head">
+        <div>
+          <Badge kind="edition">SOURCES</Badge>
+          <h3>How this sthalam is documented</h3>
+        </div>
+      </div>
+
+      <div className="source-card">
+        <small>TĒVĀRAM CATALOGUE</small>
+        <b>{authorityLabel(site.authority_scope)}</b>
+        <p>
+          The sthalam name, catalogue identifier and pathigam associations are preserved from the Tēvāram edition catalogue.
+        </p>
+        {catalogueUrl && (
+          <a href={catalogueUrl} target="_blank" rel="noreferrer">Open catalogue entry ↗</a>
+        )}
+      </div>
+
       {inscriptions.length ? (
         inscriptions.map((item) => (
-          <div className="inscription" key={item.id}>
-            <Badge kind="independent">INDEPENDENT PRIMARY EVIDENCE</Badge>
+          <div className="source-card historical" key={item.id}>
+            <small>HISTORICAL RECORD</small>
             <b>{item.label}</b>
             <p>{item.historical_scope}</p>
           </div>
         ))
       ) : (
-        <div className="evidence-callout muted">
-          <GopuramIcon />
-          <p>
-            No explicit epigraphic edge is attached to this mapped talam in the current export. That is not evidence of historical absence.
-          </p>
+        <div className="source-card muted">
+          <small>HISTORICAL RECORD</small>
+          <b>No linked inscription in this release</b>
+          <p>This does not imply that the sthalam lacks historical records; only that none is attached in the current dataset.</p>
         </div>
+      )}
+
+      {site.temple_identification_status && (
+        <p className="reader-note">
+          <b>Identification note:</b> {identificationLabel(site.temple_identification_status)}
+        </p>
       )}
     </div>
   );
