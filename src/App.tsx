@@ -53,6 +53,47 @@ type Tirumurai8Snapshot = {
   loci: Tirumurai8Locus[];
 };
 
+type SaivaLiteraryPlace = {
+  id: string;
+  label: string;
+  label_ta: string;
+  aliases: string[];
+  tevaram_site_catalogue_member: boolean;
+  geometry_status: string;
+};
+
+type SaivaLiteraryLink = {
+  id: string;
+  subject: string;
+  predicate: string;
+  object: string;
+  authority_scope: string;
+  historical_verified: boolean;
+  source_key: string;
+  locator: string;
+  source_note_ta?: string;
+  source_header_composition_place_ta?: string;
+  source_form_ta?: string;
+  normalized_place_ta?: string;
+  alias_resolution_source_key?: string;
+  formal_tevaram_sthalam_classification?: string;
+  traditional_place_ta?: string;
+  modern_name_in_ifp_catalogue?: string;
+  display_note: string;
+};
+
+type SaivaLiterarySnapshot = {
+  meta: {
+    export_version: string;
+    source_repo: string;
+    source_commit: string;
+    source_path: string;
+    authority_semantics: Record<string, string>;
+  };
+  places: SaivaLiteraryPlace[];
+  links: SaivaLiteraryLink[];
+};
+
 type PlaybackStop = {
   id: string;
   name: string;
@@ -132,6 +173,7 @@ function siteDisplayName(site: Site) {
 export default function App() {
   const [data, setData] = useState<PramanaExport | null>(null);
   const [tirumurai8, setTirumurai8] = useState<Tirumurai8Snapshot | null>(null);
+  const [saivaPlaces, setSaivaPlaces] = useState<SaivaLiterarySnapshot | null>(null);
   const [selectedSaintId, setSelectedSaintId] = useState(
     () => new URLSearchParams(window.location.search).get('saint') || 'nayanmar.20',
   );
@@ -185,10 +227,15 @@ export default function App() {
         if (!response.ok) throw new Error(`Tirumurai 8 export HTTP ${response.status}`);
         return response.json() as Promise<Tirumurai8Snapshot>;
       }),
+      fetch('/data/pramana-saiva-literary-place-links-v1.json').then((response) => {
+        if (!response.ok) throw new Error(`Saiva literary-place export HTTP ${response.status}`);
+        return response.json() as Promise<SaivaLiterarySnapshot>;
+      }),
     ])
-      .then(([graph, t8]) => {
+      .then(([graph, t8, literaryPlaces]) => {
         setData(graph);
         setTirumurai8(t8);
+        setSaivaPlaces(literaryPlaces);
       })
       .catch((error) => console.error('Unable to load Pramāṇa product exports', error));
   }, []);
@@ -548,7 +595,7 @@ export default function App() {
     return () => window.clearInterval(timer);
   }, [playing, playbackStops.length]);
 
-  if (!data || !tirumurai8) {
+  if (!data || !tirumurai8 || !saivaPlaces) {
     return (
       <div className="loading">
         <div className="loading-mark"><GopuramIcon /></div>
