@@ -104,6 +104,11 @@ for (const markerClass of ['map-temple-marker', 'map-district-marker', 'map-trav
   }
 }
 
+const travelerBlocks = [...stylesText.matchAll(/\.map-traveler\s*\{([^}]*)\}/gs)].map((match) => match[1]);
+if (travelerBlocks.some((block) => /animation\s*:\s*(?!none)/.test(block))) {
+  throw new Error('MapLibre traveler root must not animate transform; animate child elements instead');
+}
+
 const geometryRows = [...geometryText.matchAll(
   /siteId:\s*'([^']+)'[^\n]*lng:\s*([0-9.]+),\s*lat:\s*([0-9.]+)/g,
 )].map((match) => ({ siteId: match[1], lng: Number(match[2]), lat: Number(match[3]) }));
