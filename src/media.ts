@@ -38,9 +38,9 @@ export const SAINT_MEDIA: Record<string, MediaCredit> = {
 
 export const TEMPLE_MEDIA: Record<string, MediaCredit> = {
   'tevaram_site.KV01': {
-    src: commons('Chidambaram Gopuram.jpg', 920),
-    title: 'Chidambaram Nataraja Temple gopuram',
-    license: 'Public Domain',
+    src: commons('A view of Nataraja Shiva Temple at Chidambaram, Tamil Nadu (10).jpg', 1100),
+    title: 'Gopuram of the Nataraja Temple, Chidambaram',
+    license: 'CC BY 2.0 · Richard Mortel',
     source: 'Wikimedia Commons',
   },
 };
