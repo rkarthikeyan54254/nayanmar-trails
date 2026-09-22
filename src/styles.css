@@ -567,6 +567,77 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:1px solid 
   border:1px solid rgba(207,164,88,.23)!important;
 }
 .maplibregl-ctrl button .maplibregl-ctrl-icon{filter:invert(.75) sepia(.25)}
+.map-district-marker{
+  width:72px;height:50px;
+  position:relative;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  pointer-events:none;
+  opacity:.72;
+  filter:drop-shadow(0 2px 6px rgba(0,0,0,.46));
+}
+.district-marker-glow{
+  position:absolute;
+  left:50%;top:50%;
+  width:38px;height:38px;
+  transform:translate(-50%,-50%);
+  border-radius:50%;
+  background:radial-gradient(circle,rgba(238,170,72,.34),rgba(70,136,111,.14) 48%,transparent 74%);
+  filter:blur(.4px);
+}
+.district-marker-tower{
+  position:absolute;
+  left:50%;top:9px;
+  width:18px;height:21px;
+  transform:translateX(-50%);
+  color:#b98c43;
+  opacity:.8;
+}
+.district-marker-tower svg{width:18px;height:21px;fill:#b98c43}
+.district-marker-tower .door{fill:#173438}
+.district-marker-count{
+  position:absolute;
+  z-index:2;
+  left:50%;top:4px;
+  transform:translateX(7px);
+  min-width:14px;height:14px;
+  padding:0 3px;
+  display:grid;place-items:center;
+  border-radius:999px;
+  border:1px solid rgba(238,196,116,.42);
+  background:rgba(6,31,39,.88);
+  color:#f0c46f;
+  font:700 6.4px Inter,sans-serif;
+}
+.district-marker-label{
+  position:absolute;
+  bottom:0;left:50%;
+  transform:translateX(-50%);
+  width:max-content;
+  max-width:80px;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  padding:1px 3px;
+  border-radius:3px;
+  color:rgba(222,208,177,.72);
+  background:rgba(4,24,33,.46);
+  font:600 6.3px "Cormorant Garamond",serif;
+  text-shadow:0 1px 3px #000;
+}
+.map-neighbor-label{
+  position:absolute;z-index:7;
+  color:rgba(210,196,162,.42);
+  font:600 9px "Cormorant Garamond",serif;
+  letter-spacing:.17em;
+  text-shadow:0 1px 5px #04161e;
+  pointer-events:none;
+}
+.map-neighbor-label.karnataka{left:26%;top:20%}
+.map-neighbor-label.kerala{left:12%;top:59%}
+.map-neighbor-label.andhra{right:15%;top:14%}
+
 .map-temple-marker{
   width:86px;height:54px;
   position:relative;
