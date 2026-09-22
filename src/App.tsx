@@ -91,10 +91,10 @@ const MODE_COPY: Record<EvidenceMode, { label: string; short: string; body: stri
 };
 
 function authorityLabel(scope: string) {
-  if (scope === 'edition_metadata') return 'Edition metadata';
-  if (scope === 'traditional_reference') return 'Traditional reference';
-  if (scope === 'primary_text_metadata') return 'Primary text metadata';
-  if (scope === 'epigraphic_primary') return 'Independent primary evidence';
+  if (scope === 'edition_metadata') return 'Tēvāram catalogue';
+  if (scope === 'traditional_reference') return 'Traditional source';
+  if (scope === 'primary_text_metadata') return 'Literary source';
+  if (scope === 'epigraphic_primary') return 'Historical inscription';
   return scope.replace(/_/g, ' ');
 }
 
