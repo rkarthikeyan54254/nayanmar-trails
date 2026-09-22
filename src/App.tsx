@@ -209,6 +209,61 @@ export default function App() {
     [data],
   );
 
+  const saintById = useMemo(
+    () => new Map((data?.saints ?? []).map((item) => [item.id, item])),
+    [data],
+  );
+
+  const selectedSiteAllPatikams = useMemo(() => {
+    if (!data) return [];
+    const ids = new Set(
+      data.edges
+        .filter(
+          (edge) =>
+            edge.predicate === 'TEVARAM_PATIKAM_ASSOCIATED_WITH_SITE' &&
+            edge.object === selectedSiteId,
+        )
+        .map((edge) => edge.subject),
+    );
+    return data.patikams
+      .filter((item) => ids.has(item.id))
+      .sort((a, b) => a.tirumurai - b.tirumurai || a.patikam - b.patikam);
+  }, [data, selectedSiteId]);
+
+  const selectedSiteSaintBreakdown = useMemo(() => {
+    const counts = new Map<string, number>();
+    for (const item of selectedSiteAllPatikams) {
+      counts.set(item.author_saint_id, (counts.get(item.author_saint_id) ?? 0) + 1);
+    }
+    return [...counts.entries()]
+      .map(([saintId, count]) => ({
+        saintId,
+        saint: saintById.get(saintId) ?? null,
+        count,
+      }))
+      .sort((a, b) => b.count - a.count);
+  }, [selectedSiteAllPatikams, saintById]);
+
+  const selectedSiteTirumuraiBreakdown = useMemo(() => {
+    const counts = new Map<number, number>();
+    for (const item of selectedSiteAllPatikams) {
+      counts.set(item.tirumurai, (counts.get(item.tirumurai) ?? 0) + 1);
+    }
+    return [...counts.entries()].sort((a, b) => a[0] - b[0]);
+  }, [selectedSiteAllPatikams]);
+
+  const periyaPuranamTitle = useMemo(() => {
+    if (!data || selectedIsManikkavasakar) return '';
+    const edge = data.edges.find(
+      (item) =>
+        item.predicate === 'EPISODE_ABOUT_SAINT' &&
+        item.object === selectedSaintId,
+    );
+    const locator = edge?.evidence?.[0]?.locator ?? '';
+    const parts = locator.split(';').map((item) => item.trim()).filter(Boolean);
+    return parts.length > 1 ? parts.slice(1).join(' · ') : '';
+  }, [data, selectedIsManikkavasakar, selectedSaintId]);
+
   const authoredPatikams = useMemo(() => {
     if (!data || selectedIsManikkavasakar) return [];
     const ids = new Set(
