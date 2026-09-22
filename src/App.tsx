@@ -957,7 +957,11 @@ export default function App() {
                   className={tab === item ? 'active' : ''}
                   onClick={() => setTab(item)}
                 >
-                  {item === 'visits' ? 'Tradition' : item[0].toUpperCase() + item.slice(1)}
+                  {item === 'visits'
+                    ? 'Tradition'
+                    : item === 'chronology'
+                      ? 'Journey'
+                      : 'Sources'}
                 </button>
               ))
             ) : (
@@ -968,8 +972,12 @@ export default function App() {
                   onClick={() => setTab(item)}
                 >
                   {item === 'visits'
-                    ? selectedIsManikkavasakar ? 'Textual Loci' : 'Temple Visits'
-                    : item[0].toUpperCase() + item.slice(1)}
+                    ? selectedIsManikkavasakar ? 'Sthalams' : 'Overview'
+                    : item === 'hymns'
+                      ? selectedIsManikkavasakar ? 'Tirumurai 8' : 'Tēvāram'
+                      : item === 'chronology'
+                        ? 'Journey'
+                        : 'Sources'}
                 </button>
               ))
             )}
@@ -993,8 +1001,8 @@ export default function App() {
                   )}
                   <div className="temple-shade" />
                   <div className="temple-title">
-                    <small>CURRENT TALAM</small>
-                    <h2>{selectedSite ? siteDisplayName(selectedSite) : 'Select a talam'}</h2>
+                    <small>CURRENT STHALAM</small>
+                    <h2>{selectedSite ? siteDisplayName(selectedSite) : 'Select a sthalam'}</h2>
                     <p>{selectedSite ? `${cleanLabel(selectedSite.label)}${selectedSite.label_ta ? ` · ${selectedSite.label_ta}` : ''}` : ''}</p>
                   </div>
                   {templeMedia && (
@@ -1006,7 +1014,7 @@ export default function App() {
                   <>
                     <div className="chips">
                       <span>{selectedSite.site_id}</span>
-                      <span>{selectedSite.patikam_count} site patikams</span>
+                      <span>{selectedSite.patikam_count} Tēvāram pathigams</span>
                       {selectedIsManikkavasakar ? (
                         <span>
                           {selectedTirumurai8Locus
@@ -1040,28 +1048,40 @@ export default function App() {
                     ) : (
                       <>
                         {tab === 'visits' && (
-                          <Visits
+                          <SthalamOverview
                             site={selectedSite}
                             saintName={saintName}
-                            count={selectedPatikams.length}
-                            patikamIds={selectedPatikams}
-                            patikamById={patikamById}
+                            selectedCount={selectedPatikams.length}
+                            totalPathigams={selectedSiteAllPatikams.length}
+                            saintBreakdown={selectedSiteSaintBreakdown}
+                            tirumuraiBreakdown={selectedSiteTirumuraiBreakdown}
                           />
                         )}
                         {tab === 'hymns' && (
-                          <Hymns ids={selectedPatikams} patikamById={patikamById} />
+                          <ThevaramDetails
+                            items={selectedSiteAllPatikams}
+                            saintById={saintById}
+                            selectedSaintId={selectedSaintId}
+                          />
                         )}
-                        {tab === 'chronology' && <Chronology />}
-                        {tab === 'evidence' && <Evidence site={selectedSite} data={data} />}
+                        {tab === 'chronology' && (
+                          <JourneyContext
+                            saintName={saintName}
+                            stops={playbackStops}
+                            activeIndex={progress}
+                            geographic={playbackIsGeographic}
+                          />
+                        )}
+                        {tab === 'evidence' && <SourceDetails site={selectedSite} data={data} />}
                       </>
                     )}
 
                     <div className="temple-facts">
-                      <Fact label="Traditional class" value={selectedSite.traditional_location_class || 'Not supplied'} />
-                      <Fact label="Modern catalog" value={selectedSite.modern_name_nic || selectedSite.district || 'Not supplied'} />
-                      <Fact label="Map geometry" value={selectedGeoSeed ? 'Exact modern centroid exemplar' : 'District-level corpus context only'} />
+                      <Fact label="Sacred region" value={selectedSite.traditional_location_class || 'Not supplied'} />
+                      <Fact label="Modern location" value={selectedSite.modern_name_nic || selectedSite.district || 'Not supplied'} />
+                      <Fact label="Map location" value={selectedGeoSeed ? 'Mapped modern centroid' : 'District-level context'} />
                       <Fact
-                        label="Selected-saint evidence"
+                        label="Source layer"
                         value={
                           selectedIsManikkavasakar
                             ? selectedTirumurai8Locus
@@ -1081,7 +1101,7 @@ export default function App() {
                         })
                       }
                     >
-                      <GopuramIcon /> View on static map →
+                      <GopuramIcon /> Locate on map →
                     </button>
                   </>
                 )}
