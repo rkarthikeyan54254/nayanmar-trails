@@ -1229,9 +1229,11 @@ function Evidence({ site, data }: { site: Site; data: PramanaExport }) {
 function Network({
   saint,
   sites,
+  centerLabel,
 }: {
   saint: Saint | null;
   sites: Array<{ site: Site; count: number }>;
+  centerLabel?: string;
 }) {
   const width = 360;
   const height = 148;
@@ -1256,7 +1258,7 @@ function Network({
       })}
       <circle className="center" cx={cx} cy={cy} r="16" />
       <text className="center-text" x={cx} y={cy + 3} textAnchor="middle">
-        {saint?.ordinal ?? '—'}
+        {centerLabel ?? saint?.ordinal ?? '—'}
       </text>
     </svg>
   );
