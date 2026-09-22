@@ -111,7 +111,8 @@ function modernShort(value: string | null | undefined) {
 }
 
 function siteDisplayName(site: Site) {
-  return modernShort(site.modern_name_nic) || cleanLabel(site.label);
+  const mapped = GEO_SEEDS.find((seed) => seed.siteId === site.site_id);
+  return mapped?.name || modernShort(site.modern_name_nic) || cleanLabel(site.label);
 }
 
 export default function App() {
@@ -706,7 +707,7 @@ export default function App() {
               <span>{selectedIsManikkavasakar ? tirumurai8.loci.length : siteLinks.size} total</span>
             </div>
             {topLinkedSites.slice(0, 6).map(({ site, count }) => {
-              const modern = modernShort(site.modern_name_nic);
+              const primary = siteDisplayName(site);
               const canonical = cleanLabel(site.label);
               return (
                 <button
@@ -718,8 +719,8 @@ export default function App() {
                 >
                   <GopuramIcon />
                   <span className="major-talam-copy">
-                    <b>{canonical}</b>
-                    {modern && modern.toLowerCase() !== canonical.toLowerCase() && <em>{modern}</em>}
+                    <b>{primary}</b>
+                    {canonical.toLowerCase() !== primary.toLowerCase() && <em>{canonical}</em>}
                   </span>
                   <small>{count}</small>
                 </button>
@@ -769,7 +770,7 @@ export default function App() {
             progress={progress}
             epigraphicSiteIds={epigraphicSiteIds}
             travelerImage={saintMedia?.src}
-            showUnlinkedExemplars={playbackIsGeographic}
+            showUnlinkedExemplars={false}
             onSelect={(siteId) => {
               setSelectedSiteId(siteId);
               setTab('visits');
@@ -1446,14 +1447,14 @@ function ConnectionModal({
             </div>
             <div className="graph-ranking-list">
               {sites.slice(0, 12).map(({ site, count }, index) => {
-                const modern = modernShort(site.modern_name_nic);
+                const primary = siteDisplayName(site);
                 const canonical = cleanLabel(site.label);
                 return (
                   <button key={site.id} onClick={() => onSelect(site)}>
                     <span className="graph-rank">{String(index + 1).padStart(2, '0')}</span>
                     <span className="graph-rank-copy">
-                      <b>{canonical}</b>
-                      {modern && modern.toLowerCase() !== canonical.toLowerCase() && <small>{modern}</small>}
+                      <b>{primary}</b>
+                      {canonical.toLowerCase() !== primary.toLowerCase() && <small>{canonical}</small>}
                     </span>
                     <strong>{count}</strong>
                   </button>
