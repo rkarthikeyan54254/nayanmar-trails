@@ -712,11 +712,14 @@ export default function App() {
           <div className="map-toolbar">
             <div className="map-toolbar-left">
               <GopuramIcon />
-              <span>{MODE_COPY[mode].short}</span>
+              <span>Static atlas · {selectedIsManikkavasakar ? 'Tirumurai 8' : MODE_COPY[mode].short}</span>
             </div>
             <div className="map-toolbar-stats">
-              <span><b>{siteLinks.size}</b> linked talams</span>
-              <span><b>{saintDistrictCoverage.length}</b> linked districts</span>
+              <span>
+                <b>{selectedIsManikkavasakar ? tirumurai8.loci.length : playbackIsGeographic ? siteLinks.size : traditionalPlaybackStops.length}</b>
+                {selectedIsManikkavasakar ? ' textual loci' : playbackIsGeographic ? ' linked talams' : ' traditional places'}
+              </span>
+              <span><b>{saintDistrictCoverage.length}</b> mapped districts</span>
               <span><b>{routeStops.length}</b> exact exemplars</span>
             </div>
           </div>
@@ -729,6 +732,7 @@ export default function App() {
             progress={progress}
             epigraphicSiteIds={epigraphicSiteIds}
             travelerImage={saintMedia?.src}
+            showUnlinkedExemplars={playbackIsGeographic}
             onSelect={(siteId) => {
               setSelectedSiteId(siteId);
               setTab('visits');
@@ -738,7 +742,11 @@ export default function App() {
           <div className="map-legend">
             <b>Evidence legend</b>
             <span><i className="legend-tower"><GopuramIcon /></i> exact modern centroid for a mapped exemplar</span>
-            <span><i className="legend-route" /> route between known endpoints — product inference</span>
+            {playbackIsGeographic ? (
+              <span><i className="legend-route" /> line between known endpoints — product presentation, not historical road</span>
+            ) : (
+              <span><i className="legend-tradition" /> traditional place sequence plays below without invented coordinates</span>
+            )}
             <span><i className="legend-coverage" /> selected-saint linked-talam density by normalized modern district</span>
             <span><i className="legend-independent" /> explicit independent epigraphic support</span>
           </div>
@@ -746,6 +754,17 @@ export default function App() {
           <div className="map-source-note">
             OpenFreeMap / OpenStreetMap basemap · Pramāṇa data overlay
           </div>
+
+          {!playbackIsGeographic && traditionalPlaybackStops.length > 0 && (
+            <div className="map-fallback-note">
+              <Badge kind="tradition">TRADITION PLAYBACK</Badge>
+              <b>{traditionalPlaybackStops.length} Pramāṇa place traditions are available for {saintName}</b>
+              <p>
+                They play in the timeline below. Pramāṇa does not yet provide reviewed coordinates for these place nodes,
+                so Nayanmar Trails deliberately does not draw a fake geographic route.
+              </p>
+            </div>
+          )}
 
           {graphOpen && (
             <div className="overlay">
