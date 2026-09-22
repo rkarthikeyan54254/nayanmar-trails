@@ -169,6 +169,24 @@ export default function App() {
       .sort((a, b) => b.count - a.count);
   }, [data]);
 
+  const saintDistrictCoverage = useMemo<CoveragePoint[]>(() => {
+    const counts = new Map<string, number>();
+    for (const siteId of siteLinks.keys()) {
+      const site = siteById.get(siteId);
+      if (!site) continue;
+      const key = normalizeDistrict(site.district);
+      if (key === 'unknown') continue;
+      counts.set(key, (counts.get(key) ?? 0) + 1);
+    }
+    return DISTRICT_CENTROIDS
+      .map((district) => ({
+        ...district,
+        count: counts.get(district.key) ?? 0,
+      }))
+      .filter((item) => item.count > 0)
+      .sort((a, b) => b.count - a.count);
+  }, [siteById, siteLinks]);
+
   const topLinkedSites = useMemo(() => {
     return [...siteLinks.entries()]
       .map(([siteId, patikams]) => ({
@@ -473,15 +491,15 @@ export default function App() {
               <span>{MODE_COPY[mode].short}</span>
             </div>
             <div className="map-toolbar-stats">
-              <span><b>{data.meta.counts.tevaram_sites}</b> talam nodes</span>
-              <span><b>{districtCoverage.length}</b> mapped districts</span>
+              <span><b>{siteLinks.size}</b> linked talams</span>
+              <span><b>{saintDistrictCoverage.length}</b> linked districts</span>
               <span><b>{routeStops.length}</b> exact exemplars</span>
             </div>
           </div>
 
           <SacredMap
             routeStops={routeStops}
-            coverage={districtCoverage}
+            coverage={saintDistrictCoverage}
             selectedSiteId={selectedSiteId}
             mode={mode}
             progress={progress}
