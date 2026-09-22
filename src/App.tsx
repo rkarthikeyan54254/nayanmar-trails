@@ -589,9 +589,9 @@ export default function App() {
 
         <nav>
           <button className="active">Explore</button>
-          <button onClick={() => document.querySelector('.timeline')?.scrollIntoView({ behavior: 'smooth' })}>Timeline</button>
-          <button onClick={() => setTab('visits')}>Temples</button>
-          <button onClick={() => setTab('hymns')}>Hymns</button>
+          <button onClick={() => document.querySelector('.timeline')?.scrollIntoView({ behavior: 'smooth' })}>Journeys</button>
+          <button onClick={() => setTab('visits')}>Sthalams</button>
+          <button onClick={() => setTab('hymns')}>Tēvāram</button>
           <button
             onClick={() => {
               if (showTraditionalDetail) {
@@ -600,11 +600,11 @@ export default function App() {
                 setGraphOpen(true);
               }
             }}
-            title={showTraditionalDetail ? 'No mapped route is asserted; open tradition playback below' : 'Open talam connections'}
+            title={showTraditionalDetail ? 'Explore the traditional-place sequence below' : 'Open sthalam connections'}
           >
-            Routes
+            Connections
           </button>
-          <button onClick={() => setTab('evidence')}>Evidence</button>
+          <button onClick={() => setSourcesOpen(true)}>Sources</button>
         </nav>
 
         <div className="header-search">
@@ -612,7 +612,7 @@ export default function App() {
           <input
             value={query}
             onChange={(event) => setQuery(event.target.value)}
-            placeholder="Search saints, temples, or places…"
+            placeholder="Search Nayanmars, sthalams, or places…"
           />
           {query && (
             <div className="search-results">
@@ -662,7 +662,7 @@ export default function App() {
                 </button>
               ))}
               {!searchResults.saints.length && !searchResults.sites.length && !searchResults.manikkavasakar && (
-                <em>No matching Pramāṇa entity</em>
+                <em>No matching saint or sthalam</em>
               )}
             </div>
           )}
@@ -681,9 +681,9 @@ export default function App() {
         <div className="hero-lamp">✦</div>
         <div className="hero-tower left"><GopuramIcon /></div>
         <div className="hero-copy">
-          <span>ANCIENT PATHS · LIVING EVIDENCE</span>
-          <h1>Trace the living journeys of the Nayanmars</h1>
-          <p>Temples, hymns, sacred geography and evidence — read together without blurring what each source can actually support.</p>
+          <span>ANCIENT PATHS · LIVING DEVOTION</span>
+          <h1>Follow the Nayanmars across sacred Tamil Nadu</h1>
+          <p>Explore sthalams, Tēvāram pathigams, saint traditions and the sacred geography that connects them.</p>
         </div>
         <blockquote className="hero-quote">
           “Not just history,<br />but a living landscape of devotion.”
@@ -733,8 +733,8 @@ export default function App() {
           ))}
         </div>
 
-        <div className="mode-pills" aria-label="Evidence lens">
-          <span className="mode-label">Evidence</span>
+        <div className="mode-pills" aria-label="Map view">
+          <span className="mode-label">View</span>
           {(Object.keys(MODE_COPY) as EvidenceMode[]).map((item) => (
             <button
               key={item}
