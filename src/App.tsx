@@ -692,8 +692,10 @@ export default function App() {
     ? locale === 'ta' ? tirumurai8.author.label_ta : tirumurai8.author.display_label
     : localizedSaintName(saint, locale);
   const saintRegistryLabel = selectedIsManikkavasakar
-    ? 'NAALVAR · TIRUMURAI 8'
-    : `NAYANMAR ${saint?.ordinal ?? ''}`;
+    ? tr(locale, 'NAALVAR · TIRUMURAI 8')
+    : locale === 'ta'
+      ? `நாயன்மார் ${saint?.ordinal ?? ''}`
+      : `NAYANMAR ${saint?.ordinal ?? ''}`;
   const saintNumberLabel = selectedIsManikkavasakar ? 'N4' : saint?.ordinal;
   const activePlaybackStop =
     playbackStops[Math.min(progress, Math.max(0, playbackStops.length - 1))];
@@ -834,14 +836,16 @@ export default function App() {
           <p>Explore sthalams, Tēvāram pathigams, saint traditions and the sacred geography that connects them.</p>
         </div>
         <blockquote className="hero-quote">
-          “Not just history,<br />but a living landscape of devotion.”
+          {locale === 'ta'
+            ? <>“வரலாறு மட்டும் அல்ல;<br />உயிருடன் வாழும் பக்தி நிலப்பரப்பு.”</>
+            : <>“Not just history,<br />but a living landscape of devotion.”</>}
         </blockquote>
         <div className="hero-tower right"><GopuramIcon /></div>
         <small className="hero-credit">{HERO_MEDIA.source} · {HERO_MEDIA.license}</small>
       </section>
 
       <section className="filters">
-        <Filter label="Saint">
+        <Filter label={tr(locale, 'Saint')}>
           <select
             value={selectedSaintId}
             onChange={(event) => {
@@ -849,16 +853,16 @@ export default function App() {
               setGraphOpen(false);
             }}
           >
-            <optgroup label="Naalvar">
-              <option value="nayanmar.20">Appar · Tirunavukkarasar</option>
-              <option value="nayanmar.27">Sambandar</option>
-              <option value="nayanmar.63">Sundarar · Arurar</option>
-              <option value={MANIKKAVASAKAR_ID}>Manikkavasakar · Tirumurai 8</option>
+            <optgroup label={tr(locale, 'Naalvar')}>
+              <option value="nayanmar.20">{localizedSaintName(saintById.get('nayanmar.20') ?? null, locale)}</option>
+              <option value="nayanmar.27">{localizedSaintName(saintById.get('nayanmar.27') ?? null, locale)}</option>
+              <option value="nayanmar.63">{localizedSaintName(saintById.get('nayanmar.63') ?? null, locale)}</option>
+              <option value={MANIKKAVASAKAR_ID}>{locale === 'ta' ? tirumurai8.author.label_ta : 'Manikkavasakar · Tirumurai 8'}</option>
             </optgroup>
-            <optgroup label="63 Nayanmar registry">
+            <optgroup label={tr(locale, '63 Nayanmar registry')}>
               {data.saints.map((item) => (
                 <option key={item.id} value={item.id}>
-                  {item.ordinal}. {SAINT_EN[item.id] ?? item.label}
+                  {item.ordinal}. {localizedSaintName(item, locale)}
                 </option>
               ))}
             </optgroup>
@@ -876,7 +880,9 @@ export default function App() {
                 setGraphOpen(false);
               }}
             >
-              {id === MANIKKAVASAKAR_ID ? 'Manikkavasakar' : SAINT_EN[id]?.split(' · ')[0]}
+              {id === MANIKKAVASAKAR_ID
+                ? (locale === 'ta' ? tirumurai8.author.label_ta : 'Manikkavasakar')
+                : localizedSaintName(saintById.get(id) ?? null, locale).split(' · ')[0]}
             </button>
           ))}
         </div>
@@ -926,9 +932,9 @@ export default function App() {
 
           <div className="identity-line">
             <GopuramIcon />
-            {selectedIsManikkavasakar
+            {tr(locale, selectedIsManikkavasakar
               ? 'Naalvar · Tirumurai 8 companion'
-              : '63-Nayanmar traditional identity'}
+              : '63-Nayanmar traditional identity')}
           </div>
 
           <div className="saint-story-source">
@@ -960,17 +966,17 @@ export default function App() {
           <div className="stat-grid">
             {selectedIsManikkavasakar ? (
               <>
-                <Stat value={tirumurai8.works.tiruvacakam.sections} label="Tiruvācakam sections" />
-                <Stat value={tirumurai8.works.tiruvacakam.source_units} label="source units" />
-                <Stat value={tirumurai8.works.tirukkovaiyar.source_order_units} label="Tirukkōvaiyār units" />
-                <Stat value={routeStops.length} label="mapped textual loci" />
+                <Stat value={tirumurai8.works.tiruvacakam.sections} label={tr(locale, 'Tiruvācakam sections')} />
+                <Stat value={tirumurai8.works.tiruvacakam.source_units} label={tr(locale, 'source units')} />
+                <Stat value={tirumurai8.works.tirukkovaiyar.source_order_units} label={tr(locale, 'Tirukkōvaiyār units')} />
+                <Stat value={routeStops.length} label={tr(locale, 'mapped textual loci')} />
               </>
             ) : (
               <>
-                <Stat value={authoredPatikams.length} label="Tēvāram pathigams" />
-                <Stat value={siteLinks.size} label="sung sthalams" />
-                <Stat value={episodeCount} label="Periya Puranam chapter" />
-                <Stat value={playbackStops.length} label="journey stops" />
+                <Stat value={authoredPatikams.length} label={tr(locale, 'Tēvāram pathigams')} />
+                <Stat value={siteLinks.size} label={tr(locale, 'sung sthalams')} />
+                <Stat value={episodeCount} label={tr(locale, 'Periya Puranam chapter')} />
+                <Stat value={playbackStops.length} label={tr(locale, 'journey stops')} />
               </>
             )}
           </div>
@@ -978,18 +984,18 @@ export default function App() {
           <div className="major-temples">
             <div className="section-title">
               <h3>
-                {showTraditionalDetail
+                {tr(locale, showTraditionalDetail
                   ? 'Traditional place claims'
                   : selectedIsManikkavasakar
                     ? 'Tirumurai 8 textual loci'
-                    : 'Major sthalams'}
+                    : 'Major sthalams')}
               </h3>
               <span>
                 {showTraditionalDetail
                   ? traditionalPlaybackStops.length
                   : selectedIsManikkavasakar
                     ? tirumurai8.loci.length
-                    : siteLinks.size} total
+                    : siteLinks.size} {tr(locale, 'total')}
               </span>
             </div>
             {showTraditionalDetail ? (
@@ -1069,7 +1075,7 @@ export default function App() {
             <div className="map-toolbar-stats">
               <span>
                 <b>{selectedIsManikkavasakar ? tirumurai8.loci.length : playbackIsGeographic ? siteLinks.size : traditionalPlaybackStops.length}</b>
-                {selectedIsManikkavasakar ? ' textual loci' : playbackIsGeographic ? ' linked sthalams' : ' traditional places'}
+                {' '}{tr(locale, selectedIsManikkavasakar ? 'textual loci' : playbackIsGeographic ? 'linked sthalams' : 'traditional places')}
               </span>
               <span><b>{saintDistrictCoverage.length}</b><T>mapped districts</T></span>
               <span><b>{routeStops.length}</b><T>mapped sthalams</T></span>
@@ -1128,11 +1134,11 @@ export default function App() {
                   className={tab === item ? 'active' : ''}
                   onClick={() => setTab(item)}
                 >
-                  {item === 'visits'
+                  {tr(locale, item === 'visits'
                     ? 'Tradition'
                     : item === 'chronology'
                       ? 'Journey'
-                      : 'Sources'}
+                      : 'Sources')}
                 </button>
               ))
             ) : (
@@ -1142,13 +1148,13 @@ export default function App() {
                   className={tab === item ? 'active' : ''}
                   onClick={() => setTab(item)}
                 >
-                  {item === 'visits'
+                  {tr(locale, item === 'visits'
                     ? selectedIsManikkavasakar ? 'Sthalams' : 'Overview'
                     : item === 'hymns'
                       ? selectedIsManikkavasakar ? 'Tirumurai 8' : 'Tēvāram'
                       : item === 'chronology'
                         ? 'Journey'
-                        : 'Sources'}
+                        : 'Sources')}
                 </button>
               ))
             )}
