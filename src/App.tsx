@@ -378,7 +378,7 @@ export default function App() {
         name: stop.name,
         detail: selectedIsManikkavasakar
           ? `${stop.hymnIds.length} Tiruvācakam section locus${stop.hymnIds.length === 1 ? '' : 'i'}`
-          : `${stop.hymnIds.length} linked Tēvāram patikam${stop.hymnIds.length === 1 ? '' : 's'}`,
+          : `${stop.hymnIds.length} Tēvāram pathigam${stop.hymnIds.length === 1 ? '' : 's'}`,
         kind: 'exact_text_locus' as const,
         siteId: stop.siteId,
       }));
@@ -388,10 +388,10 @@ export default function App() {
 
   const playbackIsGeographic = routeStops.length >= 2;
   const playbackKind = selectedIsManikkavasakar
-    ? 'Tirumurai 8 textual loci'
+    ? 'Tirumurai 8 journey'
     : playbackIsGeographic
-      ? 'Tēvāram sthalam'
-      : 'Traditional place sequence';
+      ? 'Pilgrimage'
+      : 'Traditional place';
 
   const districtCoverage = useMemo<CoveragePoint[]>(() => {
     if (!data) return [];
@@ -892,7 +892,7 @@ export default function App() {
           <div className="map-toolbar">
             <div className="map-toolbar-left">
               <GopuramIcon />
-              <span>Static atlas · {selectedIsManikkavasakar ? 'Tirumurai 8' : MODE_COPY[mode].short}</span>
+              <span>{saintName.split(' · ')[0]} · {selectedIsManikkavasakar ? 'Tirumurai 8' : MODE_COPY[mode].short}</span>
             </div>
             <div className="map-toolbar-stats">
               <span>
@@ -900,7 +900,7 @@ export default function App() {
                 {selectedIsManikkavasakar ? ' textual loci' : playbackIsGeographic ? ' linked sthalams' : ' traditional places'}
               </span>
               <span><b>{saintDistrictCoverage.length}</b> mapped districts</span>
-              <span><b>{routeStops.length}</b> exact exemplars</span>
+              <span><b>{routeStops.length}</b> mapped sthalams</span>
             </div>
           </div>
 
@@ -921,7 +921,7 @@ export default function App() {
 
           <div className="map-legend">
             <b>Map legend</b>
-            <span><i className="legend-tower"><GopuramIcon /></i> exact modern centroid for a mapped exemplar</span>
+            <span><i className="legend-tower"><GopuramIcon /></i> mapped sthalam location (modern centroid)</span>
             {playbackIsGeographic ? (
               <span><i className="legend-route" /> reconstructed line between known Tēvāram-linked sthalams</span>
             ) : (
@@ -938,9 +938,9 @@ export default function App() {
           {!playbackIsGeographic && traditionalPlaybackStops.length > 0 && (
             <div className="map-fallback-note">
               <Badge kind="tradition">TRADITION PLAYBACK</Badge>
-              <b>{traditionalPlaybackStops.length} traditional place references are available for {saintName}</b>
+              <b>{traditionalPlaybackStops.length} traditional places are associated with {saintName}</b>
               <p>
-                They play in the journey strip below. Reviewed coordinates are not yet attached to these traditional place references, so no geographic route is drawn.
+                Use the journey strip below to explore them. A geographic route is not drawn until reviewed locations are available.
               </p>
             </div>
           )}
@@ -1114,11 +1114,11 @@ export default function App() {
         <div className="panel timeline">
           <div className="section-head">
             <div>
-              <h3>{playbackKind} Playback</h3>
+              <h3>{playbackKind} playback</h3>
               <p>
                 {playbackIsGeographic
-                  ? <>Mapped textual loci in presentation order — <b>not a historical road or chronology.</b></>
-                  : <>Birthplace, related-place and mukti-place traditions — <b>not geocoded or historical chronology.</b></>}
+                  ? <>Follow the selected sthalams in an exploratory sequence. <b>The line is not a claimed ancient road.</b></>
+                  : <>Explore birthplace, related-place and mukti-place traditions. <b>No route is invented between them.</b></>}
               </p>
             </div>
             <Badge kind={playbackIsGeographic ? 'inference' : 'tradition'}>
@@ -1272,7 +1272,7 @@ export default function App() {
 
         <div className="panel density-card">
           <div className="section-title">
-            <h3>Corpus Density</h3>
+            <h3>Sthalam Density</h3>
             <span>276 Tēvāram sthalams</span>
           </div>
           <DensityPanel points={districtCoverage.slice(0, 6)} />
@@ -1282,7 +1282,7 @@ export default function App() {
           <Stat value={data.meta.counts.saints} label="Nayanmars" />
           <Stat value={4} label="Naalvar" />
           <Stat value={data.meta.counts.tevaram_patikams} label="Tēvāram pathigams" />
-          <Stat value={data.meta.counts.total_edges} label="Source links" />
+          <Stat value={data.meta.counts.tevaram_sites} label="Sthalams" />
         </div>
       </section>
 
