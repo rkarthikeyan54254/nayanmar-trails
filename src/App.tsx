@@ -1943,7 +1943,7 @@ function ConnectionModal({
               onSelect={onSelect}
             />
             <div className="graph-stage-caption">
-              Node size reflects linked patikam or section count. Layout is a reading aid, not geography or chronology.
+              Node size reflects linked pathigam or section count. Layout is a reading aid, not geography or chronology.
             </div>
           </div>
 
