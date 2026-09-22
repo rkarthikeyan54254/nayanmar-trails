@@ -16,6 +16,12 @@ export const HERO_MEDIA: MediaCredit = {
 };
 
 export const SAINT_MEDIA: Record<string, MediaCredit> = {
+  'tirumurai8.manikkavacakar': {
+    src: commons('Manikkavacakar, India, Tamil Nadu, Chola period, 11th-12th century AD, bronze - Linden-Museum - Stuttgart, Germany - DSC03795.jpg', 760),
+    title: 'Manikkavacakar bronze, Chola period, Linden-Museum',
+    license: 'CC0 / Daderot',
+    source: 'Wikimedia Commons',
+  },
   'nayanmar.20': {
     src: commons('Appar, Chola period bronze, 12th century, Government Museum, Chennai (1) (37405562076).jpg', 760),
     title: 'Appar, Chola-period bronze, Government Museum Chennai',

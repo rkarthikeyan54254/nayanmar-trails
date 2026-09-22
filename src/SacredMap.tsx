@@ -123,6 +123,7 @@ export default function SacredMap({
   epigraphicSiteIds,
   onSelect,
   travelerImage,
+  showUnlinkedExemplars = true,
 }: {
   routeStops: MapStop[];
   coverage: CoveragePoint[];
@@ -132,6 +133,7 @@ export default function SacredMap({
   epigraphicSiteIds: Set<string>;
   onSelect: (siteId: string) => void;
   travelerImage?: string;
+  showUnlinkedExemplars?: boolean;
 }) {
   const mapNode = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<MapLibreMap | null>(null);
@@ -157,10 +159,10 @@ export default function SacredMap({
       pitch: 4,
       bearing: 0,
       attributionControl: false,
+      interactive: false,
       antialias: true,
     });
 
-    map.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'bottom-right');
     map.addControl(new maplibregl.AttributionControl({ compact: true }), 'bottom-left');
 
     map.on('load', () => {
@@ -340,6 +342,7 @@ export default function SacredMap({
       const linked = linkedSet.has(seed.siteId);
       const independent = epigraphicSiteIds.has(seed.siteId);
       if (mode === 'independent' && !independent) continue;
+      if (!showUnlinkedExemplars && !linked && mode !== 'independent') continue;
 
       const selected = selectedSiteId === entityId;
       const node = document.createElement('button');
@@ -381,19 +384,9 @@ export default function SacredMap({
         .addTo(map);
       markerRefs.current.push(marker);
     }
-  }, [coverage, epigraphicSiteIds, linkedSet, mode, progress, routeStops, selectedSiteId, travelerImage]);
+  }, [coverage, epigraphicSiteIds, linkedSet, mode, progress, routeStops, selectedSiteId, showUnlinkedExemplars, travelerImage]);
 
-  useEffect(() => {
-    const map = mapRef.current;
-    const active = routeStops[Math.min(progress, Math.max(0, routeStops.length - 1))];
-    if (!map || !active || progress === 0) return;
-    map.easeTo({
-      center: [active.lng, active.lat],
-      zoom: 7,
-      pitch: 12,
-      duration: 900,
-    });
-  }, [progress, routeStops]);
+
 
   return (
     <div className="sacred-map-shell">

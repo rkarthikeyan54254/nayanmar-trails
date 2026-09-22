@@ -9,7 +9,57 @@ import type { PramanaExport, Saint, Site } from './types';
 
 type DetailTab = 'hymns' | 'chronology' | 'visits' | 'evidence';
 
+const MANIKKAVASAKAR_ID = 'tirumurai8.manikkavacakar';
 const MUVAR = ['nayanmar.20', 'nayanmar.27', 'nayanmar.63'];
+const NAALVAR = [...MUVAR, MANIKKAVASAKAR_ID];
+
+type Tirumurai8Locus = {
+  id: string;
+  site_id: string;
+  site_entity_id: string;
+  display_name: string;
+  label_ta: string;
+  section_numbers: number[];
+  section_titles_ta: string[];
+  locus_basis: string;
+  authority_scope: string;
+  playback_rank: number;
+};
+
+type Tirumurai8Snapshot = {
+  meta: {
+    source_commit: string;
+    release_id: string;
+    beta_ready: boolean;
+    playback_policy: string;
+  };
+  author: {
+    id: string;
+    label: string;
+    display_label: string;
+    label_ta: string;
+    group: string;
+    registry_note: string;
+  };
+  works: {
+    tiruvacakam: { sections: number; source_units: number };
+    tirukkovaiyar: { source_order_units: number };
+  };
+  authority: {
+    text: string;
+    historical: string;
+    independent_textual_verification: string;
+  };
+  loci: Tirumurai8Locus[];
+};
+
+type PlaybackStop = {
+  id: string;
+  name: string;
+  detail: string;
+  kind: 'exact_text_locus' | 'traditional_place';
+  siteId?: string;
+};
 
 const SAINT_EN: Record<string, string> = {
   'nayanmar.20': 'Appar · Tirunavukkarasar',
@@ -66,7 +116,10 @@ function siteDisplayName(site: Site) {
 
 export default function App() {
   const [data, setData] = useState<PramanaExport | null>(null);
-  const [selectedSaintId, setSelectedSaintId] = useState('nayanmar.20');
+  const [tirumurai8, setTirumurai8] = useState<Tirumurai8Snapshot | null>(null);
+  const [selectedSaintId, setSelectedSaintId] = useState(
+    () => new URLSearchParams(window.location.search).get('saint') || 'nayanmar.20',
+  );
   const [selectedSiteId, setSelectedSiteId] = useState('tevaram_site.KV01');
   const [mode, setMode] = useState<EvidenceMode>('all');
   const [tab, setTab] = useState<DetailTab>('visits');
@@ -76,14 +129,24 @@ export default function App() {
   const [query, setQuery] = useState('');
 
   useEffect(() => {
-    fetch('/data/pramana-export-v1.json')
-      .then((response) => {
-        if (!response.ok) throw new Error(`HTTP ${response.status}`);
-        return response.json();
+    Promise.all([
+      fetch('/data/pramana-export-v1.json').then((response) => {
+        if (!response.ok) throw new Error(`Nayanmar export HTTP ${response.status}`);
+        return response.json() as Promise<PramanaExport>;
+      }),
+      fetch('/data/pramana-tirumurai8-v1.json').then((response) => {
+        if (!response.ok) throw new Error(`Tirumurai 8 export HTTP ${response.status}`);
+        return response.json() as Promise<Tirumurai8Snapshot>;
+      }),
+    ])
+      .then(([graph, t8]) => {
+        setData(graph);
+        setTirumurai8(t8);
       })
-      .then(setData)
-      .catch((error) => console.error('Unable to load Pramāṇa export', error));
+      .catch((error) => console.error('Unable to load Pramāṇa product exports', error));
   }, []);
+
+  const selectedIsManikkavasakar = selectedSaintId === MANIKKAVASAKAR_ID;
 
   const saint = useMemo(
     () => data?.saints.find((item) => item.id === selectedSaintId) ?? null,
@@ -95,13 +158,18 @@ export default function App() {
     [data],
   );
 
+  const traditionalPlaceById = useMemo(
+    () => new Map((data?.traditional_places ?? []).map((item) => [item.id, item])),
+    [data],
+  );
+
   const patikamById = useMemo(
     () => new Map((data?.patikams ?? []).map((item) => [item.id, item])),
     [data],
   );
 
   const authoredPatikams = useMemo(() => {
-    if (!data) return [];
+    if (!data || selectedIsManikkavasakar) return [];
     const ids = new Set(
       data.edges
         .filter(
@@ -112,11 +180,11 @@ export default function App() {
         .map((edge) => edge.object),
     );
     return data.patikams.filter((item) => ids.has(item.id));
-  }, [data, selectedSaintId]);
+  }, [data, selectedIsManikkavasakar, selectedSaintId]);
 
   const siteLinks = useMemo(() => {
     const result = new Map<string, string[]>();
-    if (!data) return result;
+    if (!data || selectedIsManikkavasakar) return result;
     const authored = new Set(authoredPatikams.map((item) => item.id));
     for (const edge of data.edges) {
       if (
@@ -128,7 +196,13 @@ export default function App() {
       result.set(edge.object, [...(result.get(edge.object) ?? []), edge.subject]);
     }
     return result;
-  }, [data, authoredPatikams]);
+  }, [data, authoredPatikams, selectedIsManikkavasakar]);
+
+  const tirumurai8LociBySite = useMemo(() => {
+    const result = new Map<string, Tirumurai8Locus>();
+    for (const locus of tirumurai8?.loci ?? []) result.set(locus.site_entity_id, locus);
+    return result;
+  }, [tirumurai8]);
 
   const epigraphicSiteIds = useMemo(
     () =>
@@ -140,17 +214,84 @@ export default function App() {
     [data],
   );
 
-  const routeStops = useMemo<MapStop[]>(
-    () =>
-      GEO_SEEDS
-        .map((seed) => ({
-          ...seed,
-          hymnIds: siteLinks.get(`tevaram_site.${seed.siteId}`) ?? [],
-        }))
-        .filter((item) => item.hymnIds.length)
-        .sort((a, b) => a.playbackRank - b.playbackRank),
-    [siteLinks],
-  );
+  const routeStops = useMemo<MapStop[]>(() => {
+    if (selectedIsManikkavasakar) {
+      return (tirumurai8?.loci ?? [])
+        .map((locus) => {
+          const seed = GEO_SEEDS.find((item) => item.siteId === locus.site_id);
+          if (!seed) return null;
+          return {
+            ...seed,
+            playbackRank: locus.playback_rank,
+            hymnIds: locus.section_numbers.map((section) => `tirumurai8.section.${section}`),
+          };
+        })
+        .filter((item): item is MapStop => Boolean(item))
+        .sort((a, b) => a.playbackRank - b.playbackRank);
+    }
+
+    return GEO_SEEDS
+      .map((seed) => ({
+        ...seed,
+        hymnIds: siteLinks.get(`tevaram_site.${seed.siteId}`) ?? [],
+      }))
+      .filter((item) => item.hymnIds.length)
+      .sort((a, b) => a.playbackRank - b.playbackRank);
+  }, [selectedIsManikkavasakar, siteLinks, tirumurai8]);
+
+  const traditionalPlaybackStops = useMemo<PlaybackStop[]>(() => {
+    if (!data || selectedIsManikkavasakar) return [];
+    const rank: Record<string, number> = {
+      BIRTHPLACE_TRADITION: 0,
+      RELATED_PLACE_TRADITION: 1,
+      MUKTI_PLACE_TRADITION: 2,
+    };
+    return data.edges
+      .filter(
+        (edge) =>
+          edge.subject === selectedSaintId &&
+          edge.predicate in rank,
+      )
+      .sort((a, b) => (rank[a.predicate] ?? 9) - (rank[b.predicate] ?? 9))
+      .flatMap((edge) => {
+        const place = traditionalPlaceById.get(edge.object);
+        if (!place) return [];
+        const detail =
+          edge.predicate === 'BIRTHPLACE_TRADITION'
+            ? 'Birthplace tradition'
+            : edge.predicate === 'MUKTI_PLACE_TRADITION'
+              ? 'Mukti-place tradition'
+              : 'Related-place tradition';
+        return [{
+          id: `${edge.predicate}:${place.id}`,
+          name: place.label_ta || place.label,
+          detail,
+          kind: 'traditional_place' as const,
+        }];
+      });
+  }, [data, selectedIsManikkavasakar, selectedSaintId, traditionalPlaceById]);
+
+  const playbackStops = useMemo<PlaybackStop[]>(() => {
+    if (routeStops.length >= 2) {
+      return routeStops.map((stop) => ({
+        id: `mapped:${stop.siteId}`,
+        name: stop.name,
+        detail: selectedIsManikkavasakar
+          ? `${stop.hymnIds.length} Tiruvācakam section locus${stop.hymnIds.length === 1 ? '' : 'i'}`
+          : `${stop.hymnIds.length} linked Tēvāram patikam${stop.hymnIds.length === 1 ? '' : 's'}`,
+        kind: 'exact_text_locus' as const,
+        siteId: stop.siteId,
+      }));
+    }
+    return traditionalPlaybackStops;
+  }, [routeStops, selectedIsManikkavasakar, traditionalPlaybackStops]);
+
+  const playbackIsGeographic = routeStops.length >= 2;
+  const playbackKind = selectedIsManikkavasakar
+    ? 'Tirumurai 8 textual loci'
+    : playbackIsGeographic
+      ? 'Mapped Tēvāram loci'
+      : 'Traditional place sequence';
 
   const districtCoverage = useMemo<CoveragePoint[]>(() => {
     if (!data) return [];
@@ -171,13 +312,25 @@ export default function App() {
 
   const saintDistrictCoverage = useMemo<CoveragePoint[]>(() => {
     const counts = new Map<string, number>();
-    for (const siteId of siteLinks.keys()) {
-      const site = siteById.get(siteId);
-      if (!site) continue;
-      const key = normalizeDistrict(site.district);
-      if (key === 'unknown') continue;
-      counts.set(key, (counts.get(key) ?? 0) + 1);
+
+    if (selectedIsManikkavasakar) {
+      for (const stop of routeStops) {
+        const site = siteById.get(`tevaram_site.${stop.siteId}`);
+        if (!site) continue;
+        const key = normalizeDistrict(site.district);
+        if (key === 'unknown') continue;
+        counts.set(key, (counts.get(key) ?? 0) + 1);
+      }
+    } else {
+      for (const siteId of siteLinks.keys()) {
+        const site = siteById.get(siteId);
+        if (!site) continue;
+        const key = normalizeDistrict(site.district);
+        if (key === 'unknown') continue;
+        counts.set(key, (counts.get(key) ?? 0) + 1);
+      }
     }
+
     return DISTRICT_CENTROIDS
       .map((district) => ({
         ...district,
@@ -185,9 +338,19 @@ export default function App() {
       }))
       .filter((item) => item.count > 0)
       .sort((a, b) => b.count - a.count);
-  }, [siteById, siteLinks]);
+  }, [routeStops, selectedIsManikkavasakar, siteById, siteLinks]);
 
   const topLinkedSites = useMemo(() => {
+    if (selectedIsManikkavasakar) {
+      return (tirumurai8?.loci ?? [])
+        .map((locus) => ({
+          site: siteById.get(locus.site_entity_id),
+          count: locus.section_numbers.length,
+        }))
+        .filter((item): item is { site: Site; count: number } => Boolean(item.site))
+        .sort((a, b) => b.count - a.count);
+    }
+
     return [...siteLinks.entries()]
       .map(([siteId, patikams]) => ({
         site: siteById.get(siteId),
@@ -196,23 +359,28 @@ export default function App() {
       .filter((item): item is { site: Site; count: number } => Boolean(item.site))
       .sort((a, b) => b.count - a.count || b.site.patikam_count - a.site.patikam_count)
       .slice(0, 6);
-  }, [siteById, siteLinks]);
+  }, [selectedIsManikkavasakar, siteById, siteLinks, tirumurai8]);
 
   const selectedSite = siteById.get(selectedSiteId) ?? null;
   const selectedPatikams = siteLinks.get(selectedSiteId) ?? [];
+  const selectedTirumurai8Locus = tirumurai8LociBySite.get(selectedSiteId) ?? null;
 
   const episodeCount =
-    data?.edges.filter(
-      (edge) =>
-        edge.predicate === 'EPISODE_ABOUT_SAINT' &&
-        edge.object === selectedSaintId,
-    ).length ?? 0;
+    selectedIsManikkavasakar
+      ? 0
+      : data?.edges.filter(
+          (edge) =>
+            edge.predicate === 'EPISODE_ABOUT_SAINT' &&
+            edge.object === selectedSaintId,
+        ).length ?? 0;
 
   const independentEdges =
     data?.edges.filter((edge) => edge.authority_scope === 'epigraphic_primary').length ?? 0;
 
   const searchResults = useMemo(() => {
-    if (!data || !query.trim()) return { saints: [] as Saint[], sites: [] as Site[] };
+    if (!data || !query.trim()) {
+      return { saints: [] as Saint[], sites: [] as Site[], manikkavasakar: false };
+    }
     const needle = query.trim().toLowerCase();
 
     const saints = data.saints
@@ -231,7 +399,10 @@ export default function App() {
       )
       .slice(0, 5);
 
-    return { saints, sites };
+    const manikkavasakar = ['manikkavasakar', 'manikkavacakar', 'மாணிக்கவாசகர்']
+      .some((value) => value.toLowerCase().includes(needle) || needle.includes(value.toLowerCase()));
+
+    return { saints, sites, manikkavasakar };
   }, [data, query]);
 
   useEffect(() => {
@@ -240,10 +411,16 @@ export default function App() {
   }, [selectedSaintId]);
 
   useEffect(() => {
-    if (!playing || routeStops.length < 2) return;
+    if (!selectedIsManikkavasakar || !tirumurai8?.loci.length) return;
+    setSelectedSiteId(tirumurai8.loci[0].site_entity_id);
+    setTab('visits');
+  }, [selectedIsManikkavasakar, tirumurai8]);
+
+  useEffect(() => {
+    if (!playing || playbackStops.length < 2) return;
     const timer = window.setInterval(() => {
       setProgress((value) => {
-        if (value >= routeStops.length - 1) {
+        if (value >= playbackStops.length - 1) {
           setPlaying(false);
           return value;
         }
@@ -251,9 +428,9 @@ export default function App() {
       });
     }, 1500);
     return () => window.clearInterval(timer);
-  }, [playing, routeStops.length]);
+  }, [playing, playbackStops.length]);
 
-  if (!data) {
+  if (!data || !tirumurai8) {
     return (
       <div className="loading">
         <div className="loading-mark"><GopuramIcon /></div>
@@ -262,10 +439,20 @@ export default function App() {
     );
   }
 
-  const saintName = SAINT_EN[selectedSaintId] ?? saint?.label ?? 'Nayanmar';
-  const activeStop = routeStops[Math.min(progress, Math.max(0, routeStops.length - 1))];
+  const saintName = selectedIsManikkavasakar
+    ? tirumurai8.author.display_label
+    : SAINT_EN[selectedSaintId] ?? saint?.label ?? 'Nayanmar';
+  const saintTamil = selectedIsManikkavasakar
+    ? tirumurai8.author.label_ta
+    : saint?.label_ta ?? '';
+  const saintRegistryLabel = selectedIsManikkavasakar
+    ? 'NAALVAR · TIRUMURAI 8'
+    : `NAYANMAR ${saint?.ordinal ?? ''}`;
+  const saintNumberLabel = selectedIsManikkavasakar ? 'N4' : saint?.ordinal;
+  const activePlaybackStop =
+    playbackStops[Math.min(progress, Math.max(0, playbackStops.length - 1))];
   const progressPct =
-    routeStops.length <= 1 ? 0 : (progress / (routeStops.length - 1)) * 100;
+    playbackStops.length <= 1 ? 0 : (progress / (playbackStops.length - 1)) * 100;
   const saintMedia = SAINT_MEDIA[selectedSaintId];
   const templeMedia = selectedSite ? TEMPLE_MEDIA[selectedSite.id] : undefined;
   const selectedGeoSeed = selectedSite
@@ -316,6 +503,20 @@ export default function App() {
                   </span>
                 </button>
               ))}
+              {searchResults.manikkavasakar && (
+                <button
+                  onClick={() => {
+                    setSelectedSaintId(MANIKKAVASAKAR_ID);
+                    setQuery('');
+                  }}
+                >
+                  <GopuramIcon />
+                  <span>
+                    Manikkavasakar
+                    <small>Naalvar · Tirumurai 8 · not numbered among the 63</small>
+                  </span>
+                </button>
+              )}
               {searchResults.sites.map((item) => (
                 <button
                   key={item.id}
@@ -332,7 +533,7 @@ export default function App() {
                   </span>
                 </button>
               ))}
-              {!searchResults.saints.length && !searchResults.sites.length && (
+              {!searchResults.saints.length && !searchResults.sites.length && !searchResults.manikkavasakar && (
                 <em>No matching Pramāṇa entity</em>
               )}
             </div>
@@ -366,11 +567,19 @@ export default function App() {
       <section className="filters">
         <Filter label="Saint">
           <select value={selectedSaintId} onChange={(event) => setSelectedSaintId(event.target.value)}>
-            {data.saints.map((item) => (
-              <option key={item.id} value={item.id}>
-                {item.ordinal}. {SAINT_EN[item.id] ?? item.label}
-              </option>
-            ))}
+            <optgroup label="Naalvar">
+              <option value="nayanmar.20">Appar · Tirunavukkarasar</option>
+              <option value="nayanmar.27">Sambandar</option>
+              <option value="nayanmar.63">Sundarar · Arurar</option>
+              <option value={MANIKKAVASAKAR_ID}>Manikkavasakar · Tirumurai 8</option>
+            </optgroup>
+            <optgroup label="63 Nayanmar registry">
+              {data.saints.map((item) => (
+                <option key={item.id} value={item.id}>
+                  {item.ordinal}. {SAINT_EN[item.id] ?? item.label}
+                </option>
+              ))}
+            </optgroup>
           </select>
         </Filter>
 
@@ -422,7 +631,7 @@ export default function App() {
               <div className="saint-fallback"><GopuramIcon /></div>
             )}
             <div className="saint-gradient" />
-            <div className="saint-number">{saint?.ordinal}</div>
+            <div className="saint-number">{saintNumberLabel}</div>
             <div className="saint-temple"><GopuramIcon /></div>
             {saintMedia && (
               <small className="media-credit">
@@ -432,28 +641,44 @@ export default function App() {
           </div>
 
           <div className="saint-heading">
-            <small>NAYANMAR {saint?.ordinal}</small>
+            <small>{saintRegistryLabel}</small>
             <h2>{saintName}</h2>
-            <div className="tamil">{saint?.label_ta}</div>
+            <div className="tamil">{saintTamil}</div>
           </div>
 
-          <div className="identity-line"><GopuramIcon /> Traditional identity</div>
+          <div className="identity-line">
+            <GopuramIcon />
+            {selectedIsManikkavasakar
+              ? 'Naalvar · Tirumurai 8 companion'
+              : '63-Nayanmar traditional identity'}
+          </div>
 
           <blockquote className="saint-quote">
             The devotional story remains vivid; the evidence layer remains explicit.
           </blockquote>
 
           <div className="stat-grid">
-            <Stat value={authoredPatikams.length} label="Tēvāram patikams" />
-            <Stat value={siteLinks.size} label="linked talams" />
-            <Stat value={episodeCount} label="Periya Puranam links" />
-            <Stat value={routeStops.length} label="exact mapped exemplars" />
+            {selectedIsManikkavasakar ? (
+              <>
+                <Stat value={tirumurai8.works.tiruvacakam.sections} label="Tiruvācakam sections" />
+                <Stat value={tirumurai8.works.tiruvacakam.source_units} label="source units" />
+                <Stat value={tirumurai8.works.tirukkovaiyar.source_order_units} label="Tirukkōvaiyār units" />
+                <Stat value={routeStops.length} label="mapped textual loci" />
+              </>
+            ) : (
+              <>
+                <Stat value={authoredPatikams.length} label="Tēvāram patikams" />
+                <Stat value={siteLinks.size} label="linked talams" />
+                <Stat value={episodeCount} label="Periya Puranam links" />
+                <Stat value={playbackStops.length} label="playback stops" />
+              </>
+            )}
           </div>
 
           <div className="major-temples">
             <div className="section-title">
-              <h3>Major linked talams</h3>
-              <span>{siteLinks.size} total</span>
+              <h3>{selectedIsManikkavasakar ? 'Tirumurai 8 textual loci' : 'Major linked talams'}</h3>
+              <span>{selectedIsManikkavasakar ? tirumurai8.loci.length : siteLinks.size} total</span>
             </div>
             {topLinkedSites.map(({ site, count }) => (
               <button
@@ -473,14 +698,18 @@ export default function App() {
           <div className="journey-progress">
             <div>
               <b>Playback progress</b>
-              <span>{routeStops.length ? Math.min(progress + 1, routeStops.length) : 0} / {routeStops.length}</span>
+              <span>{playbackStops.length ? Math.min(progress + 1, playbackStops.length) : 0} / {playbackStops.length}</span>
             </div>
             <div className="mini-track"><i style={{ width: `${progressPct}%` }} /></div>
           </div>
 
           <div className="authority-box">
-            <b>{MODE_COPY[mode].short}</b>
-            <p>{MODE_COPY[mode].body}</p>
+            <b>{selectedIsManikkavasakar ? 'Tirumurai 8 authority boundary' : MODE_COPY[mode].short}</b>
+            <p>
+              {selectedIsManikkavasakar
+                ? 'Pramāṇa preserves the Tiruvācakam/Tirukkōvaiyār edition loci; the two plotted modern centroids and the line between them are product presentation, not a historical journey claim.'
+                : MODE_COPY[mode].body}
+            </p>
           </div>
         </aside>
 
@@ -488,11 +717,14 @@ export default function App() {
           <div className="map-toolbar">
             <div className="map-toolbar-left">
               <GopuramIcon />
-              <span>{MODE_COPY[mode].short}</span>
+              <span>Static atlas · {selectedIsManikkavasakar ? 'Tirumurai 8' : MODE_COPY[mode].short}</span>
             </div>
             <div className="map-toolbar-stats">
-              <span><b>{siteLinks.size}</b> linked talams</span>
-              <span><b>{saintDistrictCoverage.length}</b> linked districts</span>
+              <span>
+                <b>{selectedIsManikkavasakar ? tirumurai8.loci.length : playbackIsGeographic ? siteLinks.size : traditionalPlaybackStops.length}</b>
+                {selectedIsManikkavasakar ? ' textual loci' : playbackIsGeographic ? ' linked talams' : ' traditional places'}
+              </span>
+              <span><b>{saintDistrictCoverage.length}</b> mapped districts</span>
               <span><b>{routeStops.length}</b> exact exemplars</span>
             </div>
           </div>
@@ -505,6 +737,7 @@ export default function App() {
             progress={progress}
             epigraphicSiteIds={epigraphicSiteIds}
             travelerImage={saintMedia?.src}
+            showUnlinkedExemplars={playbackIsGeographic}
             onSelect={(siteId) => {
               setSelectedSiteId(siteId);
               setTab('visits');
@@ -514,7 +747,11 @@ export default function App() {
           <div className="map-legend">
             <b>Evidence legend</b>
             <span><i className="legend-tower"><GopuramIcon /></i> exact modern centroid for a mapped exemplar</span>
-            <span><i className="legend-route" /> route between known endpoints — product inference</span>
+            {playbackIsGeographic ? (
+              <span><i className="legend-route" /> line between known endpoints — product presentation, not historical road</span>
+            ) : (
+              <span><i className="legend-tradition" /> traditional place sequence plays below without invented coordinates</span>
+            )}
             <span><i className="legend-coverage" /> selected-saint linked-talam density by normalized modern district</span>
             <span><i className="legend-independent" /> explicit independent epigraphic support</span>
           </div>
@@ -523,22 +760,35 @@ export default function App() {
             OpenFreeMap / OpenStreetMap basemap · Pramāṇa data overlay
           </div>
 
+          {!playbackIsGeographic && traditionalPlaybackStops.length > 0 && (
+            <div className="map-fallback-note">
+              <Badge kind="tradition">TRADITION PLAYBACK</Badge>
+              <b>{traditionalPlaybackStops.length} Pramāṇa place traditions are available for {saintName}</b>
+              <p>
+                They play in the timeline below. Pramāṇa does not yet provide reviewed coordinates for these place nodes,
+                so Nayanmar Trails deliberately does not draw a fake geographic route.
+              </p>
+            </div>
+          )}
+
           {graphOpen && (
             <div className="overlay">
               <div className="overlay-head">
                 <div>
-                  <small>SELECTED SAINT</small>
-                  <h3>Saint ↔ Talam Connections</h3>
+                  <small>{selectedIsManikkavasakar ? 'NAALVAR · TIRUMURAI 8' : 'SELECTED NAYANMAR'}</small>
+                  <h3>{selectedIsManikkavasakar ? 'Tirumurai 8 ↔ Talam Loci' : 'Saint ↔ Talam Connections'}</h3>
                 </div>
                 <button onClick={() => setGraphOpen(false)}>Close</button>
               </div>
               <Network
                 saint={saint}
+                centerLabel={selectedIsManikkavasakar ? 'M' : undefined}
                 sites={topLinkedSites.slice(0, 12)}
               />
               <p>
-                Edges are Tēvāram author → patikam → talam relationships from the versioned Pramāṇa export.
-                Layout position has no evidentiary meaning.
+                {selectedIsManikkavasakar
+                  ? 'Edges show the explicitly qualified Tiruvācakam section-to-locus mappings in this pinned product snapshot. They are not a biographical itinerary.'
+                  : 'Edges are Tēvāram author → patikam → talam relationships from the versioned Pramāṇa export. Layout position has no evidentiary meaning.'}
               </p>
             </div>
           )}
@@ -552,7 +802,9 @@ export default function App() {
                 className={tab === item ? 'active' : ''}
                 onClick={() => setTab(item)}
               >
-                {item === 'visits' ? 'Temple Visits' : item[0].toUpperCase() + item.slice(1)}
+                {item === 'visits'
+                  ? selectedIsManikkavasakar ? 'Textual Loci' : 'Temple Visits'
+                  : item[0].toUpperCase() + item.slice(1)}
               </button>
             ))}
           </div>
@@ -580,29 +832,69 @@ export default function App() {
                 <div className="chips">
                   <span>{selectedSite.site_id}</span>
                   <span>{selectedSite.patikam_count} site patikams</span>
-                  <span>{selectedPatikams.length} by {saintName.split(' · ')[0]}</span>
+                  {selectedIsManikkavasakar ? (
+                    <span>
+                      {selectedTirumurai8Locus
+                        ? `${selectedTirumurai8Locus.section_numbers.length} Tiruvācakam section ${selectedTirumurai8Locus.section_numbers.length === 1 ? 'locus' : 'loci'}`
+                        : 'no mapped Tirumurai 8 locus'}
+                    </span>
+                  ) : (
+                    <span>{selectedPatikams.length} by {saintName.split(' · ')[0]}</span>
+                  )}
                 </div>
 
-                {tab === 'visits' && (
-                  <Visits
-                    site={selectedSite}
-                    saintName={saintName}
-                    count={selectedPatikams.length}
-                    patikamIds={selectedPatikams}
-                    patikamById={patikamById}
-                  />
+                {selectedIsManikkavasakar ? (
+                  <>
+                    {(tab === 'visits' || tab === 'hymns') && (
+                      <Tirumurai8LocusDetail
+                        locus={selectedTirumurai8Locus}
+                        view={tab}
+                      />
+                    )}
+                    {tab === 'chronology' && (
+                      <Tirumurai8Chronology snapshot={tirumurai8} />
+                    )}
+                    {tab === 'evidence' && (
+                      <Tirumurai8Evidence
+                        locus={selectedTirumurai8Locus}
+                        site={selectedSite}
+                        snapshot={tirumurai8}
+                      />
+                    )}
+                  </>
+                ) : (
+                  <>
+                    {tab === 'visits' && (
+                      <Visits
+                        site={selectedSite}
+                        saintName={saintName}
+                        count={selectedPatikams.length}
+                        patikamIds={selectedPatikams}
+                        patikamById={patikamById}
+                      />
+                    )}
+                    {tab === 'hymns' && (
+                      <Hymns ids={selectedPatikams} patikamById={patikamById} />
+                    )}
+                    {tab === 'chronology' && <Chronology />}
+                    {tab === 'evidence' && <Evidence site={selectedSite} data={data} />}
+                  </>
                 )}
-                {tab === 'hymns' && (
-                  <Hymns ids={selectedPatikams} patikamById={patikamById} />
-                )}
-                {tab === 'chronology' && <Chronology />}
-                {tab === 'evidence' && <Evidence site={selectedSite} data={data} />}
 
                 <div className="temple-facts">
                   <Fact label="Traditional class" value={selectedSite.traditional_location_class || 'Not supplied'} />
                   <Fact label="Modern catalog" value={selectedSite.modern_name_nic || selectedSite.district || 'Not supplied'} />
                   <Fact label="Map geometry" value={selectedGeoSeed ? 'Exact modern centroid exemplar' : 'District-level corpus context only'} />
-                  <Fact label="Evidence class" value={authorityLabel(selectedSite.authority_scope)} />
+                  <Fact
+                    label="Selected-saint evidence"
+                    value={
+                      selectedIsManikkavasakar
+                        ? selectedTirumurai8Locus
+                          ? 'Tirumurai 8 textual locus'
+                          : 'No mapped Tirumurai 8 locus'
+                        : authorityLabel(selectedSite.authority_scope)
+                    }
+                  />
                 </div>
 
                 <button
@@ -614,7 +906,7 @@ export default function App() {
                     })
                   }
                 >
-                  <GopuramIcon /> View on map →
+                  <GopuramIcon /> View on static map →
                 </button>
               </>
             )}
@@ -626,18 +918,29 @@ export default function App() {
         <div className="panel timeline">
           <div className="section-head">
             <div>
-              <h3>Journey Playback</h3>
-              <p>Geographic presentation sequence — <b>not a historical chronology.</b></p>
+              <h3>{playbackKind} Playback</h3>
+              <p>
+                {playbackIsGeographic
+                  ? <>Mapped textual loci in presentation order — <b>not a historical road or chronology.</b></>
+                  : <>Pramāṇa birth/related/mukti place traditions — <b>not geocoded or historical chronology.</b></>}
+              </p>
             </div>
-            <Badge kind="inference">INFERENCE</Badge>
+            <Badge kind={playbackIsGeographic ? 'inference' : 'tradition'}>
+              {playbackIsGeographic ? 'PRESENTATION' : 'TRADITION'}
+            </Badge>
           </div>
 
           <div className="play-row">
             <button
               className="play"
-              disabled={routeStops.length < 2}
+              disabled={playbackStops.length < 1}
               onClick={() => {
-                if (progress >= routeStops.length - 1) setProgress(0);
+                if (playbackStops.length === 1) {
+                  setProgress(0);
+                  setPlaying(false);
+                  return;
+                }
+                if (progress >= playbackStops.length - 1) setProgress(0);
                 setPlaying((value) => !value);
               }}
             >
@@ -646,82 +949,107 @@ export default function App() {
 
             <div className="track">
               <div className="fill" style={{ width: `${progressPct}%` }} />
-              {routeStops.map((stop, index) => (
+              {playbackStops.map((stop, index) => (
                 <button
-                  key={stop.siteId}
-                  title={stop.name}
-                  className={`stop ${index <= progress ? 'reached' : ''}`}
+                  key={stop.id}
+                  title={`${stop.name} · ${stop.detail}`}
+                  className={`stop ${index <= progress ? 'reached' : ''} ${stop.kind === 'traditional_place' ? 'traditional-stop' : ''}`}
                   style={{
-                    left: `${routeStops.length <= 1 ? 0 : (index / (routeStops.length - 1)) * 100}%`,
+                    left: `${playbackStops.length <= 1 ? 0 : (index / (playbackStops.length - 1)) * 100}%`,
                   }}
                   onClick={() => {
                     setProgress(index);
-                    setSelectedSiteId(`tevaram_site.${stop.siteId}`);
+                    if (stop.siteId) setSelectedSiteId(`tevaram_site.${stop.siteId}`);
                   }}
                 />
               ))}
             </div>
 
             <div className="now">
-              {activeStop ? (
+              {activePlaybackStop ? (
                 <>
-                  <b>{activeStop.name}</b>
-                  <small>{activeStop.hymnIds.length} linked patikam{activeStop.hymnIds.length === 1 ? '' : 's'}</small>
+                  <b>{activePlaybackStop.name}</b>
+                  <small>{activePlaybackStop.detail}</small>
                 </>
               ) : (
                 <>
-                  <b>No exact mapped playback</b>
-                  <small>This saint has no current exact seed stops.</small>
+                  <b>No playback evidence yet</b>
+                  <small>No mapped loci or traditional place references are available for this selection.</small>
                 </>
               )}
             </div>
           </div>
 
           <div className="timeline-labels">
-            {routeStops.slice(0, 6).map((stop) => <span key={stop.siteId}>{stop.name}</span>)}
+            {playbackStops.slice(0, 6).map((stop) => (
+              <span key={stop.id}>{stop.name}</span>
+            ))}
           </div>
 
           <div className="saint-registry">
             <div className="registry-copy">
-              <b>63-saint traditional registry</b>
-              <small>ordinal sequence · not historical dating</small>
+              <b>Naalvar + 63-saint registry</b>
+              <small>Manikkavasakar is Naalvar, not a 64th Nayanmar</small>
             </div>
-            <div className="registry-dots">
-              {data.saints
-                .slice()
-                .sort((a, b) => a.ordinal - b.ordinal)
-                .map((item) => (
+            <div className="registry-stack">
+              <div className="naalvar-mini">
+                {NAALVAR.map((id) => (
                   <button
-                    key={item.id}
-                    title={SAINT_EN[item.id] ?? item.label}
-                    className={item.id === selectedSaintId ? 'selected' : ''}
-                    onClick={() => setSelectedSaintId(item.id)}
-                  />
+                    key={id}
+                    className={id === selectedSaintId ? 'selected' : ''}
+                    onClick={() => setSelectedSaintId(id)}
+                  >
+                    {id === MANIKKAVASAKAR_ID
+                      ? 'Manikkavasakar'
+                      : SAINT_EN[id]?.split(' · ')[0]}
+                  </button>
                 ))}
+              </div>
+              <div className="registry-dots">
+                {data.saints
+                  .slice()
+                  .sort((a, b) => a.ordinal - b.ordinal)
+                  .map((item) => (
+                    <button
+                      key={item.id}
+                      title={SAINT_EN[item.id] ?? item.label}
+                      className={item.id === selectedSaintId ? 'selected' : ''}
+                      onClick={() => setSelectedSaintId(item.id)}
+                    />
+                  ))}
+              </div>
             </div>
           </div>
         </div>
 
         <div className="panel graph-mini">
           <div className="section-title">
-            <h3>Saint – Talam Graph</h3>
-            <span>{siteLinks.size} linked talams</span>
+            <h3>{selectedIsManikkavasakar ? 'Tirumurai 8 – Talam Graph' : 'Saint – Talam Graph'}</h3>
+            <span>
+              {selectedIsManikkavasakar
+                ? `${tirumurai8.loci.length} textual loci`
+                : `${siteLinks.size} linked talams`}
+            </span>
           </div>
-          <Network saint={saint} sites={topLinkedSites.slice(0, 8)} />
+          <Network
+            saint={saint}
+            centerLabel={selectedIsManikkavasakar ? 'M' : undefined}
+            sites={topLinkedSites.slice(0, 8)}
+          />
         </div>
 
         <div className="panel density-card">
           <div className="section-title">
             <h3>Corpus Density</h3>
-            <span>by catalog district</span>
+            <span>all 276 Tēvāram catalog sites</span>
           </div>
           <DensityPanel points={districtCoverage.slice(0, 6)} />
         </div>
 
         <div className="panel totals">
           <Stat value={data.meta.counts.saints} label="Nayanmars" />
-          <Stat value={data.meta.counts.tevaram_sites} label="Tēvāram talams" />
-          <Stat value={data.meta.counts.tevaram_patikams} label="Patikams" />
+          <Stat value={4} label="Naalvar" />
+          <Stat value={data.meta.counts.tevaram_patikams} label="Tēvāram patikams" />
           <Stat value={data.meta.counts.total_edges} label="Typed edges" />
         </div>
       </section>
@@ -771,6 +1099,113 @@ function Fact({ label, value }: { label: string; value: string | number }) {
         <small>{label}</small>
         {value}
       </span>
+    </div>
+  );
+}
+
+
+function Tirumurai8LocusDetail({
+  locus,
+  view,
+}: {
+  locus: Tirumurai8Locus | null;
+  view: 'visits' | 'hymns';
+}) {
+  if (!locus) {
+    return (
+      <div className="text">
+        <Badge kind="edition">NO MAPPED TIRUMURAI 8 LOCUS</Badge>
+        <p>
+          This talam is part of the broader Tēvāram catalog, but the pinned Tirumurai 8 product snapshot does not map a Manikkavasakar textual locus here.
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="text">
+      <Badge kind="edition">TIRUMURAI 8 · SOURCE-PRESERVED LOCUS</Badge>
+      {view === 'visits' ? (
+        <p>
+          This view is a <b>textual-locus mapping</b>, not a claim that Pramāṇa has established a historical temple visit or a travel sequence for Manikkavasakar.
+        </p>
+      ) : (
+        <p>
+          The pinned Tiruvācakam edition metadata associates this product locus with the following section title{locus.section_numbers.length === 1 ? '' : 's'}.
+        </p>
+      )}
+
+      <div className="locus-strip">
+        <small>TIRUVĀCAKAM SECTIONS</small>
+        <div>
+          {locus.section_numbers.map((section, index) => (
+            <span key={section} title={locus.section_titles_ta[index]}>
+              <GopuramIcon />
+              Section {section}
+            </span>
+          ))}
+        </div>
+      </div>
+
+      <ul className="t8-section-list">
+        {locus.section_titles_ta.map((title, index) => (
+          <li key={locus.id + ':' + index}>
+            <b>{locus.section_numbers[index]}</b>
+            <span>{title}</span>
+          </li>
+        ))}
+      </ul>
+
+      <div className="evidence-callout">
+        <GopuramIcon />
+        <p>{locus.locus_basis}</p>
+      </div>
+    </div>
+  );
+}
+
+function Tirumurai8Chronology({ snapshot }: { snapshot: Tirumurai8Snapshot }) {
+  return (
+    <div className="text">
+      <Badge kind="inference">FAIL-CLOSED BIOGRAPHICAL CHRONOLOGY</Badge>
+      <p>
+        Pramāṇa v1 has a beta-ready Tiruvācakam/Tirukkōvaiyār edition corpus, but it does not automatically turn section order into Manikkavasakar's historical itinerary.
+      </p>
+      <div className="evidence-callout">
+        <GopuramIcon />
+        <p>{snapshot.meta.playback_policy}</p>
+      </div>
+    </div>
+  );
+}
+
+function Tirumurai8Evidence({
+  locus,
+  site,
+  snapshot,
+}: {
+  locus: Tirumurai8Locus | null;
+  site: Site;
+  snapshot: Tirumurai8Snapshot;
+}) {
+  return (
+    <div className="text">
+      <Badge kind="edition">{snapshot.authority.text.replace(/_/g, ' ')}</Badge>
+      <p>
+        Tirumurai 8 is pinned from Pramāṇa release <b>{snapshot.meta.release_id}</b>. Historical authority remains <b>{snapshot.authority.historical.replace(/_/g, ' ')}</b>.
+      </p>
+      {locus ? (
+        <div className="inscription">
+          <Badge kind="edition">TEXTUAL LOCUS</Badge>
+          <b>{locus.display_name}</b>
+          <p>{locus.locus_basis}</p>
+        </div>
+      ) : (
+        <div className="evidence-callout muted">
+          <GopuramIcon />
+          <p>No Tirumurai 8 textual-locus mapping is attached to {siteDisplayName(site)} in this product snapshot.</p>
+        </div>
+      )}
     </div>
   );
 }
@@ -913,9 +1348,11 @@ function Evidence({ site, data }: { site: Site; data: PramanaExport }) {
 function Network({
   saint,
   sites,
+  centerLabel,
 }: {
   saint: Saint | null;
   sites: Array<{ site: Site; count: number }>;
+  centerLabel?: string;
 }) {
   const width = 360;
   const height = 148;
@@ -940,7 +1377,7 @@ function Network({
       })}
       <circle className="center" cx={cx} cy={cy} r="16" />
       <text className="center-text" x={cx} y={cy + 3} textAnchor="middle">
-        {saint?.ordinal ?? '—'}
+        {centerLabel ?? saint?.ordinal ?? '—'}
       </text>
     </svg>
   );

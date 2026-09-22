@@ -1,0 +1,83 @@
+{
+  "meta": {
+    "export_version": "pramana-tirumurai8-product-metadata-v1",
+    "source_repo": "rkarthikeyan54254/pramana",
+    "source_commit": "1f2cec34c5b4412fe3178884a38a51dbca6eb452",
+    "source_paths": [
+      "data/release/tirumurai8_v1_beta_status.json",
+      "data/review/tirumurai8_v1_section_catalog.json"
+    ],
+    "release_id": "pramana-tirumurai8-v1.0-beta",
+    "release_class": "BETA",
+    "beta_ready": true,
+    "ga_ready": false,
+    "public_text_release_ready": false,
+    "playback_policy": "Section-order presentation of explicitly mapped textual loci; not a biographical journey or historical chronology."
+  },
+  "author": {
+    "id": "tirumurai8.manikkavacakar",
+    "label": "Manikkavacakar",
+    "display_label": "Manikkavasakar",
+    "label_ta": "மாணிக்கவாசகர்",
+    "group": "Naalvar",
+    "registry_note": "Traditionally one of the Naalvar; kept outside the numbered 63-Nayanmar registry."
+  },
+  "works": {
+    "tiruvacakam": {
+      "sections": 51,
+      "source_units": 661,
+      "cumulative_start": 1,
+      "cumulative_terminal": 661,
+      "identity_policy": "section + source-order unit; printed cumulative locator preserved separately"
+    },
+    "tirukkovaiyar": {
+      "source_order_units": 400,
+      "source_order_start": 1,
+      "source_order_end": 400,
+      "printed_terminal": 400,
+      "printed_unique_labels": 395,
+      "printed_number_anomalies": 9
+    }
+  },
+  "authority": {
+    "text": "SOURCE_PRESERVED_EDITION_LOCUS",
+    "historical": "NOT_AUTO_VERIFIED",
+    "independent_textual_verification": "NOT_CLAIMED"
+  },
+  "loci": [
+    {
+      "id": "tirumurai8.locus.koil",
+      "site_id": "KV01",
+      "site_entity_id": "tevaram_site.KV01",
+      "display_name": "Chidambaram",
+      "label_ta": "சிதம்பரம்",
+      "section_numbers": [
+        21,
+        22
+      ],
+      "section_titles_ta": [
+        "கோயில் மூத்த திருப்பதிகம் - அநாதியாகிய சற்காரியம்",
+        "கோயில் திருப்பதிகம் - அனுபோக இலக்கணம்"
+      ],
+      "locus_basis": "Tiruvacakam section titles use Kōyil; product mapping follows the conventional Saiva identification with Chidambaram and is not independent historical proof.",
+      "authority_scope": "edition_metadata_plus_product_traditional_identification",
+      "playback_rank": 1
+    },
+    {
+      "id": "tirumurai8.locus.tirukkazhukkunram",
+      "site_id": "TO28",
+      "site_entity_id": "tevaram_site.TO28",
+      "display_name": "Tirukalukundram",
+      "label_ta": "திருக்கழுக்குன்றம்",
+      "section_numbers": [
+        30
+      ],
+      "section_titles_ta": [
+        "திருக்கழுக்குன்றப் பதிகம் - குரு தரிசனம்"
+      ],
+      "locus_basis": "The Tiruvacakam section title explicitly names Tirukkazhukkunram; the modern centroid remains product presentation geometry.",
+      "authority_scope": "source_preserved_edition_locus_plus_product_geometry",
+      "playback_rank": 2
+    }
+  ]
+}
