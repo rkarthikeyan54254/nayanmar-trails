@@ -117,7 +117,9 @@ function siteDisplayName(site: Site) {
 export default function App() {
   const [data, setData] = useState<PramanaExport | null>(null);
   const [tirumurai8, setTirumurai8] = useState<Tirumurai8Snapshot | null>(null);
-  const [selectedSaintId, setSelectedSaintId] = useState('nayanmar.20');
+  const [selectedSaintId, setSelectedSaintId] = useState(
+    () => new URLSearchParams(window.location.search).get('saint') || 'nayanmar.20',
+  );
   const [selectedSiteId, setSelectedSiteId] = useState('tevaram_site.KV01');
   const [mode, setMode] = useState<EvidenceMode>('all');
   const [tab, setTab] = useState<DetailTab>('visits');
