@@ -548,6 +548,39 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:1px solid 
 .legend-route{width:20px;height:2px;background:#efb454;box-shadow:0 0 6px #e9a944}
 .legend-coverage{width:11px;height:11px;border-radius:50%;background:#e69f48;box-shadow:0 0 11px rgba(230,159,72,.7)}
 .legend-independent{width:8px;height:8px;transform:rotate(45deg);background:#6edbc3}
+.legend-tradition{
+  width:10px;height:10px;border-radius:50%;
+  border:1px solid #dfad57;
+  background:rgba(223,173,87,.22);
+  box-shadow:0 0 7px rgba(223,173,87,.32);
+}
+.map-fallback-note{
+  position:absolute;z-index:19;
+  left:50%;top:50%;
+  transform:translate(-50%,-50%);
+  width:min(390px,calc(100% - 300px));
+  min-width:270px;
+  padding:12px 13px;
+  border:1px solid rgba(219,173,91,.36);
+  border-radius:10px;
+  background:rgba(4,24,34,.92);
+  backdrop-filter:blur(9px);
+  box-shadow:0 16px 38px rgba(0,0,0,.32);
+  text-align:center;
+}
+.map-fallback-note>b{
+  display:block;
+  margin-top:6px;
+  color:#e1c17f;
+  font:700 13px "Cormorant Garamond",serif;
+}
+.map-fallback-note p{
+  margin:4px 0 0;
+  color:#8ca19b;
+  font-size:7px;
+  line-height:1.45;
+}
+.sacred-map-canvas .maplibregl-canvas{cursor:default!important}
 .map-source-note{
   position:absolute;z-index:17;
   right:9px;bottom:7px;
@@ -888,6 +921,32 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:1px solid 
   font-size:6.3px;
 }
 .locus-strip svg{width:11px;height:11px;fill:#d9a24a}
+.t8-section-list{
+  list-style:none;
+  margin:7px 0;
+  padding:0;
+  display:flex;
+  flex-direction:column;
+  gap:5px;
+}
+.t8-section-list li{
+  display:grid;
+  grid-template-columns:24px 1fr;
+  gap:7px;
+  align-items:start;
+  padding:6px 7px;
+  border:1px solid rgba(198,158,93,.15);
+  border-radius:6px;
+  background:rgba(3,20,29,.52);
+}
+.t8-section-list b{
+  color:#e3ad54;
+  font:700 9px "Cormorant Garamond",serif;
+}
+.t8-section-list span{
+  color:#c8c0ad;
+  font:8px/1.4 "Noto Serif Tamil","Cormorant Garamond",serif;
+}
 .hymns{
   list-style:none;
   margin:7px 0;padding:0;
@@ -984,6 +1043,15 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:1px solid 
   cursor:pointer;
 }
 .stop.reached{background:#e6b155;border-color:#ffe0a0;box-shadow:0 0 8px rgba(230,177,85,.7)}
+.stop.traditional-stop{
+  border-color:#b38849;
+  background:#142d32;
+}
+.stop.traditional-stop.reached{
+  background:#c99445;
+  border-color:#f0c87e;
+  box-shadow:0 0 8px rgba(202,148,69,.58);
+}
 .now{display:flex;flex-direction:column}
 .now b{color:#dbb873;font:700 11px "Cormorant Garamond",serif}
 .now small{color:#6e8680;font-size:6.5px}
@@ -1003,6 +1071,23 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:1px solid 
 .registry-copy{display:flex;flex-direction:column}
 .registry-copy b{color:#bfa46c;font:600 8px "Cormorant Garamond",serif}
 .registry-copy small{color:#607872;font-size:5.3px;margin-top:1px}
+.registry-stack{min-width:0;display:flex;flex-direction:column;gap:6px}
+.naalvar-mini{display:flex;gap:4px;flex-wrap:wrap}
+.naalvar-mini button{
+  padding:3px 5px;
+  border:1px solid rgba(95,145,142,.24);
+  border-radius:999px;
+  background:#0a2b36;
+  color:#849b95;
+  font-size:5.6px;
+  cursor:pointer;
+}
+.naalvar-mini button.selected{
+  color:#f0c474;
+  border-color:#b9843a;
+  background:#17383d;
+  box-shadow:0 0 8px rgba(222,167,72,.16);
+}
 .registry-dots{
   min-width:0;
   display:grid;
