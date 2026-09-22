@@ -2533,3 +2533,8 @@ button,select,input,.text,.chips,.fact,.search-results{
   .sources-version{padding-left:0;padding-top:8px;border-left:0;border-top:1px solid rgba(210,165,83,.16)}
   .method-strip{grid-template-columns:1fr}
 }
+
+/* Tamil reader mode: prevent Latin display-font shorthands from dropping Tamil glyphs. */
+.app[data-locale="ta"] :is(h1,h2,h3,h4,p,span,small,b,strong,em,button,label,input,select,option,blockquote){
+  font-family:"Noto Serif Tamil","Noto Sans Tamil",system-ui,sans-serif!important;
+}
