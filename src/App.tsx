@@ -911,18 +911,24 @@ export default function App() {
         <div className="panel timeline">
           <div className="section-head">
             <div>
-              <h3>Journey Playback</h3>
-              <p>Geographic presentation sequence — <b>not a historical chronology.</b></p>
+              <h3>{playbackKind} Playback</h3>
+              <p>
+                {playbackIsGeographic
+                  ? <>Mapped textual loci in presentation order — <b>not a historical road or chronology.</b></>
+                  : <>Pramāṇa birth/related/mukti place traditions — <b>not geocoded or historical chronology.</b></>}
+              </p>
             </div>
-            <Badge kind="inference">INFERENCE</Badge>
+            <Badge kind={playbackIsGeographic ? 'inference' : 'tradition'}>
+              {playbackIsGeographic ? 'PRESENTATION' : 'TRADITION'}
+            </Badge>
           </div>
 
           <div className="play-row">
             <button
               className="play"
-              disabled={routeStops.length < 2}
+              disabled={playbackStops.length < 2}
               onClick={() => {
-                if (progress >= routeStops.length - 1) setProgress(0);
+                if (progress >= playbackStops.length - 1) setProgress(0);
                 setPlaying((value) => !value);
               }}
             >
@@ -931,82 +937,107 @@ export default function App() {
 
             <div className="track">
               <div className="fill" style={{ width: `${progressPct}%` }} />
-              {routeStops.map((stop, index) => (
+              {playbackStops.map((stop, index) => (
                 <button
-                  key={stop.siteId}
-                  title={stop.name}
-                  className={`stop ${index <= progress ? 'reached' : ''}`}
+                  key={stop.id}
+                  title={`${stop.name} · ${stop.detail}`}
+                  className={`stop ${index <= progress ? 'reached' : ''} ${stop.kind === 'traditional_place' ? 'traditional-stop' : ''}`}
                   style={{
-                    left: `${routeStops.length <= 1 ? 0 : (index / (routeStops.length - 1)) * 100}%`,
+                    left: `${playbackStops.length <= 1 ? 0 : (index / (playbackStops.length - 1)) * 100}%`,
                   }}
                   onClick={() => {
                     setProgress(index);
-                    setSelectedSiteId(`tevaram_site.${stop.siteId}`);
+                    if (stop.siteId) setSelectedSiteId(`tevaram_site.${stop.siteId}`);
                   }}
                 />
               ))}
             </div>
 
             <div className="now">
-              {activeStop ? (
+              {activePlaybackStop ? (
                 <>
-                  <b>{activeStop.name}</b>
-                  <small>{activeStop.hymnIds.length} linked patikam{activeStop.hymnIds.length === 1 ? '' : 's'}</small>
+                  <b>{activePlaybackStop.name}</b>
+                  <small>{activePlaybackStop.detail}</small>
                 </>
               ) : (
                 <>
-                  <b>No exact mapped playback</b>
-                  <small>This saint has no current exact seed stops.</small>
+                  <b>No playback evidence yet</b>
+                  <small>No mapped loci or traditional place references are available for this selection.</small>
                 </>
               )}
             </div>
           </div>
 
           <div className="timeline-labels">
-            {routeStops.slice(0, 6).map((stop) => <span key={stop.siteId}>{stop.name}</span>)}
+            {playbackStops.slice(0, 6).map((stop) => (
+              <span key={stop.id}>{stop.name}</span>
+            ))}
           </div>
 
           <div className="saint-registry">
             <div className="registry-copy">
-              <b>63-saint traditional registry</b>
-              <small>ordinal sequence · not historical dating</small>
+              <b>Naalvar + 63-saint registry</b>
+              <small>Manikkavasakar is Naalvar, not a 64th Nayanmar</small>
             </div>
-            <div className="registry-dots">
-              {data.saints
-                .slice()
-                .sort((a, b) => a.ordinal - b.ordinal)
-                .map((item) => (
+            <div className="registry-stack">
+              <div className="naalvar-mini">
+                {NAALVAR.map((id) => (
                   <button
-                    key={item.id}
-                    title={SAINT_EN[item.id] ?? item.label}
-                    className={item.id === selectedSaintId ? 'selected' : ''}
-                    onClick={() => setSelectedSaintId(item.id)}
-                  />
+                    key={id}
+                    className={id === selectedSaintId ? 'selected' : ''}
+                    onClick={() => setSelectedSaintId(id)}
+                  >
+                    {id === MANIKKAVASAKAR_ID
+                      ? 'Manikkavasakar'
+                      : SAINT_EN[id]?.split(' · ')[0]}
+                  </button>
                 ))}
+              </div>
+              <div className="registry-dots">
+                {data.saints
+                  .slice()
+                  .sort((a, b) => a.ordinal - b.ordinal)
+                  .map((item) => (
+                    <button
+                      key={item.id}
+                      title={SAINT_EN[item.id] ?? item.label}
+                      className={item.id === selectedSaintId ? 'selected' : ''}
+                      onClick={() => setSelectedSaintId(item.id)}
+                    />
+                  ))}
+              </div>
             </div>
           </div>
         </div>
 
         <div className="panel graph-mini">
           <div className="section-title">
-            <h3>Saint – Talam Graph</h3>
-            <span>{siteLinks.size} linked talams</span>
+            <h3>{selectedIsManikkavasakar ? 'Tirumurai 8 – Talam Graph' : 'Saint – Talam Graph'}</h3>
+            <span>
+              {selectedIsManikkavasakar
+                ? `${tirumurai8.loci.length} textual loci`
+                : `${siteLinks.size} linked talams`}
+            </span>
           </div>
-          <Network saint={saint} sites={topLinkedSites.slice(0, 8)} />
+          <Network
+            saint={saint}
+            centerLabel={selectedIsManikkavasakar ? 'M' : undefined}
+            sites={topLinkedSites.slice(0, 8)}
+          />
         </div>
 
         <div className="panel density-card">
           <div className="section-title">
             <h3>Corpus Density</h3>
-            <span>by catalog district</span>
+            <span>all 276 Tēvāram catalog sites</span>
           </div>
           <DensityPanel points={districtCoverage.slice(0, 6)} />
         </div>
 
         <div className="panel totals">
           <Stat value={data.meta.counts.saints} label="Nayanmars" />
-          <Stat value={data.meta.counts.tevaram_sites} label="Tēvāram talams" />
-          <Stat value={data.meta.counts.tevaram_patikams} label="Patikams" />
+          <Stat value={4} label="Naalvar" />
+          <Stat value={data.meta.counts.tevaram_patikams} label="Tēvāram patikams" />
           <Stat value={data.meta.counts.total_edges} label="Typed edges" />
         </div>
       </section>
