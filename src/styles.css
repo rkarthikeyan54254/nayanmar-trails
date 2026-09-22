@@ -1599,3 +1599,16 @@ footer svg{width:16px;height:16px;fill:#d9a84f}
   color:rgba(213,202,179,.66);
   font-size:6px;
 }
+
+.marker-label{
+  opacity:0;
+  transform:translateX(-50%) translateY(2px);
+  transition:opacity .16s ease,transform .16s ease;
+}
+.map-temple-marker.featured .marker-label,
+.map-temple-marker.selected .marker-label,
+.map-temple-marker:hover .marker-label,
+.map-temple-marker:focus-visible .marker-label{
+  opacity:1;
+  transform:translateX(-50%) translateY(0);
+}
