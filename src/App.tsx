@@ -6,6 +6,7 @@ import { HERO_MEDIA, SAINT_MEDIA, TEMPLE_MEDIA } from './media';
 import GopuramIcon from './GopuramIcon';
 import SacredMap, { type CoveragePoint, type EvidenceMode, type MapStop } from './SacredMap';
 import type { Patikam, PramanaExport, Saint, Site } from './types';
+import { LocaleContext, T, tr, type Locale } from './i18n';
 
 type DetailTab = 'hymns' | 'chronology' | 'visits' | 'evidence';
 
@@ -94,6 +95,29 @@ type SaivaLiterarySnapshot = {
   links: SaivaLiteraryLink[];
 };
 
+type SaintCuriosity = {
+  saint_id: string;
+  ordinal: number;
+  hook_en: string;
+  hook_ta: string;
+  authority_scope: string;
+  source_work: string;
+  presentation_policy: string;
+};
+
+type SaintCuriositySnapshot = {
+  meta: {
+    version: string;
+    purpose: string;
+    authority_scope: string;
+    source_repo: string;
+    source_commit: string;
+    source_basis: string;
+    language_policy: string;
+  };
+  stories: SaintCuriosity[];
+};
+
 type PlaybackStop = {
   id: string;
   name: string;
@@ -170,10 +194,25 @@ function siteDisplayName(site: Site) {
   return mapped?.name || modernShort(site.modern_name_nic) || cleanLabel(site.label);
 }
 
+function localizedSiteName(site: Site, locale: Locale) {
+  if (locale === 'ta' && site.label_ta) return site.label_ta;
+  return siteDisplayName(site);
+}
+
+function localizedSaintName(saint: Saint | null, locale: Locale) {
+  if (!saint) return locale === 'ta' ? 'நாயன்மார்' : 'Nayanmar';
+  if (locale === 'ta' && saint.label_ta) return saint.label_ta;
+  return SAINT_EN[saint.id] ?? saint.label;
+}
+
 export default function App() {
   const [data, setData] = useState<PramanaExport | null>(null);
   const [tirumurai8, setTirumurai8] = useState<Tirumurai8Snapshot | null>(null);
   const [saivaPlaces, setSaivaPlaces] = useState<SaivaLiterarySnapshot | null>(null);
+  const [curiosities, setCuriosities] = useState<SaintCuriositySnapshot | null>(null);
+  const [locale, setLocale] = useState<Locale>(() =>
+    new URLSearchParams(window.location.search).get('lang') === 'ta' ? 'ta' : 'en',
+  );
   const [selectedSaintId, setSelectedSaintId] = useState(
     () => new URLSearchParams(window.location.search).get('saint') || 'nayanmar.20',
   );
@@ -234,14 +273,26 @@ export default function App() {
         if (!response.ok) throw new Error(`Saiva literary-place export HTTP ${response.status}`);
         return response.json() as Promise<SaivaLiterarySnapshot>;
       }),
+      fetch('/data/pramana-saint-curiosities-v1.json').then((response) => {
+        if (!response.ok) throw new Error(`Saint curiosity export HTTP ${response.status}`);
+        return response.json() as Promise<SaintCuriositySnapshot>;
+      }),
     ])
-      .then(([graph, t8, literaryPlaces]) => {
+      .then(([graph, t8, literaryPlaces, saintCuriosities]) => {
         setData(graph);
         setTirumurai8(t8);
         setSaivaPlaces(literaryPlaces);
+        setCuriosities(saintCuriosities);
       })
       .catch((error) => console.error('Unable to load Pramāṇa product exports', error));
   }, []);
+
+  useEffect(() => {
+    document.documentElement.lang = locale;
+    const url = new URL(window.location.href);
+    url.searchParams.set('lang', locale);
+    window.history.replaceState({}, '', url);
+  }, [locale]);
 
   const selectedIsManikkavasakar = selectedSaintId === MANIKKAVASAKAR_ID;
 
@@ -374,6 +425,7 @@ export default function App() {
           if (!seed) return null;
           return {
             ...seed,
+            name: locale === 'ta' ? (locus.label_ta || locus.display_name) : locus.display_name,
             playbackRank: locus.playback_rank,
             hymnIds: locus.section_numbers.map((section) => `tirumurai8.section.${section}`),
           };
@@ -383,13 +435,17 @@ export default function App() {
     }
 
     return GEO_SEEDS
-      .map((seed) => ({
-        ...seed,
-        hymnIds: siteLinks.get(`tevaram_site.${seed.siteId}`) ?? [],
-      }))
+      .map((seed) => {
+        const mappedSite = siteById.get(`tevaram_site.${seed.siteId}`);
+        return {
+          ...seed,
+          name: mappedSite ? localizedSiteName(mappedSite, locale) : seed.name,
+          hymnIds: siteLinks.get(`tevaram_site.${seed.siteId}`) ?? [],
+        };
+      })
       .filter((item) => item.hymnIds.length)
       .sort((a, b) => a.playbackRank - b.playbackRank);
-  }, [selectedIsManikkavasakar, siteLinks, tirumurai8]);
+  }, [locale, selectedIsManikkavasakar, siteById, siteLinks, tirumurai8]);
 
   const traditionalPlaybackStops = useMemo<PlaybackStop[]>(() => {
     if (!data || selectedIsManikkavasakar) return [];
@@ -416,12 +472,12 @@ export default function App() {
               : 'Related-place tradition';
         return [{
           id: `${edge.predicate}:${place.id}`,
-          name: place.label_ta || place.label,
+          name: locale === 'ta' ? (place.label_ta || place.label) : place.label,
           detail,
           kind: 'traditional_place' as const,
         }];
       });
-  }, [data, selectedIsManikkavasakar, selectedSaintId, traditionalPlaceById]);
+  }, [data, locale, selectedIsManikkavasakar, selectedSaintId, traditionalPlaceById]);
 
   const playbackStops = useMemo<PlaybackStop[]>(() => {
     if (routeStops.length >= 2) {
@@ -546,6 +602,10 @@ export default function App() {
   const independentEdges =
     data?.edges.filter((edge) => edge.authority_scope === 'epigraphic_primary').length ?? 0;
 
+  const saintCuriosity = !selectedIsManikkavasakar
+    ? curiosities?.stories.find((item) => item.saint_id === selectedSaintId) ?? null
+    : null;
+
   const searchResults = useMemo(() => {
     if (!data || !query.trim()) {
       return { saints: [] as Saint[], sites: [] as Site[], manikkavasakar: false };
@@ -619,21 +679,18 @@ export default function App() {
     return () => window.clearInterval(timer);
   }, [playing, playbackStops.length]);
 
-  if (!data || !tirumurai8 || !saivaPlaces) {
+  if (!data || !tirumurai8 || !saivaPlaces || !curiosities) {
     return (
       <div className="loading">
         <div className="loading-mark"><GopuramIcon /></div>
-        <div>Opening Nayanmar Trails…</div>
+        <div>{tr(locale, 'Opening Nayanmar Trails…')}</div>
       </div>
     );
   }
 
   const saintName = selectedIsManikkavasakar
-    ? tirumurai8.author.display_label
-    : SAINT_EN[selectedSaintId] ?? saint?.label ?? 'Nayanmar';
-  const saintTamil = selectedIsManikkavasakar
-    ? tirumurai8.author.label_ta
-    : saint?.label_ta ?? '';
+    ? locale === 'ta' ? tirumurai8.author.label_ta : tirumurai8.author.display_label
+    : localizedSaintName(saint, locale);
   const saintRegistryLabel = selectedIsManikkavasakar
     ? 'NAALVAR · TIRUMURAI 8'
     : `NAYANMAR ${saint?.ordinal ?? ''}`;
@@ -650,7 +707,8 @@ export default function App() {
   const showTraditionalDetail = !selectedIsManikkavasakar && !playbackIsGeographic;
 
   return (
-    <main className="app">
+    <LocaleContext.Provider value={locale}>
+    <main className="app" data-locale={locale}>
       <header className="topbar">
         <div className="brand">
           <span className="brand-mark"><GopuramIcon /></span>
@@ -680,12 +738,29 @@ export default function App() {
           <button onClick={() => setSourcesOpen(true)}>Sources</button>
         </nav>
 
+        <div className="language-switcher" aria-label={tr(locale, 'Language')}>
+          <button
+            className={locale === 'en' ? 'active' : ''}
+            onClick={() => setLocale('en')}
+            aria-pressed={locale === 'en'}
+          >
+            EN
+          </button>
+          <button
+            className={locale === 'ta' ? 'active' : ''}
+            onClick={() => setLocale('ta')}
+            aria-pressed={locale === 'ta'}
+          >
+            தமிழ்
+          </button>
+        </div>
+
         <div className="header-search">
           <span className="search-glyph">⌕</span>
           <input
             value={query}
             onChange={(event) => setQuery(event.target.value)}
-            placeholder="Search Nayanmars, sthalams, or places…"
+            placeholder={tr(locale, 'Search Nayanmars, sthalams, or places…')}
           />
           {query && (
             <div className="search-results">
@@ -699,8 +774,8 @@ export default function App() {
                 >
                   <GopuramIcon />
                   <span>
-                    {SAINT_EN[item.id] ?? item.label}
-                    <small>Nayanmar {item.ordinal}</small>
+                    {localizedSaintName(item, locale)}
+                    <small>{locale === 'ta' ? `நாயன்மார் ${item.ordinal}` : `Nayanmar ${item.ordinal}`}</small>
                   </span>
                 </button>
               ))}
@@ -713,8 +788,8 @@ export default function App() {
                 >
                   <GopuramIcon />
                   <span>
-                    Manikkavasakar
-                    <small>Naalvar · Tirumurai 8 · not numbered among the 63</small>
+                    {locale === 'ta' ? tirumurai8.author.label_ta : 'Manikkavasakar'}
+                    <small>{tr(locale, 'Naalvar · Tirumurai 8 · not numbered among the 63')}</small>
                   </span>
                 </button>
               )}
@@ -729,13 +804,13 @@ export default function App() {
                 >
                   <GopuramIcon />
                   <span>
-                    {siteDisplayName(item)}
-                    <small>{cleanLabel(item.label)} · {item.district || item.site_id}</small>
+                    {localizedSiteName(item, locale)}
+                    <small>{locale === 'ta' ? (item.district || item.site_id) : `${cleanLabel(item.label)} · ${item.district || item.site_id}`}</small>
                   </span>
                 </button>
               ))}
               {!searchResults.saints.length && !searchResults.sites.length && !searchResults.manikkavasakar && (
-                <em>No matching saint or sthalam</em>
+                <em>{tr(locale, 'No matching saint or sthalam')}</em>
               )}
             </div>
           )}
@@ -847,7 +922,6 @@ export default function App() {
           <div className="saint-heading">
             <small>{saintRegistryLabel}</small>
             <h2>{saintName}</h2>
-            <div className="tamil">{saintTamil}</div>
           </div>
 
           <div className="identity-line">
@@ -858,13 +932,30 @@ export default function App() {
           </div>
 
           <div className="saint-story-source">
-            <small>{selectedIsManikkavasakar ? 'DEVOTIONAL WORKS' : 'STORY TRADITION'}</small>
+            <small>{selectedIsManikkavasakar ? tr(locale, 'DEVOTIONAL WORKS') : tr(locale, 'STORY TRADITION')}</small>
             <b>
               {selectedIsManikkavasakar
                 ? 'Tiruvācakam · Tirukkōvaiyār'
-                : periyaPuranamTitle || 'Periya Puranam tradition'}
+                : periyaPuranamTitle || tr(locale, 'Periya Puranam tradition')}
             </b>
           </div>
+
+          {saintCuriosity && (
+            <div className="saint-curiosity">
+              <div className="saint-curiosity-head">
+                <small>{tr(locale, 'WHY THIS NAYANMAR IS REMEMBERED')}</small>
+                <span>{tr(locale, 'A story from tradition')}</span>
+              </div>
+              <p>{locale === 'ta' ? saintCuriosity.hook_ta : saintCuriosity.hook_en}</p>
+              <div className="saint-curiosity-source">
+                <b>{periyaPuranamTitle || tr(locale, 'Periya Puranam tradition')}</b>
+                <small>{tr(locale, 'Traditional narrative — not presented as independently verified biography.')}</small>
+              </div>
+              <button onClick={() => setSourcesOpen(true)}>
+                {tr(locale, 'Read the source trail')} →
+              </button>
+            </div>
+          )}
 
           <div className="stat-grid">
             {selectedIsManikkavasakar ? (
@@ -921,7 +1012,7 @@ export default function App() {
               ))
             ) : (
               topLinkedSites.slice(0, 6).map(({ site, count }) => {
-                const primary = siteDisplayName(site);
+                const primary = localizedSiteName(site, locale);
                 const canonical = cleanLabel(site.label);
                 return (
                   <button
@@ -934,7 +1025,7 @@ export default function App() {
                     <GopuramIcon />
                     <span className="major-talam-copy">
                       <b>{primary}</b>
-                      {canonical.toLowerCase() !== primary.toLowerCase() && <em>{canonical}</em>}
+                      {locale === 'en' && canonical.toLowerCase() !== primary.toLowerCase() && <em>{canonical}</em>}
                     </span>
                     <small>{count}</small>
                   </button>
@@ -1082,8 +1173,8 @@ export default function App() {
                   <div className="temple-shade" />
                   <div className="temple-title">
                     <small>CURRENT STHALAM</small>
-                    <h2>{selectedSite ? siteDisplayName(selectedSite) : 'Select a sthalam'}</h2>
-                    <p>{selectedSite ? `${cleanLabel(selectedSite.label)}${selectedSite.label_ta ? ` · ${selectedSite.label_ta}` : ''}` : ''}</p>
+                    <h2>{selectedSite ? localizedSiteName(selectedSite, locale) : (locale === 'ta' ? 'ஒரு தலத்தைத் தேர்ந்தெடுக்கவும்' : 'Select a sthalam')}</h2>
+                    <p>{selectedSite && locale === 'en' ? cleanLabel(selectedSite.label) : ''}</p>
                   </div>
                   {templeMedia && (
                     <span className="temple-credit">{templeMedia.source} · {templeMedia.license}</span>
@@ -1403,6 +1494,7 @@ export default function App() {
         <span>Map © OpenFreeMap / OpenMapTiles / OpenStreetMap</span>
       </footer>
     </main>
+    </LocaleContext.Provider>
   );
 }
 
