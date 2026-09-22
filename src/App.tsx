@@ -511,7 +511,7 @@ export default function App() {
                     <small>Naalvar · Tirumurai 8 · not numbered among the 63</small>
                   </span>
                 </button>
-              ))}
+              )}
               {searchResults.sites.map((item) => (
                 <button
                   key={item.id}
@@ -528,7 +528,7 @@ export default function App() {
                   </span>
                 </button>
               ))}
-              {!searchResults.saints.length && !searchResults.sites.length && (
+              {!searchResults.saints.length && !searchResults.sites.length && !searchResults.manikkavasakar && (
                 <em>No matching Pramāṇa entity</em>
               )}
             </div>
