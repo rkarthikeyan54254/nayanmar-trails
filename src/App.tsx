@@ -1223,7 +1223,7 @@ export default function App() {
             <div className="section-title">
               <div>
                 <h3>Traditional Place Claims</h3>
-                <span>{traditionalPlaybackStops.length} Pramāṇa references</span>
+                <span>{traditionalPlaybackStops.length} traditional references</span>
               </div>
               <Badge kind="tradition">TRADITION</Badge>
             </div>
@@ -1387,7 +1387,7 @@ function TraditionalPlaceDetail({
         <div className="text">
           <Badge kind="tradition">TRADITION</Badge>
           <p>
-            Pramāṇa records <b>{total}</b> traditional place claim{total === 1 ? '' : 's'} for <b>{saintName}</b>.
+            This site records <b>{total}</b> traditional place claim{total === 1 ? '' : 's'} for <b>{saintName}</b>.
             This playback keeps those claims visible without inventing modern coordinates or a travel route.
           </p>
           <div className="evidence-callout muted">
@@ -1414,7 +1414,7 @@ function TraditionalPlaceDetail({
         <div className="text">
           <Badge kind="tradition">TRADITIONAL_REFERENCE</Badge>
           <p>
-            This surface is intentionally fail-closed: no map marker appears until Pramāṇa carries reviewed geometry
+            No map marker is shown until a reviewed location is attached
             or another explicitly qualified location mapping.
           </p>
         </div>
@@ -1440,7 +1440,7 @@ function Tirumurai8LocusDetail({
       <div className="text">
         <Badge kind="edition">NO MAPPED TIRUMURAI 8 LOCUS</Badge>
         <p>
-          This talam is part of the broader Tēvāram catalog, but the pinned Tirumurai 8 product snapshot does not map a Manikkavasakar textual locus here.
+          This sthalam is part of the broader Tēvāram catalogue, but the pinned Tirumurai 8 product snapshot does not map a Manikkavasakar textual locus here.
         </p>
       </div>
     );
@@ -1451,7 +1451,7 @@ function Tirumurai8LocusDetail({
       <Badge kind="edition">TIRUMURAI 8 · SOURCE-PRESERVED LOCUS</Badge>
       {view === 'visits' ? (
         <p>
-          This view is a <b>textual-locus mapping</b>, not a claim that Pramāṇa has established a historical temple visit or a travel sequence for Manikkavasakar.
+          This view is a <b>textual-locus mapping</b>, not a claim of a historically verified temple visit or a travel sequence for Manikkavasakar.
         </p>
       ) : (
         <p>
@@ -1493,7 +1493,7 @@ function Tirumurai8Chronology({ snapshot }: { snapshot: Tirumurai8Snapshot }) {
     <div className="text">
       <Badge kind="inference">FAIL-CLOSED BIOGRAPHICAL CHRONOLOGY</Badge>
       <p>
-        Pramāṇa v1 has a beta-ready Tiruvācakam/Tirukkōvaiyār edition corpus, but it does not automatically turn section order into Manikkavasakar's historical itinerary.
+        The Tiruvācakam/Tirukkōvaiyār corpus preserves section order, but section order is not treated as Manikkavasakar's historical itinerary.
       </p>
       <div className="evidence-callout">
         <GopuramIcon />
@@ -1516,7 +1516,7 @@ function Tirumurai8Evidence({
     <div className="text">
       <Badge kind="edition">{snapshot.authority.text.replace(/_/g, ' ')}</Badge>
       <p>
-        Tirumurai 8 is pinned from Pramāṇa release <b>{snapshot.meta.release_id}</b>. Historical authority remains <b>{snapshot.authority.historical.replace(/_/g, ' ')}</b>.
+        This Tirumurai 8 view uses the pinned release <b>{snapshot.meta.release_id}</b>. The historical status of each location remains separate from the text itself.
       </p>
       {locus ? (
         <div className="inscription">
@@ -1915,7 +1915,7 @@ function ConnectionModal({
         className="graph-modal"
         role="dialog"
         aria-modal="true"
-        aria-label={selectedIsManikkavasakar ? 'Tirumurai 8 talam connections' : 'Saint talam connections'}
+        aria-label={selectedIsManikkavasakar ? 'Tirumurai 8 sthalam connections' : 'Saint sthalam connections'}
         onMouseDown={(event) => event.stopPropagation()}
       >
         <header className="graph-modal-head">
@@ -1924,8 +1924,8 @@ function ConnectionModal({
             <h2>{saintName}</h2>
             <p>
               {selectedIsManikkavasakar
-                ? 'Qualified Tiruvācakam textual loci from the pinned Pramāṇa snapshot.'
-                : `${totalConnections} Tēvāram-linked talams in the current Pramāṇa graph.`}
+                ? 'Qualified Tiruvācakam textual loci from the pinned Tirumurai 8 release.'
+                : `${totalConnections} Tēvāram-linked sthalams for this saint.`}
             </p>
           </div>
           <button className="modal-close" onClick={onClose} aria-label="Close connection graph">×</button>
@@ -1948,7 +1948,7 @@ function ConnectionModal({
           <aside className="graph-ranking">
             <div className="graph-ranking-head">
               <small>TOP CONNECTIONS</small>
-              <b>{sites.length ? 'Select a talam to inspect it' : 'No mapped talam connections'}</b>
+              <b>{sites.length ? 'Select a sthalam to inspect it' : 'No mapped sthalam connections'}</b>
             </div>
             <div className="graph-ranking-list">
               {sites.slice(0, 12).map(({ site, count }, index) => {
@@ -1976,7 +1976,7 @@ function ConnectionModal({
           <p>
             {selectedIsManikkavasakar
               ? 'These connections do not establish Manikkavasakar’s historical itinerary.'
-              : 'These edges express author → patikam → talam relationships; they do not establish a historical travel route.'}
+              : 'These edges express author → pathigam → sthalam relationships; they do not establish a historical travel route.'}
           </p>
         </div>
       </section>
@@ -2009,7 +2009,7 @@ function Network({
       className={`network ${expanded ? 'expanded' : ''}`}
       viewBox={`0 0 ${width} ${height}`}
       role="img"
-      aria-label="Saint to talam graph"
+      aria-label="Saint to sthalam graph"
     >
       {sites.map(({ site, count }, index) => {
         const angle = (index / Math.max(sites.length, 1)) * Math.PI * 2 - Math.PI / 2;
@@ -2073,7 +2073,7 @@ function DensityPanel({ points }: { points: CoveragePoint[] }) {
 
   return (
     <div className="density-map">
-      <svg viewBox={`0 0 ${width} ${height}`} role="img" aria-label="Pramāṇa talam density by modern catalog district">
+      <svg viewBox={`0 0 ${width} ${height}`} role="img" aria-label="Tēvāram sthalam density by modern district">
         <defs>
           <filter id="densityGlow" x="-80%" y="-80%" width="260%" height="260%">
             <feGaussianBlur stdDeviation="4" />
