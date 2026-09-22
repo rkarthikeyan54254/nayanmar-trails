@@ -562,11 +562,19 @@ export default function App() {
       <section className="filters">
         <Filter label="Saint">
           <select value={selectedSaintId} onChange={(event) => setSelectedSaintId(event.target.value)}>
-            {data.saints.map((item) => (
-              <option key={item.id} value={item.id}>
-                {item.ordinal}. {SAINT_EN[item.id] ?? item.label}
-              </option>
-            ))}
+            <optgroup label="Naalvar">
+              <option value="nayanmar.20">Appar · Tirunavukkarasar</option>
+              <option value="nayanmar.27">Sambandar</option>
+              <option value="nayanmar.63">Sundarar · Arurar</option>
+              <option value={MANIKKAVASAKAR_ID}>Manikkavasakar · Tirumurai 8</option>
+            </optgroup>
+            <optgroup label="63 Nayanmar registry">
+              {data.saints.map((item) => (
+                <option key={item.id} value={item.id}>
+                  {item.ordinal}. {SAINT_EN[item.id] ?? item.label}
+                </option>
+              ))}
+            </optgroup>
           </select>
         </Filter>
 
@@ -618,7 +626,7 @@ export default function App() {
               <div className="saint-fallback"><GopuramIcon /></div>
             )}
             <div className="saint-gradient" />
-            <div className="saint-number">{saint?.ordinal}</div>
+            <div className="saint-number">{saintNumberLabel}</div>
             <div className="saint-temple"><GopuramIcon /></div>
             {saintMedia && (
               <small className="media-credit">
@@ -628,28 +636,44 @@ export default function App() {
           </div>
 
           <div className="saint-heading">
-            <small>NAYANMAR {saint?.ordinal}</small>
+            <small>{saintRegistryLabel}</small>
             <h2>{saintName}</h2>
-            <div className="tamil">{saint?.label_ta}</div>
+            <div className="tamil">{saintTamil}</div>
           </div>
 
-          <div className="identity-line"><GopuramIcon /> Traditional identity</div>
+          <div className="identity-line">
+            <GopuramIcon />
+            {selectedIsManikkavasakar
+              ? 'Naalvar · Tirumurai 8 companion'
+              : '63-Nayanmar traditional identity'}
+          </div>
 
           <blockquote className="saint-quote">
             The devotional story remains vivid; the evidence layer remains explicit.
           </blockquote>
 
           <div className="stat-grid">
-            <Stat value={authoredPatikams.length} label="Tēvāram patikams" />
-            <Stat value={siteLinks.size} label="linked talams" />
-            <Stat value={episodeCount} label="Periya Puranam links" />
-            <Stat value={routeStops.length} label="exact mapped exemplars" />
+            {selectedIsManikkavasakar ? (
+              <>
+                <Stat value={tirumurai8.works.tiruvacakam.sections} label="Tiruvācakam sections" />
+                <Stat value={tirumurai8.works.tiruvacakam.source_units} label="source units" />
+                <Stat value={tirumurai8.works.tirukkovaiyar.source_order_units} label="Tirukkōvaiyār units" />
+                <Stat value={routeStops.length} label="mapped textual loci" />
+              </>
+            ) : (
+              <>
+                <Stat value={authoredPatikams.length} label="Tēvāram patikams" />
+                <Stat value={siteLinks.size} label="linked talams" />
+                <Stat value={episodeCount} label="Periya Puranam links" />
+                <Stat value={playbackStops.length} label="playback stops" />
+              </>
+            )}
           </div>
 
           <div className="major-temples">
             <div className="section-title">
-              <h3>Major linked talams</h3>
-              <span>{siteLinks.size} total</span>
+              <h3>{selectedIsManikkavasakar ? 'Tirumurai 8 textual loci' : 'Major linked talams'}</h3>
+              <span>{selectedIsManikkavasakar ? tirumurai8.loci.length : siteLinks.size} total</span>
             </div>
             {topLinkedSites.map(({ site, count }) => (
               <button
@@ -669,14 +693,18 @@ export default function App() {
           <div className="journey-progress">
             <div>
               <b>Playback progress</b>
-              <span>{routeStops.length ? Math.min(progress + 1, routeStops.length) : 0} / {routeStops.length}</span>
+              <span>{playbackStops.length ? Math.min(progress + 1, playbackStops.length) : 0} / {playbackStops.length}</span>
             </div>
             <div className="mini-track"><i style={{ width: `${progressPct}%` }} /></div>
           </div>
 
           <div className="authority-box">
-            <b>{MODE_COPY[mode].short}</b>
-            <p>{MODE_COPY[mode].body}</p>
+            <b>{selectedIsManikkavasakar ? 'Tirumurai 8 authority boundary' : MODE_COPY[mode].short}</b>
+            <p>
+              {selectedIsManikkavasakar
+                ? 'Pramāṇa preserves the Tiruvācakam/Tirukkōvaiyār edition loci; the two plotted modern centroids and the line between them are product presentation, not a historical journey claim.'
+                : MODE_COPY[mode].body}
+            </p>
           </div>
         </aside>
 
