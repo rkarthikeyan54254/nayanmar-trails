@@ -2226,6 +2226,7 @@ function JourneyContext({
 }
 
 function SourceDetails({ site, data }: { site: Site; data: PramanaExport }) {
+  const locale = useLocale();
   const inscriptions = data.inscriptions.filter(
     (item) => item.ifp_site_id === site.site_id,
   );
@@ -2242,9 +2243,11 @@ function SourceDetails({ site, data }: { site: Site; data: PramanaExport }) {
 
       <div className="source-card">
         <small><T>TĒVĀRAM CATALOGUE</T></small>
-        <b>{authorityLabel(site.authority_scope)}</b>
+        <b>{authorityLabel(site.authority_scope, locale)}</b>
         <p>
-          The sthalam name, catalogue identifier and pathigam associations are preserved from the Tēvāram edition catalogue.
+          {locale === 'ta'
+            ? 'தலப் பெயர், பட்டியல் எண், அதனுடன் இணைக்கப்பட்ட தேவாரப் பதிகங்கள் ஆகியவை தேவாரப் பதிப்புப் பட்டியலில் இருப்பதுபோலவே பாதுகாக்கப்பட்டுள்ளன.'
+            : 'The sthalam name, catalogue identifier and pathigam associations are preserved from the Tēvāram edition catalogue.'}
         </p>
         {catalogueUrl && (
           <a href={catalogueUrl} target="_blank" rel="noreferrer"><T>Open catalogue entry ↗</T></a>
@@ -2256,20 +2259,28 @@ function SourceDetails({ site, data }: { site: Site; data: PramanaExport }) {
           <div className="source-card historical" key={item.id}>
             <small><T>HISTORICAL RECORD</T></small>
             <b>{item.label}</b>
-            <p>{item.historical_scope}</p>
+            <p>
+              {locale === 'ta'
+                ? 'இந்தக் கல்வெட்டு பதிவு, இத்தலத்துடன் தனித்த வரலாற்றுச் சான்றாக இணைக்கப்பட்டுள்ளது.'
+                : item.historical_scope}
+            </p>
           </div>
         ))
       ) : (
         <div className="source-card muted">
           <small><T>HISTORICAL RECORD</T></small>
           <b><T>No linked inscription in this release</T></b>
-          <p>This does not imply that the sthalam lacks historical records; only that none is attached in the current dataset.</p>
+          <p>
+            {locale === 'ta'
+              ? 'இதனால் இந்தத் தலத்திற்கு கல்வெட்டுச் சான்றே இல்லை என்று பொருள் அல்ல; இப்போது உள்ள தரவுத் தொகுப்பில் அத்தகைய பதிவு எதுவும் இணைக்கப்படவில்லை என்பதுதான் பொருள்.'
+              : 'This does not imply that the sthalam lacks historical records; only that none is attached in the current dataset.'}
+          </p>
         </div>
       )}
 
       {site.temple_identification_status && (
         <p className="reader-note">
-          <b><T>Identification note:</T></b> {identificationLabel(site.temple_identification_status)}
+          <b><T>Identification note:</T></b> {identificationLabel(site.temple_identification_status, locale)}
         </p>
       )}
     </div>
