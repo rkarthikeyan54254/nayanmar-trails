@@ -3,6 +3,7 @@ import { readFile } from 'node:fs/promises';
 const exportPath = new URL('../public/data/pramana-export-v1.json', import.meta.url);
 const tirumurai8Path = new URL('../public/data/pramana-tirumurai8-v1.json', import.meta.url);
 const saivaPlacesPath = new URL('../public/data/pramana-saiva-literary-place-links-v1.json', import.meta.url);
+const curiositiesPath = new URL('../public/data/pramana-saint-curiosities-v1.json', import.meta.url);
 const geometryPath = new URL('../src/geometry.ts', import.meta.url);
 const mapPath = new URL('../src/SacredMap.tsx', import.meta.url);
 const appPath = new URL('../src/App.tsx', import.meta.url);
@@ -11,6 +12,7 @@ const stylesPath = new URL('../src/styles.css', import.meta.url);
 const doc = JSON.parse(await readFile(exportPath, 'utf8'));
 const tirumurai8 = JSON.parse(await readFile(tirumurai8Path, 'utf8'));
 const saivaPlaces = JSON.parse(await readFile(saivaPlacesPath, 'utf8'));
+const curiosities = JSON.parse(await readFile(curiositiesPath, 'utf8'));
 const geometryText = await readFile(geometryPath, 'utf8');
 const mapText = await readFile(mapPath, 'utf8');
 const appText = await readFile(appPath, 'utf8');
@@ -42,6 +44,32 @@ for (const scope of required) {
 }
 if (doc.edges.some((edge) => !edge.authority_scope)) {
   throw new Error('Every edge must retain authority_scope');
+}
+
+if (curiosities.meta?.source_repo !== 'rkarthikeyan54254/pramana' ||
+    curiosities.meta?.authority_scope !== 'traditional_reference') {
+  throw new Error('Saint curiosity layer must remain pinned to Pramana and explicitly traditional');
+}
+if (!Array.isArray(curiosities.stories) || curiosities.stories.length !== 63) {
+  throw new Error(`Expected one curiosity hook for each of 63 Nayanmars, got ${curiosities.stories?.length}`);
+}
+const saintIds = new Set(doc.saints.map((saint) => saint.id));
+const curiosityIds = new Set(curiosities.stories.map((story) => story.saint_id));
+if (curiosityIds.size !== 63 || [...saintIds].some((id) => !curiosityIds.has(id))) {
+  throw new Error('Saint curiosity coverage must exactly match the 63-saint Pramana registry');
+}
+for (const story of curiosities.stories) {
+  if (story.authority_scope !== 'traditional_reference' ||
+      story.source_work !== 'Periya Puranam' ||
+      !story.hook_en?.trim() ||
+      !story.hook_ta?.trim()) {
+    throw new Error(`Invalid bilingual traditional story record: ${story.saint_id}`);
+  }
+}
+if (!appText.includes("LocaleContext.Provider") ||
+    !appText.includes("setLocale('en')") ||
+    !appText.includes("setLocale('ta')")) {
+  throw new Error('English/Tamil reader-mode separation is missing from App');
 }
 
 if (tirumurai8.author?.id !== 'tirumurai8.manikkavacakar') {
@@ -205,5 +233,5 @@ console.log(
   `${doc.patikams.length} Tēvāram patikams, ${doc.edges.length} edges; ` +
   `${geometryIds.length} deliberately exact product map seeds; ` +
   `tradition playback covers ${saintsWithTraditionPlayback.size}/63 (62 multi-step, 1 single-stop); ` +
-  `Manikkavasakar remains a separate Naalvar/Tirumurai 8 companion; Uttarakosamangai spans ${uttaraLinks.length} Tiruvacakam section links; Kolaru 2.085 stays POTU with separate Tirumaraikadu traditional chronology.`,
+  `Manikkavasakar remains a separate Naalvar/Tirumurai 8 companion; 63/63 saint curiosity hooks are bilingual and traditional-reference scoped; Uttarakosamangai spans ${uttaraLinks.length} Tiruvacakam section links; Kolaru 2.085 stays POTU with separate Tirumaraikadu traditional chronology.`,
 );
