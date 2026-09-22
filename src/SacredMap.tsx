@@ -327,7 +327,7 @@ export default function SacredMap({
           <span class="district-marker-glow"></span>
           <span class="district-marker-count">${point.count}</span>
         `;
-        node.title = `${point.label}: ${point.count} Pramāṇa talam nodes in the normalized modern district aggregate`;
+        node.title = `${point.label}: ${point.count} Tēvāram sthalam entries in the normalized modern district aggregate`;
         node.setAttribute('aria-label', node.title);
 
         const marker = new maplibregl.Marker({
@@ -410,7 +410,7 @@ export default function SacredMap({
         <div className="map-layer-message">
           <strong>Tradition layer</strong>
           <p>
-            Traditional place associations are retained in Pramāṇa, but this map does not fabricate precise coordinates for them.
+            Traditional place associations are shown without fabricating precise coordinates for them.
           </p>
         </div>
       )}
