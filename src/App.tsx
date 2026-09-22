@@ -1303,6 +1303,14 @@ export default function App() {
         />
       )}
 
+      {sourcesOpen && (
+        <SourcesModal
+          data={data}
+          tirumurai8={tirumurai8}
+          onClose={() => setSourcesOpen(false)}
+        />
+      )}
+
       <footer>
         <strong><GopuramIcon /> Nayanmar Trails</strong>
         <span>Data provenance · version {data.meta.source_commit.slice(0, 10)}</span>
@@ -1743,6 +1751,135 @@ function SourceDetails({ site, data }: { site: Site; data: PramanaExport }) {
           <b>Identification note:</b> {identificationLabel(site.temple_identification_status)}
         </p>
       )}
+    </div>
+  );
+}
+
+function SourcesModal({
+  data,
+  tirumurai8,
+  onClose,
+}: {
+  data: PramanaExport;
+  tirumurai8: Tirumurai8Snapshot;
+  onClose: () => void;
+}) {
+  return (
+    <div
+      className="graph-backdrop sources-backdrop"
+      role="presentation"
+      onMouseDown={(event) => {
+        if (event.currentTarget === event.target) onClose();
+      }}
+    >
+      <section
+        className="sources-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Sources and methodology"
+        onMouseDown={(event) => event.stopPropagation()}
+      >
+        <header className="sources-modal-head">
+          <div>
+            <small>SOURCES · METHOD · PROVENANCE</small>
+            <h2>Where Nayanmar Trails gets its information</h2>
+            <p>
+              The site is designed for exploration first. This page explains the source chain behind the map, Tēvāram catalogue and historical notes.
+            </p>
+          </div>
+          <button className="modal-close" onClick={onClose} aria-label="Close sources page">×</button>
+        </header>
+
+        <div className="sources-intro">
+          <div>
+            <b>What Pramāṇa contributes</b>
+            <p>
+              Pramāṇa is the versioned evidence layer behind Nayanmar Trails. Its value is not branding on every screen:
+              it keeps textual tradition, edition metadata, inference and independent historical evidence from being silently merged.
+            </p>
+          </div>
+          <div className="sources-version">
+            <span>Dataset</span>
+            <b>{data.meta.export_version}</b>
+            <small>source {data.meta.source_commit.slice(0, 10)}</small>
+          </div>
+        </div>
+
+        <div className="source-pillars">
+          <article>
+            <span>01</span>
+            <div>
+              <small>TĒVĀRAM CATALOGUE</small>
+              <h3>798 numbered pathigams · 276 sthalams</h3>
+              <p>
+                Saint ↔ pathigam ↔ sthalam relationships are carried from the edition-aligned Tēvāram catalogue.
+                Numbering remains edition-qualified where sources differ.
+              </p>
+            </div>
+          </article>
+
+          <article>
+            <span>02</span>
+            <div>
+              <small>PROJECT MADURAI</small>
+              <h3>Source-preserved Tēvāram text layer</h3>
+              <p>
+                Project Madurai provides the public-text family used for the Tēvāram beta corpus.
+                Known HTML gaps and numbering differences remain explicit rather than being silently repaired.
+              </p>
+            </div>
+          </article>
+
+          <article>
+            <span>03</span>
+            <div>
+              <small>PERIYA PURANAM</small>
+              <h3>Saint story and identity links</h3>
+              <p>
+                Periya Puranam episode metadata connects individual Nayanmars with their traditional hagiographic chapters.
+                These are devotional-literary sources, not automatically historical proof.
+              </p>
+            </div>
+          </article>
+
+          <article>
+            <span>04</span>
+            <div>
+              <small>DHARMA INSCRIPTIONS</small>
+              <h3>Independent historical records</h3>
+              <p>
+                Where a reviewed inscription is linked to a mapped site, Nayanmar Trails marks it separately as an
+                independent historical record rather than treating it as the same thing as a literary tradition.
+              </p>
+            </div>
+          </article>
+
+          <article>
+            <span>05</span>
+            <div>
+              <small>TIRUMURAI 8</small>
+              <h3>Manikkavasakar as Naalvar</h3>
+              <p>
+                Tiruvācakam and Tirukkōvaiyār are carried through a separate beta snapshot
+                ({tirumurai8.works.tiruvacakam.sections} Tiruvācakam sections; {tirumurai8.works.tirukkovaiyar.source_order_units} Tirukkōvaiyār units).
+                Manikkavasakar is shown as the fourth Naalvar, not inserted into the numbered 63 Nayanmars.
+              </p>
+            </div>
+          </article>
+        </div>
+
+        <div className="method-strip">
+          <div><b>Text-linked</b><span>What the editions associate with a sthalam.</span></div>
+          <div><b>Tradition</b><span>Birthplace, related-place and mukti-place traditions.</span></div>
+          <div><b>Historical</b><span>Independent inscriptional records where currently linked.</span></div>
+          <div><b>Journey line</b><span>An exploratory reconstruction between known endpoints, never a claimed ancient road.</span></div>
+        </div>
+
+        <footer className="sources-modal-footer">
+          <span>Read the site as a heritage explorer; open Sources whenever you want the provenance underneath it.</span>
+          <button onClick={onClose}>Back to exploration</button>
+        </footer>
+      </section>
     </div>
   );
 }
