@@ -1163,6 +1163,73 @@ function Fact({ label, value }: { label: string; value: string | number }) {
 }
 
 
+function TraditionalPlaceDetail({
+  saintName,
+  stop,
+  total,
+  tab,
+}: {
+  saintName: string;
+  stop: PlaybackStop | undefined;
+  total: number;
+  tab: DetailTab;
+}) {
+  return (
+    <div className="traditional-detail">
+      <div className="traditional-visual">
+        <div className="traditional-symbol"><GopuramIcon /></div>
+        <div>
+          <small>TRADITIONAL PLACE REFERENCE</small>
+          <h2>{stop?.name || 'No place selected'}</h2>
+          <p>{stop?.detail || 'No current traditional-place claim.'}</p>
+        </div>
+      </div>
+
+      {tab === 'visits' && (
+        <div className="text">
+          <Badge kind="tradition">TRADITION</Badge>
+          <p>
+            Pramāṇa records <b>{total}</b> traditional place claim{total === 1 ? '' : 's'} for <b>{saintName}</b>.
+            This playback keeps those claims visible without inventing modern coordinates or a travel route.
+          </p>
+          <div className="evidence-callout muted">
+            <GopuramIcon />
+            <p>
+              The selected item is a traditional association. It is not automatically a modern temple identification,
+              exact geographic point, or independently verified historical event.
+            </p>
+          </div>
+        </div>
+      )}
+
+      {tab === 'chronology' && (
+        <div className="text">
+          <Badge kind="inference">NO ASSERTED JOURNEY CHRONOLOGY</Badge>
+          <p>
+            Birthplace, related-place and mukti-place traditions are ordered only as a reading sequence.
+            Nayanmar Trails does not infer the historical path between them.
+          </p>
+        </div>
+      )}
+
+      {tab === 'evidence' && (
+        <div className="text">
+          <Badge kind="tradition">TRADITIONAL_REFERENCE</Badge>
+          <p>
+            This surface is intentionally fail-closed: no map marker appears until Pramāṇa carries reviewed geometry
+            or another explicitly qualified location mapping.
+          </p>
+        </div>
+      )}
+
+      <div className="traditional-detail-footer">
+        <span>{total} tradition claim{total === 1 ? '' : 's'}</span>
+        <span>0 invented coordinates</span>
+      </div>
+    </div>
+  );
+}
+
 function Tirumurai8LocusDetail({
   locus,
   view,
