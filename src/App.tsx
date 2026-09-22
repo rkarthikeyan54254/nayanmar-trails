@@ -498,6 +498,20 @@ export default function App() {
                   </span>
                 </button>
               ))}
+              {searchResults.manikkavasakar && (
+                <button
+                  onClick={() => {
+                    setSelectedSaintId(MANIKKAVASAKAR_ID);
+                    setQuery('');
+                  }}
+                >
+                  <GopuramIcon />
+                  <span>
+                    Manikkavasakar
+                    <small>Naalvar · Tirumurai 8 · not numbered among the 63</small>
+                  </span>
+                </button>
+              ))}
               {searchResults.sites.map((item) => (
                 <button
                   key={item.id}
