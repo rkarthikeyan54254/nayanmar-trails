@@ -1763,3 +1763,54 @@ button,select,input,.text,.chips,.fact,.search-results{
 .saint-card::-webkit-scrollbar-thumb,.detail-card::-webkit-scrollbar-thumb{
   background:#35565b;border-radius:5px
 }
+
+
+.tradition-mini{
+  display:flex;
+  flex-direction:column;
+  gap:7px;
+}
+.tradition-mini-list{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:5px;
+}
+.tradition-mini-list button{
+  min-width:0;
+  display:grid;
+  grid-template-columns:22px 1fr;
+  gap:6px;
+  align-items:center;
+  padding:6px;
+  border:1px solid rgba(207,164,88,.13);
+  border-radius:6px;
+  background:rgba(4,25,34,.48);
+  text-align:left;
+  cursor:pointer;
+}
+.tradition-mini-list button:hover,
+.tradition-mini-list button.active{
+  border-color:rgba(219,171,85,.35);
+  background:rgba(198,145,62,.08);
+}
+.tradition-mini-list button>span{
+  width:19px;height:19px;
+  display:grid;place-items:center;
+  border-radius:50%;
+  border:1px solid rgba(218,169,79,.44);
+  color:#e4b864;
+  font:700 8px "Cormorant Garamond",serif;
+}
+.tradition-mini-list button>div{min-width:0;display:flex;flex-direction:column}
+.tradition-mini-list b{
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  color:#cbbd9c;font-size:7.4px;font-weight:500;
+}
+.tradition-mini-list small{
+  color:#687f79;font-size:5.8px;
+}
+.tradition-mini>p{
+  margin:auto 0 0;
+  color:#657d77;
+  font-size:6.2px;
+}
