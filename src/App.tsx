@@ -1091,6 +1091,113 @@ function Fact({ label, value }: { label: string; value: string | number }) {
   );
 }
 
+
+function Tirumurai8LocusDetail({
+  locus,
+  view,
+}: {
+  locus: Tirumurai8Locus | null;
+  view: 'visits' | 'hymns';
+}) {
+  if (!locus) {
+    return (
+      <div className="text">
+        <Badge kind="edition">NO MAPPED TIRUMURAI 8 LOCUS</Badge>
+        <p>
+          This talam is part of the broader Tēvāram catalog, but the pinned Tirumurai 8 product snapshot does not map a Manikkavasakar textual locus here.
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="text">
+      <Badge kind="edition">TIRUMURAI 8 · SOURCE-PRESERVED LOCUS</Badge>
+      {view === 'visits' ? (
+        <p>
+          This view is a <b>textual-locus mapping</b>, not a claim that Pramāṇa has established a historical temple visit or a travel sequence for Manikkavasakar.
+        </p>
+      ) : (
+        <p>
+          The pinned Tiruvācakam edition metadata associates this product locus with the following section title{locus.section_numbers.length === 1 ? '' : 's'}.
+        </p>
+      )}
+
+      <div className="locus-strip">
+        <small>TIRUVĀCAKAM SECTIONS</small>
+        <div>
+          {locus.section_numbers.map((section, index) => (
+            <span key={section} title={locus.section_titles_ta[index]}>
+              <GopuramIcon />
+              Section {section}
+            </span>
+          ))}
+        </div>
+      </div>
+
+      <ul className="t8-section-list">
+        {locus.section_titles_ta.map((title, index) => (
+          <li key={locus.id + ':' + index}>
+            <b>{locus.section_numbers[index]}</b>
+            <span>{title}</span>
+          </li>
+        ))}
+      </ul>
+
+      <div className="evidence-callout">
+        <GopuramIcon />
+        <p>{locus.locus_basis}</p>
+      </div>
+    </div>
+  );
+}
+
+function Tirumurai8Chronology({ snapshot }: { snapshot: Tirumurai8Snapshot }) {
+  return (
+    <div className="text">
+      <Badge kind="inference">FAIL-CLOSED BIOGRAPHICAL CHRONOLOGY</Badge>
+      <p>
+        Pramāṇa v1 has a beta-ready Tiruvācakam/Tirukkōvaiyār edition corpus, but it does not automatically turn section order into Manikkavasakar's historical itinerary.
+      </p>
+      <div className="evidence-callout">
+        <GopuramIcon />
+        <p>{snapshot.meta.playback_policy}</p>
+      </div>
+    </div>
+  );
+}
+
+function Tirumurai8Evidence({
+  locus,
+  site,
+  snapshot,
+}: {
+  locus: Tirumurai8Locus | null;
+  site: Site;
+  snapshot: Tirumurai8Snapshot;
+}) {
+  return (
+    <div className="text">
+      <Badge kind="edition">{snapshot.authority.text.replace(/_/g, ' ')}</Badge>
+      <p>
+        Tirumurai 8 is pinned from Pramāṇa release <b>{snapshot.meta.release_id}</b>. Historical authority remains <b>{snapshot.authority.historical.replace(/_/g, ' ')}</b>.
+      </p>
+      {locus ? (
+        <div className="inscription">
+          <Badge kind="edition">TEXTUAL LOCUS</Badge>
+          <b>{locus.display_name}</b>
+          <p>{locus.locus_basis}</p>
+        </div>
+      ) : (
+        <div className="evidence-callout muted">
+          <GopuramIcon />
+          <p>No Tirumurai 8 textual-locus mapping is attached to {siteDisplayName(site)} in this product snapshot.</p>
+        </div>
+      )}
+    </div>
+  );
+}
+
 function Visits({
   site,
   saintName,
