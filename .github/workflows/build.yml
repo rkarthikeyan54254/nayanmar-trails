@@ -70,6 +70,8 @@ jobs:
           capture "sources-methodology" "http://127.0.0.1:4173/?sources=1"
           capture "nayanmar-tradition-fallback" "http://127.0.0.1:4173/?saint=nayanmar.01"
           capture "manikkavasakar-naalvar" "http://127.0.0.1:4173/?saint=tirumurai8.manikkavacakar"
+          capture "manikkavasakar-uttarakosamangai-context" "http://127.0.0.1:4173/?saint=tirumurai8.manikkavacakar&tab=chronology"
+          capture "sambandar-vedaranyam-kolaru-context" "http://127.0.0.1:4173/?saint=nayanmar.27&site=KT125&tab=visits"
 
       - name: Upload visual QA artifact
         uses: actions/upload-artifact@v4
