@@ -1375,38 +1375,173 @@ function Evidence({ site, data }: { site: Site; data: PramanaExport }) {
   );
 }
 
+function ConnectionModal({
+  saint,
+  saintName,
+  selectedIsManikkavasakar,
+  sites,
+  centerLabel,
+  totalConnections,
+  onClose,
+  onSelect,
+}: {
+  saint: Saint | null;
+  saintName: string;
+  selectedIsManikkavasakar: boolean;
+  sites: Array<{ site: Site; count: number }>;
+  centerLabel?: string;
+  totalConnections: number;
+  onClose: () => void;
+  onSelect: (site: Site) => void;
+}) {
+  return (
+    <div
+      className="graph-backdrop"
+      role="presentation"
+      onMouseDown={(event) => {
+        if (event.currentTarget === event.target) onClose();
+      }}
+    >
+      <section
+        className="graph-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-label={selectedIsManikkavasakar ? 'Tirumurai 8 talam connections' : 'Saint talam connections'}
+        onMouseDown={(event) => event.stopPropagation()}
+      >
+        <header className="graph-modal-head">
+          <div>
+            <small>{selectedIsManikkavasakar ? 'NAALVAR · TIRUMURAI 8' : 'SELECTED NAYANMAR'}</small>
+            <h2>{saintName}</h2>
+            <p>
+              {selectedIsManikkavasakar
+                ? 'Qualified Tiruvācakam textual loci from the pinned Pramāṇa snapshot.'
+                : `${totalConnections} Tēvāram-linked talams in the current Pramāṇa graph.`}
+            </p>
+          </div>
+          <button className="modal-close" onClick={onClose} aria-label="Close connection graph">×</button>
+        </header>
+
+        <div className="graph-modal-grid">
+          <div className="graph-stage">
+            <Network
+              saint={saint}
+              centerLabel={centerLabel}
+              sites={sites.slice(0, 12)}
+              expanded
+              onSelect={onSelect}
+            />
+            <div className="graph-stage-caption">
+              Node size reflects linked patikam or section count. Layout is a reading aid, not geography or chronology.
+            </div>
+          </div>
+
+          <aside className="graph-ranking">
+            <div className="graph-ranking-head">
+              <small>TOP CONNECTIONS</small>
+              <b>{sites.length ? 'Select a talam to inspect it' : 'No mapped talam connections'}</b>
+            </div>
+            <div className="graph-ranking-list">
+              {sites.slice(0, 12).map(({ site, count }, index) => {
+                const modern = modernShort(site.modern_name_nic);
+                const canonical = cleanLabel(site.label);
+                return (
+                  <button key={site.id} onClick={() => onSelect(site)}>
+                    <span className="graph-rank">{String(index + 1).padStart(2, '0')}</span>
+                    <span className="graph-rank-copy">
+                      <b>{canonical}</b>
+                      {modern && modern.toLowerCase() !== canonical.toLowerCase() && <small>{modern}</small>}
+                    </span>
+                    <strong>{count}</strong>
+                  </button>
+                );
+              })}
+            </div>
+          </aside>
+        </div>
+
+        <div className="graph-modal-note">
+          <Badge kind={selectedIsManikkavasakar ? 'edition' : 'edition'}>
+            {selectedIsManikkavasakar ? 'TEXTUAL LOCI' : 'EDITION METADATA'}
+          </Badge>
+          <p>
+            {selectedIsManikkavasakar
+              ? 'These connections do not establish Manikkavasakar’s historical itinerary.'
+              : 'These edges express author → patikam → talam relationships; they do not establish a historical travel route.'}
+          </p>
+        </div>
+      </section>
+    </div>
+  );
+}
+
 function Network({
   saint,
   sites,
   centerLabel,
+  expanded = false,
+  onSelect,
 }: {
   saint: Saint | null;
   sites: Array<{ site: Site; count: number }>;
   centerLabel?: string;
+  expanded?: boolean;
+  onSelect?: (site: Site) => void;
 }) {
-  const width = 360;
-  const height = 148;
-  const cx = 180;
-  const cy = 73;
-  const rx = 137;
-  const ry = 52;
+  const width = expanded ? 720 : 360;
+  const height = expanded ? 360 : 148;
+  const cx = width / 2;
+  const cy = expanded ? 170 : 73;
+  const rx = expanded ? 255 : 137;
+  const ry = expanded ? 120 : 52;
 
   return (
-    <svg className="network" viewBox={`0 0 ${width} ${height}`} role="img" aria-label="Saint to talam graph">
+    <svg
+      className={`network ${expanded ? 'expanded' : ''}`}
+      viewBox={`0 0 ${width} ${height}`}
+      role="img"
+      aria-label="Saint to talam graph"
+    >
       {sites.map(({ site, count }, index) => {
         const angle = (index / Math.max(sites.length, 1)) * Math.PI * 2 - Math.PI / 2;
         const x = cx + Math.cos(angle) * rx;
         const y = cy + Math.sin(angle) * ry;
+        const label = siteDisplayName(site);
+        const radius = (expanded ? 8 : 4) + Math.min(count, 9) * (expanded ? .72 : .8);
+
         return (
-          <g key={site.id}>
+          <g
+            key={site.id}
+            className={onSelect ? 'network-node interactive' : 'network-node'}
+            onClick={() => onSelect?.(site)}
+            onKeyDown={(event) => {
+              if (!onSelect) return;
+              if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                onSelect(site);
+              }
+            }}
+            role={onSelect ? 'button' : undefined}
+            tabIndex={onSelect ? 0 : undefined}
+            aria-label={onSelect ? `${label}, ${count} linked items` : undefined}
+          >
             <line x1={cx} y1={cy} x2={x} y2={y} />
-            <circle cx={x} cy={y} r={4 + Math.min(count, 7) * .8} />
-            <text x={x} y={y + 16} textAnchor="middle">{cleanLabel(site.label).slice(0, 13)}</text>
+            <circle cx={x} cy={y} r={radius} />
+            {expanded && <text className="node-count" x={x} y={y + 3} textAnchor="middle">{count}</text>}
+            <text
+              className="node-label"
+              x={x}
+              y={y + (expanded ? radius + 18 : 16)}
+              textAnchor="middle"
+            >
+              {label.slice(0, expanded ? 22 : 13)}
+            </text>
           </g>
         );
       })}
-      <circle className="center" cx={cx} cy={cy} r="16" />
-      <text className="center-text" x={cx} y={cy + 3} textAnchor="middle">
+      <circle className="center-halo" cx={cx} cy={cy} r={expanded ? 34 : 20} />
+      <circle className="center" cx={cx} cy={cy} r={expanded ? 25 : 16} />
+      <text className="center-text" x={cx} y={cy + (expanded ? 5 : 3)} textAnchor="middle">
         {centerLabel ?? saint?.ordinal ?? '—'}
       </text>
     </svg>
