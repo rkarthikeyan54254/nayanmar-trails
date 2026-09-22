@@ -955,7 +955,7 @@ export default function App() {
                   <GopuramIcon />
                   <span>
                     {localizedSiteName(item, locale)}
-                    <small>{locale === 'ta' ? (item.district || item.site_id) : `${cleanLabel(item.label)} · ${item.district || item.site_id}`}</small>
+                    <small>{locale === 'ta' ? (localizedAdministrativeName(item.district, locale) || item.site_id) : `${cleanLabel(item.label)} · ${item.district || item.site_id}`}</small>
                   </span>
                 </button>
               ))}
@@ -967,7 +967,7 @@ export default function App() {
         </div>
 
         <div className="header-motto">
-          Ancient Paths<br /><b><T>Living Today</T></b>
+          {locale === 'ta' ? <>பழம்பாதைகள்<br /><b>இன்றும் வாழும் மரபு</b></> : <>Ancient Paths<br /><b>Living Today</b></>}
         </div>
       </header>
 
@@ -981,7 +981,7 @@ export default function App() {
         <div className="hero-copy">
           <span><T>ANCIENT PATHS · LIVING DEVOTION</T></span>
           <h1><T>Follow the Nayanmars across sacred Tamil Nadu</T></h1>
-          <p>Explore sthalams, Tēvāram pathigams, saint traditions and the sacred geography that connects them.</p>
+          <p>{tr(locale, 'Explore sthalams, Tēvāram pathigams, saint traditions and the sacred geography that connects them.')}</p>
         </div>
         <blockquote className="hero-quote">
           {locale === 'ta'
