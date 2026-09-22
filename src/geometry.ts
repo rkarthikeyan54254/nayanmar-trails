@@ -14,6 +14,7 @@ export interface GeoSeed {
 export const GEO_SEEDS: GeoSeed[] = [
   { siteId: 'TO20', name: 'Tiruvotriyur', nameTa: 'திருவொற்றியூர்', lng: 80.3047, lat: 13.1694, playbackRank: 1, geometryStatus: 'modern_place_centroid_product_metadata' },
   { siteId: 'TO01', name: 'Kanchipuram', nameTa: 'காஞ்சிபுரம்', lng: 79.7036, lat: 12.8342, playbackRank: 2, geometryStatus: 'modern_place_centroid_product_metadata' },
+  { siteId: 'TO28', name: 'Tirukalukundram', nameTa: 'திருக்கழுக்குன்றம்', lng: 80.0610, lat: 12.6080, playbackRank: 15, geometryStatus: 'modern_place_centroid_product_metadata' },
   { siteId: 'NA22', name: 'Tiruvannamalai', nameTa: 'திருவண்ணாமலை', lng: 79.0747, lat: 12.2253, playbackRank: 3, geometryStatus: 'modern_place_centroid_product_metadata' },
   { siteId: 'KV01', name: 'Chidambaram', nameTa: 'சிதம்பரம்', lng: 79.6935, lat: 11.3996, playbackRank: 4, geometryStatus: 'modern_place_centroid_product_metadata' },
   { siteId: 'KV14', name: 'Sirkazhi', nameTa: 'சீர்காழி', lng: 79.7360, lat: 11.2390, playbackRank: 5, geometryStatus: 'modern_place_centroid_product_metadata' },
