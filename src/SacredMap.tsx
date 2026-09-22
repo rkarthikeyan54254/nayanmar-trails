@@ -123,6 +123,7 @@ export default function SacredMap({
   epigraphicSiteIds,
   onSelect,
   travelerImage,
+  showUnlinkedExemplars = true,
 }: {
   routeStops: MapStop[];
   coverage: CoveragePoint[];
@@ -132,6 +133,7 @@ export default function SacredMap({
   epigraphicSiteIds: Set<string>;
   onSelect: (siteId: string) => void;
   travelerImage?: string;
+  showUnlinkedExemplars?: boolean;
 }) {
   const mapNode = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<MapLibreMap | null>(null);
@@ -340,6 +342,7 @@ export default function SacredMap({
       const linked = linkedSet.has(seed.siteId);
       const independent = epigraphicSiteIds.has(seed.siteId);
       if (mode === 'independent' && !independent) continue;
+      if (!showUnlinkedExemplars && !linked && mode !== 'independent') continue;
 
       const selected = selectedSiteId === entityId;
       const node = document.createElement('button');
@@ -381,7 +384,7 @@ export default function SacredMap({
         .addTo(map);
       markerRefs.current.push(marker);
     }
-  }, [coverage, epigraphicSiteIds, linkedSet, mode, progress, routeStops, selectedSiteId, travelerImage]);
+  }, [coverage, epigraphicSiteIds, linkedSet, mode, progress, routeStops, selectedSiteId, showUnlinkedExemplars, travelerImage]);
 
 
 
