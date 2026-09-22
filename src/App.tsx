@@ -431,6 +431,7 @@ export default function App() {
   useEffect(() => {
     setProgress(0);
     setPlaying(false);
+    setTab('visits');
   }, [selectedSaintId]);
 
   useEffect(() => {
@@ -481,6 +482,7 @@ export default function App() {
   const selectedGeoSeed = selectedSite
     ? GEO_SEEDS.find((seed) => seed.siteId === selectedSite.site_id)
     : undefined;
+  const showTraditionalDetail = !selectedIsManikkavasakar && !playbackIsGeographic;
 
   return (
     <main className="app">
@@ -808,118 +810,141 @@ export default function App() {
 
         <aside className="panel detail-card">
           <div className="tabs">
-            {(['hymns', 'chronology', 'visits', 'evidence'] as DetailTab[]).map((item) => (
-              <button
-                key={item}
-                className={tab === item ? 'active' : ''}
-                onClick={() => setTab(item)}
-              >
-                {item === 'visits'
-                  ? selectedIsManikkavasakar ? 'Textual Loci' : 'Temple Visits'
-                  : item[0].toUpperCase() + item.slice(1)}
-              </button>
-            ))}
+            {showTraditionalDetail ? (
+              (['visits', 'chronology', 'evidence'] as DetailTab[]).map((item) => (
+                <button
+                  key={item}
+                  className={tab === item ? 'active' : ''}
+                  onClick={() => setTab(item)}
+                >
+                  {item === 'visits' ? 'Tradition' : item[0].toUpperCase() + item.slice(1)}
+                </button>
+              ))
+            ) : (
+              (['hymns', 'chronology', 'visits', 'evidence'] as DetailTab[]).map((item) => (
+                <button
+                  key={item}
+                  className={tab === item ? 'active' : ''}
+                  onClick={() => setTab(item)}
+                >
+                  {item === 'visits'
+                    ? selectedIsManikkavasakar ? 'Textual Loci' : 'Temple Visits'
+                    : item[0].toUpperCase() + item.slice(1)}
+                </button>
+              ))
+            )}
           </div>
 
           <div className="detail">
-            <div className={`temple-visual ${templeMedia ? 'has-photo' : ''}`}>
-              {templeMedia ? (
-                <img src={templeMedia.src} alt="" />
-              ) : (
-                <div className="temple-art"><GopuramIcon /></div>
-              )}
-              <div className="temple-shade" />
-              <div className="temple-title">
-                <small>CURRENT TALAM</small>
-                <h2>{selectedSite ? siteDisplayName(selectedSite) : 'Select a talam'}</h2>
-                <p>{selectedSite ? `${cleanLabel(selectedSite.label)}${selectedSite.label_ta ? ` · ${selectedSite.label_ta}` : ''}` : ''}</p>
-              </div>
-              {templeMedia && (
-                <span className="temple-credit">{templeMedia.source} · {templeMedia.license}</span>
-              )}
-            </div>
-
-            {selectedSite && (
+            {showTraditionalDetail ? (
+              <TraditionalPlaceDetail
+                saintName={saintName}
+                stop={activePlaybackStop}
+                total={traditionalPlaybackStops.length}
+                tab={tab}
+              />
+            ) : (
               <>
-                <div className="chips">
-                  <span>{selectedSite.site_id}</span>
-                  <span>{selectedSite.patikam_count} site patikams</span>
-                  {selectedIsManikkavasakar ? (
-                    <span>
-                      {selectedTirumurai8Locus
-                        ? `${selectedTirumurai8Locus.section_numbers.length} Tiruvācakam section ${selectedTirumurai8Locus.section_numbers.length === 1 ? 'locus' : 'loci'}`
-                        : 'no mapped Tirumurai 8 locus'}
-                    </span>
+                <div className={`temple-visual ${templeMedia ? 'has-photo' : ''}`}>
+                  {templeMedia ? (
+                    <img src={templeMedia.src} alt="" />
                   ) : (
-                    <span>{selectedPatikams.length} by {saintName.split(' · ')[0]}</span>
+                    <div className="temple-art"><GopuramIcon /></div>
+                  )}
+                  <div className="temple-shade" />
+                  <div className="temple-title">
+                    <small>CURRENT TALAM</small>
+                    <h2>{selectedSite ? siteDisplayName(selectedSite) : 'Select a talam'}</h2>
+                    <p>{selectedSite ? `${cleanLabel(selectedSite.label)}${selectedSite.label_ta ? ` · ${selectedSite.label_ta}` : ''}` : ''}</p>
+                  </div>
+                  {templeMedia && (
+                    <span className="temple-credit">{templeMedia.source} · {templeMedia.license}</span>
                   )}
                 </div>
 
-                {selectedIsManikkavasakar ? (
+                {selectedSite && (
                   <>
-                    {(tab === 'visits' || tab === 'hymns') && (
-                      <Tirumurai8LocusDetail
-                        locus={selectedTirumurai8Locus}
-                        view={tab}
+                    <div className="chips">
+                      <span>{selectedSite.site_id}</span>
+                      <span>{selectedSite.patikam_count} site patikams</span>
+                      {selectedIsManikkavasakar ? (
+                        <span>
+                          {selectedTirumurai8Locus
+                            ? `${selectedTirumurai8Locus.section_numbers.length} Tiruvācakam section ${selectedTirumurai8Locus.section_numbers.length === 1 ? 'locus' : 'loci'}`
+                            : 'no mapped Tirumurai 8 locus'}
+                        </span>
+                      ) : (
+                        <span>{selectedPatikams.length} by {saintName.split(' · ')[0]}</span>
+                      )}
+                    </div>
+
+                    {selectedIsManikkavasakar ? (
+                      <>
+                        {(tab === 'visits' || tab === 'hymns') && (
+                          <Tirumurai8LocusDetail
+                            locus={selectedTirumurai8Locus}
+                            view={tab}
+                          />
+                        )}
+                        {tab === 'chronology' && (
+                          <Tirumurai8Chronology snapshot={tirumurai8} />
+                        )}
+                        {tab === 'evidence' && (
+                          <Tirumurai8Evidence
+                            locus={selectedTirumurai8Locus}
+                            site={selectedSite}
+                            snapshot={tirumurai8}
+                          />
+                        )}
+                      </>
+                    ) : (
+                      <>
+                        {tab === 'visits' && (
+                          <Visits
+                            site={selectedSite}
+                            saintName={saintName}
+                            count={selectedPatikams.length}
+                            patikamIds={selectedPatikams}
+                            patikamById={patikamById}
+                          />
+                        )}
+                        {tab === 'hymns' && (
+                          <Hymns ids={selectedPatikams} patikamById={patikamById} />
+                        )}
+                        {tab === 'chronology' && <Chronology />}
+                        {tab === 'evidence' && <Evidence site={selectedSite} data={data} />}
+                      </>
+                    )}
+
+                    <div className="temple-facts">
+                      <Fact label="Traditional class" value={selectedSite.traditional_location_class || 'Not supplied'} />
+                      <Fact label="Modern catalog" value={selectedSite.modern_name_nic || selectedSite.district || 'Not supplied'} />
+                      <Fact label="Map geometry" value={selectedGeoSeed ? 'Exact modern centroid exemplar' : 'District-level corpus context only'} />
+                      <Fact
+                        label="Selected-saint evidence"
+                        value={
+                          selectedIsManikkavasakar
+                            ? selectedTirumurai8Locus
+                              ? 'Tirumurai 8 textual locus'
+                              : 'No mapped Tirumurai 8 locus'
+                            : authorityLabel(selectedSite.authority_scope)
+                        }
                       />
-                    )}
-                    {tab === 'chronology' && (
-                      <Tirumurai8Chronology snapshot={tirumurai8} />
-                    )}
-                    {tab === 'evidence' && (
-                      <Tirumurai8Evidence
-                        locus={selectedTirumurai8Locus}
-                        site={selectedSite}
-                        snapshot={tirumurai8}
-                      />
-                    )}
-                  </>
-                ) : (
-                  <>
-                    {tab === 'visits' && (
-                      <Visits
-                        site={selectedSite}
-                        saintName={saintName}
-                        count={selectedPatikams.length}
-                        patikamIds={selectedPatikams}
-                        patikamById={patikamById}
-                      />
-                    )}
-                    {tab === 'hymns' && (
-                      <Hymns ids={selectedPatikams} patikamById={patikamById} />
-                    )}
-                    {tab === 'chronology' && <Chronology />}
-                    {tab === 'evidence' && <Evidence site={selectedSite} data={data} />}
+                    </div>
+
+                    <button
+                      className="focus"
+                      onClick={() =>
+                        document.querySelector('.map-card')?.scrollIntoView({
+                          behavior: 'smooth',
+                          block: 'center',
+                        })
+                      }
+                    >
+                      <GopuramIcon /> View on static map →
+                    </button>
                   </>
                 )}
-
-                <div className="temple-facts">
-                  <Fact label="Traditional class" value={selectedSite.traditional_location_class || 'Not supplied'} />
-                  <Fact label="Modern catalog" value={selectedSite.modern_name_nic || selectedSite.district || 'Not supplied'} />
-                  <Fact label="Map geometry" value={selectedGeoSeed ? 'Exact modern centroid exemplar' : 'District-level corpus context only'} />
-                  <Fact
-                    label="Selected-saint evidence"
-                    value={
-                      selectedIsManikkavasakar
-                        ? selectedTirumurai8Locus
-                          ? 'Tirumurai 8 textual locus'
-                          : 'No mapped Tirumurai 8 locus'
-                        : authorityLabel(selectedSite.authority_scope)
-                    }
-                  />
-                </div>
-
-                <button
-                  className="focus"
-                  onClick={() =>
-                    document.querySelector('.map-card')?.scrollIntoView({
-                      behavior: 'smooth',
-                      block: 'center',
-                    })
-                  }
-                >
-                  <GopuramIcon /> View on static map →
-                </button>
               </>
             )}
           </div>
