@@ -705,29 +705,61 @@ export default function App() {
 
           <div className="major-temples">
             <div className="section-title">
-              <h3>{selectedIsManikkavasakar ? 'Tirumurai 8 textual loci' : 'Major linked talams'}</h3>
-              <span>{selectedIsManikkavasakar ? tirumurai8.loci.length : siteLinks.size} total</span>
+              <h3>
+                {showTraditionalDetail
+                  ? 'Traditional place claims'
+                  : selectedIsManikkavasakar
+                    ? 'Tirumurai 8 textual loci'
+                    : 'Major linked talams'}
+              </h3>
+              <span>
+                {showTraditionalDetail
+                  ? traditionalPlaybackStops.length
+                  : selectedIsManikkavasakar
+                    ? tirumurai8.loci.length
+                    : siteLinks.size} total
+              </span>
             </div>
-            {topLinkedSites.slice(0, 6).map(({ site, count }) => {
-              const primary = siteDisplayName(site);
-              const canonical = cleanLabel(site.label);
-              return (
+            {showTraditionalDetail ? (
+              traditionalPlaybackStops.slice(0, 6).map((stop, index) => (
                 <button
-                  key={site.id}
+                  key={stop.id}
+                  className={index === progress ? 'active-tradition-place' : ''}
                   onClick={() => {
-                    setSelectedSiteId(site.id);
+                    setProgress(index);
                     setTab('visits');
                   }}
                 >
-                  <GopuramIcon />
+                  <i className="tradition-place-dot" />
                   <span className="major-talam-copy">
-                    <b>{primary}</b>
-                    {canonical.toLowerCase() !== primary.toLowerCase() && <em>{canonical}</em>}
+                    <b>{stop.name}</b>
+                    <em>{stop.detail}</em>
                   </span>
-                  <small>{count}</small>
+                  <small>{index + 1}</small>
                 </button>
-              );
-            })}
+              ))
+            ) : (
+              topLinkedSites.slice(0, 6).map(({ site, count }) => {
+                const primary = siteDisplayName(site);
+                const canonical = cleanLabel(site.label);
+                return (
+                  <button
+                    key={site.id}
+                    onClick={() => {
+                      setSelectedSiteId(site.id);
+                      setTab('visits');
+                    }}
+                  >
+                    <GopuramIcon />
+                    <span className="major-talam-copy">
+                      <b>{primary}</b>
+                      {canonical.toLowerCase() !== primary.toLowerCase() && <em>{canonical}</em>}
+                    </span>
+                    <small>{count}</small>
+                  </button>
+                );
+              })
+            )}
           </div>
 
           <div className="journey-progress">
