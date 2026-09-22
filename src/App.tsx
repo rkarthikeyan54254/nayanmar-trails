@@ -149,7 +149,9 @@ export default function App() {
   const [graphOpen, setGraphOpen] = useState(
     () => new URLSearchParams(window.location.search).get('graph') === '1',
   );
-  const [sourcesOpen, setSourcesOpen] = useState(false);
+  const [sourcesOpen, setSourcesOpen] = useState(
+    () => new URLSearchParams(window.location.search).get('sources') === '1',
+  );
   const [query, setQuery] = useState('');
   const didInitSaintSelection = useRef(false);
   const preserveInitialSiteDeepLink = useRef(
