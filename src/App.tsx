@@ -533,7 +533,18 @@ export default function App() {
           <button onClick={() => document.querySelector('.timeline')?.scrollIntoView({ behavior: 'smooth' })}>Timeline</button>
           <button onClick={() => setTab('visits')}>Temples</button>
           <button onClick={() => setTab('hymns')}>Hymns</button>
-          <button onClick={() => setGraphOpen(true)}>Routes</button>
+          <button
+            onClick={() => {
+              if (showTraditionalDetail) {
+                document.querySelector('.timeline')?.scrollIntoView({ behavior: 'smooth' });
+              } else {
+                setGraphOpen(true);
+              }
+            }}
+            title={showTraditionalDetail ? 'No mapped route is asserted; open tradition playback below' : 'Open talam connections'}
+          >
+            Routes
+          </button>
           <button onClick={() => setTab('evidence')}>Evidence</button>
         </nav>
 
@@ -1124,26 +1135,57 @@ export default function App() {
           </div>
         </div>
 
-        <div className="panel graph-mini">
-          <div className="section-title">
-            <div>
-              <h3>{selectedIsManikkavasakar ? 'Tirumurai 8 – Talam Graph' : 'Saint – Talam Graph'}</h3>
-              <span>
-                {selectedIsManikkavasakar
-                  ? `${tirumurai8.loci.length} textual loci`
-                  : `${siteLinks.size} linked talams`}
-              </span>
+        {showTraditionalDetail ? (
+          <div className="panel tradition-mini">
+            <div className="section-title">
+              <div>
+                <h3>Traditional Place Claims</h3>
+                <span>{traditionalPlaybackStops.length} Pramāṇa references</span>
+              </div>
+              <Badge kind="tradition">TRADITION</Badge>
             </div>
-            <button className="graph-expand" onClick={() => setGraphOpen(true)}>Expand ↗</button>
+            <div className="tradition-mini-list">
+              {traditionalPlaybackStops.slice(0, 4).map((stop, index) => (
+                <button
+                  key={stop.id}
+                  className={index === progress ? 'active' : ''}
+                  onClick={() => {
+                    setProgress(index);
+                    setTab('visits');
+                  }}
+                >
+                  <span>{index + 1}</span>
+                  <div>
+                    <b>{stop.name}</b>
+                    <small>{stop.detail}</small>
+                  </div>
+                </button>
+              ))}
+            </div>
+            <p>Shown as claims, not coordinates or a reconstructed road.</p>
           </div>
-          <button className="graph-preview-button" onClick={() => setGraphOpen(true)} aria-label="Open expanded connection graph">
-            <Network
-              saint={saint}
-              centerLabel={selectedIsManikkavasakar ? 'M' : undefined}
-              sites={topLinkedSites.slice(0, 8)}
-            />
-          </button>
-        </div>
+        ) : (
+          <div className="panel graph-mini">
+            <div className="section-title">
+              <div>
+                <h3>{selectedIsManikkavasakar ? 'Tirumurai 8 – Talam Graph' : 'Saint – Talam Graph'}</h3>
+                <span>
+                  {selectedIsManikkavasakar
+                    ? `${tirumurai8.loci.length} textual loci`
+                    : `${siteLinks.size} linked talams`}
+                </span>
+              </div>
+              <button className="graph-expand" onClick={() => setGraphOpen(true)}>Expand ↗</button>
+            </div>
+            <button className="graph-preview-button" onClick={() => setGraphOpen(true)} aria-label="Open expanded connection graph">
+              <Network
+                saint={saint}
+                centerLabel={selectedIsManikkavasakar ? 'M' : undefined}
+                sites={topLinkedSites.slice(0, 8)}
+              />
+            </button>
+          </div>
+        )}
 
         <div className="panel density-card">
           <div className="section-title">
