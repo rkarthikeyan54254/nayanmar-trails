@@ -460,6 +460,13 @@ export default function App() {
   }, [selectedIsManikkavasakar, tirumurai8]);
 
   useEffect(() => {
+    if (!playbackIsGeographic || !routeStops.length) return;
+    const active = routeStops[Math.min(progress, routeStops.length - 1)];
+    if (!active) return;
+    setSelectedSiteId(`tevaram_site.${active.siteId}`);
+  }, [playbackIsGeographic, progress, routeStops, selectedSaintId]);
+
+  useEffect(() => {
     if (!playing || playbackStops.length < 2) return;
     const timer = window.setInterval(() => {
       setProgress((value) => {
