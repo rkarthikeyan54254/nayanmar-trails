@@ -1414,7 +1414,7 @@ function TraditionalPlaceDetail({
 
       {tab === 'evidence' && (
         <div className="text">
-          <Badge kind="tradition">TRADITIONAL_REFERENCE</Badge>
+          <Badge kind="tradition">TRADITIONAL SOURCE</Badge>
           <p>
             No map marker is shown until a reviewed location is attached
             or another explicitly qualified location mapping.
@@ -1450,7 +1450,7 @@ function Tirumurai8LocusDetail({
 
   return (
     <div className="text">
-      <Badge kind="edition">TIRUMURAI 8 · SOURCE-PRESERVED LOCUS</Badge>
+      <Badge kind="edition">TIRUVĀCAKAM STHALAM</Badge>
       {view === 'visits' ? (
         <p>
           This view is a <b>textual-locus mapping</b>, not a claim of a historically verified temple visit or a travel sequence for Manikkavasakar.
