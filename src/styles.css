@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Noto+Serif+Tamil:wght@400;600&family=Inter:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Noto+Sans+Tamil:wght@400;500;600;700&family=Noto+Serif+Tamil:wght@400;600&family=Inter:wght@400;500;600&display=swap');
 
 :root{
   font-family:Inter,system-ui,sans-serif;
@@ -653,19 +653,20 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:1px solid 
   cursor:pointer;
 }
 .app[data-locale="ta"]{
-  font-family:"Noto Serif Tamil","Noto Sans Tamil",system-ui,sans-serif;
+  font-family:"Noto Sans Tamil",system-ui,sans-serif;
 }
 .app[data-locale="ta"] .topbar nav button,
 .app[data-locale="ta"] .filter,
 .app[data-locale="ta"] .mode-pills button{
-  font-family:"Noto Serif Tamil","Noto Sans Tamil",sans-serif;
+  font-family:"Noto Sans Tamil",system-ui,sans-serif;
 }
 .app[data-locale="ta"] .saint-heading h2{
+  font-family:"Noto Serif Tamil",serif;
   font-size:20px;
-  line-height:1.25;
+  line-height:1.35;
 }
 .app[data-locale="ta"] .saint-curiosity p{
-  font:500 8.6px/1.65 "Noto Serif Tamil",serif;
+  font:500 8.6px/1.7 "Noto Serif Tamil",serif;
 }
 
 .authority-box{
@@ -2534,7 +2535,168 @@ button,select,input,.text,.chips,.fact,.search-results{
   .method-strip{grid-template-columns:1fr}
 }
 
-/* Tamil reader mode: prevent Latin display-font shorthands from dropping Tamil glyphs. */
-.app[data-locale="ta"] :is(h1,h2,h3,h4,p,span,small,b,strong,em,button,label,input,select,option,blockquote){
-  font-family:"Noto Serif Tamil","Noto Sans Tamil",system-ui,sans-serif!important;
+/* Tamil reader mode: typography and spacing are intentionally independent of English.
+   Functional UI uses Noto Sans Tamil; editorial/display copy uses Noto Serif Tamil. */
+.app[data-locale="ta"] :is(button,label,input,select,option,.filter,.mode-pills,.chips,.tabs){
+  font-family:"Noto Sans Tamil",system-ui,sans-serif!important;
+}
+.app[data-locale="ta"] :is(h1,h2,h3,h4,blockquote,.saint-curiosity p,.detail-card .text,.sources-modal p){
+  font-family:"Noto Serif Tamil",serif!important;
+}
+.app[data-locale="ta"] .brand strong{
+  font-family:"Cormorant Garamond",Georgia,serif!important;
+}
+.app[data-locale="ta"] .brand{
+  overflow:hidden;
+}
+.app[data-locale="ta"] .brand>div,
+.app[data-locale="ta"] .hero-copy,
+.app[data-locale="ta"] .topbar nav,
+.app[data-locale="ta"] .header-search{
+  min-width:0;
+}
+.app[data-locale="ta"] .brand strong{
+  font-size:23px;
+  line-height:1.02;
+  letter-spacing:.006em;
+}
+.app[data-locale="ta"] .brand small{
+  margin-top:4px;
+  font-family:"Noto Sans Tamil",system-ui,sans-serif;
+  font-size:6.4px;
+  line-height:1.45;
+  letter-spacing:.08em;
+  white-space:nowrap;
+}
+.app[data-locale="ta"] .topbar{
+  height:84px;
+  grid-template-columns:290px minmax(560px,1fr) auto minmax(270px,320px) 115px;
+  gap:12px;
+  padding:0 20px;
+}
+.app[data-locale="ta"] .topbar nav button{
+  min-width:0;
+  padding:0 14px;
+  white-space:nowrap;
+  font-size:9.4px;
+  line-height:1.35;
+}
+.app[data-locale="ta"] .language-switcher button{
+  font-family:"Noto Sans Tamil",system-ui,sans-serif!important;
+  font-size:7.6px;
+}
+.app[data-locale="ta"] .header-search input{
+  font-family:"Noto Sans Tamil",system-ui,sans-serif!important;
+  font-size:8.3px;
+  line-height:1.4;
+}
+.app[data-locale="ta"] .header-motto{
+  font-family:"Noto Serif Tamil",serif;
+  font-size:8.5px;
+  line-height:1.5;
+}
+.app[data-locale="ta"] .hero{
+  height:auto;
+  min-height:154px;
+  grid-template-columns:145px minmax(620px,1fr) 285px 110px;
+  gap:14px;
+  padding:16px 22px;
+}
+.app[data-locale="ta"] .hero-copy>span{
+  display:block;
+  font-family:"Noto Sans Tamil",system-ui,sans-serif;
+  font-size:6.8px;
+  line-height:1.45;
+  letter-spacing:.1em;
+}
+.app[data-locale="ta"] .hero h1{
+  max-width:920px;
+  margin:7px auto 5px;
+  font-size:32px;
+  line-height:1.34;
+  letter-spacing:0;
+  text-wrap:balance;
+}
+.app[data-locale="ta"] .hero p{
+  max-width:860px;
+  font-family:"Noto Serif Tamil",serif;
+  font-size:9.4px;
+  line-height:1.65;
+}
+.app[data-locale="ta"] .hero-quote{
+  padding-left:14px;
+  font-family:"Noto Serif Tamil",serif;
+  font-size:8.6px;
+  line-height:1.65;
+}
+.app[data-locale="ta"] .filters{
+  min-height:66px;
+}
+.app[data-locale="ta"] .filter{
+  min-height:46px;
+  height:auto;
+  line-height:1.45;
+}
+.app[data-locale="ta"] .filter select,
+.app[data-locale="ta"] .mode-pills button{
+  line-height:1.45;
+}
+
+@media(min-width:1500px){
+  .app[data-locale="ta"] .topbar{
+    grid-template-columns:300px minmax(620px,1fr) auto minmax(280px,330px) 120px;
+  }
+}
+@media(max-width:1500px){
+  .app[data-locale="ta"] .topbar{
+    grid-template-columns:270px minmax(500px,1fr) auto minmax(235px,280px) 100px;
+    gap:9px;
+    padding:0 14px;
+  }
+  .app[data-locale="ta"] .topbar nav button{padding:0 10px;font-size:8.8px}
+  .app[data-locale="ta"] .brand strong{font-size:21px}
+  .app[data-locale="ta"] .hero{
+    grid-template-columns:120px minmax(560px,1fr) 250px;
+  }
+  .app[data-locale="ta"] .hero-tower.right{display:none}
+}
+@media(max-width:1300px){
+  .app[data-locale="ta"] .topbar{
+    grid-template-columns:255px minmax(460px,1fr) auto minmax(220px,1fr);
+  }
+  .app[data-locale="ta"] .header-motto{display:none}
+  .app[data-locale="ta"] .hero h1{font-size:29px}
+}
+@media(max-width:1120px){
+  .app[data-locale="ta"] .topbar{
+    grid-template-columns:245px minmax(430px,1fr) auto;
+  }
+  .app[data-locale="ta"] .header-search{display:none}
+  .app[data-locale="ta"] .topbar nav button{padding:0 8px;font-size:8.2px}
+}
+@media(max-width:900px){
+  .app[data-locale="ta"] .topbar{
+    height:auto;
+    grid-template-columns:1fr auto;
+    padding:10px 12px;
+  }
+  .app[data-locale="ta"] .topbar nav,
+  .app[data-locale="ta"] .header-search,
+  .app[data-locale="ta"] .header-motto{display:none}
+  .app[data-locale="ta"] .brand strong{font-size:22px}
+  .app[data-locale="ta"] .hero{
+    min-height:150px;
+    grid-template-columns:1fr;
+    padding:18px 14px;
+  }
+  .app[data-locale="ta"] .hero-tower,
+  .app[data-locale="ta"] .hero-quote,
+  .app[data-locale="ta"] .hero-lamp,
+  .app[data-locale="ta"] .hero-mountain{display:none}
+  .app[data-locale="ta"] .hero h1{
+    max-width:720px;
+    font-size:27px;
+    line-height:1.4;
+  }
+  .app[data-locale="ta"] .hero p{font-size:9px}
 }
