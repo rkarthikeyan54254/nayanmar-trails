@@ -1032,18 +1032,23 @@ export default function App() {
 
         <div className="panel graph-mini">
           <div className="section-title">
-            <h3>{selectedIsManikkavasakar ? 'Tirumurai 8 – Talam Graph' : 'Saint – Talam Graph'}</h3>
-            <span>
-              {selectedIsManikkavasakar
-                ? `${tirumurai8.loci.length} textual loci`
-                : `${siteLinks.size} linked talams`}
-            </span>
+            <div>
+              <h3>{selectedIsManikkavasakar ? 'Tirumurai 8 – Talam Graph' : 'Saint – Talam Graph'}</h3>
+              <span>
+                {selectedIsManikkavasakar
+                  ? `${tirumurai8.loci.length} textual loci`
+                  : `${siteLinks.size} linked talams`}
+              </span>
+            </div>
+            <button className="graph-expand" onClick={() => setGraphOpen(true)}>Expand ↗</button>
           </div>
-          <Network
-            saint={saint}
-            centerLabel={selectedIsManikkavasakar ? 'M' : undefined}
-            sites={topLinkedSites.slice(0, 8)}
-          />
+          <button className="graph-preview-button" onClick={() => setGraphOpen(true)} aria-label="Open expanded connection graph">
+            <Network
+              saint={saint}
+              centerLabel={selectedIsManikkavasakar ? 'M' : undefined}
+              sites={topLinkedSites.slice(0, 8)}
+            />
+          </button>
         </div>
 
         <div className="panel density-card">
