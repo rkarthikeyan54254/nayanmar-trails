@@ -120,7 +120,10 @@ export default function App() {
   const [selectedSaintId, setSelectedSaintId] = useState(
     () => new URLSearchParams(window.location.search).get('saint') || 'nayanmar.20',
   );
-  const [selectedSiteId, setSelectedSiteId] = useState('tevaram_site.KV01');
+  const [selectedSiteId, setSelectedSiteId] = useState(() => {
+    const site = new URLSearchParams(window.location.search).get('site');
+    return site ? (site.startsWith('tevaram_site.') ? site : `tevaram_site.${site}`) : 'tevaram_site.KV01';
+  });
   const [mode, setMode] = useState<EvidenceMode>('all');
   const [tab, setTab] = useState<DetailTab>(() => {
     const value = new URLSearchParams(window.location.search).get('tab');
