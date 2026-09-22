@@ -56,7 +56,7 @@ function recolorBase(map: MapLibreMap) {
       } else if (layer.type === 'line') {
         if (/road|highway|street|motorway|trunk|primary|secondary/.test(id)) {
           map.setPaintProperty(layer.id, 'line-color', '#817652');
-          map.setPaintProperty(layer.id, 'line-opacity', 0.13);
+          map.setPaintProperty(layer.id, 'line-opacity', 0.055);
         } else if (/rail/.test(id)) {
           map.setPaintProperty(layer.id, 'line-opacity', 0.05);
         } else if (/boundary/.test(id)) {
@@ -69,11 +69,8 @@ function recolorBase(map: MapLibreMap) {
       } else if (layer.type === 'symbol') {
         if (/road|highway|transit|station|poi|shop|airport|rail|housenumber|village|suburb|neighbourhood/.test(id)) {
           map.setLayoutProperty(layer.id, 'visibility', 'none');
-        } else if (/place|city|state|country/.test(id)) {
-          map.setPaintProperty(layer.id, 'text-color', '#d4c7a7');
-          map.setPaintProperty(layer.id, 'text-halo-color', '#061923');
-          map.setPaintProperty(layer.id, 'text-halo-width', 1.2);
-          map.setPaintProperty(layer.id, 'text-opacity', 0.68);
+        } else if (/place|city|town|state|country/.test(id)) {
+          map.setLayoutProperty(layer.id, 'visibility', 'none');
         }
       }
     } catch {
@@ -330,6 +327,31 @@ export default function SacredMap({
 
     if (mode === 'tradition') return;
 
+    if (mode === 'all' || mode === 'edition') {
+      for (const point of coverage.slice(0, 16)) {
+        if (point.count < 2) continue;
+        const node = document.createElement('div');
+        node.className = 'map-district-marker';
+        node.innerHTML = `
+          <span class="district-marker-glow"></span>
+          <span class="district-marker-tower">${gopuramMarkup}</span>
+          <span class="district-marker-count">${point.count}</span>
+          <span class="district-marker-label">${point.label}</span>
+        `;
+        node.title = `${point.label}: ${point.count} Pramāṇa talam nodes in the normalized modern district aggregate`;
+        node.setAttribute('aria-label', node.title);
+
+        const marker = new maplibregl.Marker({
+          element: node,
+          anchor: 'center',
+        })
+          .setLngLat([point.lng, point.lat])
+          .addTo(map);
+
+        markerRefs.current.push(marker);
+      }
+    }
+
     for (const seed of GEO_SEEDS) {
       const entityId = `tevaram_site.${seed.siteId}`;
       const linked = linkedSet.has(seed.siteId);
@@ -374,7 +396,7 @@ export default function SacredMap({
         .addTo(map);
       markerRefs.current.push(marker);
     }
-  }, [epigraphicSiteIds, linkedSet, mode, progress, routeStops, selectedSiteId]);
+  }, [coverage, epigraphicSiteIds, linkedSet, mode, progress, routeStops, selectedSiteId]);
 
   useEffect(() => {
     const map = mapRef.current;
@@ -393,6 +415,9 @@ export default function SacredMap({
       <div ref={mapNode} className="sacred-map-canvas" />
       <div className="map-vignette" />
       <div className="map-compass"><b>N</b><span>✦</span></div>
+      <div className="map-neighbor-label karnataka">KARNATAKA</div>
+      <div className="map-neighbor-label kerala">KERALA</div>
+      <div className="map-neighbor-label andhra">ANDHRA PRADESH</div>
       <div className="map-region-title">TAMIL NADU</div>
       <div className="map-sea-label east">BAY OF BENGAL</div>
       <div className="map-sea-label south">INDIAN OCEAN</div>
