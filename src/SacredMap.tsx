@@ -35,6 +35,48 @@ const gopuramMarkup = `
   <path class="door" d="M25 39h14v21H25z"/>
 </svg>`;
 
+function recolorBase(map: MapLibreMap) {
+  const layers = map.getStyle().layers ?? [];
+  for (const layer of layers) {
+    const id = layer.id.toLowerCase();
+    try {
+      if (layer.type === 'background') {
+        map.setPaintProperty(layer.id, 'background-color', '#061923');
+      } else if (layer.type === 'fill') {
+        if (/water|ocean|lake|river/.test(id)) {
+          map.setPaintProperty(layer.id, 'fill-color', '#062c3b');
+          map.setPaintProperty(layer.id, 'fill-opacity', 0.98);
+        } else if (/park|wood|forest|landcover|landuse|natural/.test(id)) {
+          map.setPaintProperty(layer.id, 'fill-color', '#2f5a45');
+          map.setPaintProperty(layer.id, 'fill-opacity', 0.55);
+        } else if (/building/.test(id)) {
+          map.setPaintProperty(layer.id, 'fill-color', '#263a34');
+          map.setPaintProperty(layer.id, 'fill-opacity', 0.14);
+        }
+      } else if (layer.type === 'line') {
+        if (/road|highway|street|motorway|trunk|primary|secondary/.test(id)) {
+          map.setPaintProperty(layer.id, 'line-color', '#817652');
+          map.setPaintProperty(layer.id, 'line-opacity', 0.045);
+        } else if (/rail/.test(id)) {
+          map.setPaintProperty(layer.id, 'line-opacity', 0.025);
+        } else if (/boundary/.test(id)) {
+          map.setPaintProperty(layer.id, 'line-color', '#bfa66c');
+          map.setPaintProperty(layer.id, 'line-opacity', 0.18);
+        } else if (/water|river/.test(id)) {
+          map.setPaintProperty(layer.id, 'line-color', '#3d94ad');
+          map.setPaintProperty(layer.id, 'line-opacity', 0.62);
+        }
+      } else if (layer.type === 'symbol') {
+        if (/road|highway|transit|station|poi|shop|airport|rail|housenumber|village|suburb|neighbourhood|place|city|town|state|country/.test(id)) {
+          map.setLayoutProperty(layer.id, 'visibility', 'none');
+        }
+      }
+    } catch {
+      // Public basemap layers can evolve. Unsupported style tweaks stay non-fatal.
+    }
+  }
+}
+
 function routeCollection(stops: MapStop[]): FeatureCollection<LineString> {
   return {
     type: 'FeatureCollection',
@@ -102,30 +144,7 @@ export default function SacredMap({
 
     const map = new maplibregl.Map({
       container: mapNode.current,
-      style: {
-        version: 8,
-        sources: {
-          'sacred-raster': {
-            type: 'raster',
-            tiles: ['https://basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}.png'],
-            tileSize: 256,
-            attribution: '© OpenStreetMap contributors © CARTO',
-          },
-        },
-        layers: [
-          {
-            id: 'sacred-raster',
-            type: 'raster',
-            source: 'sacred-raster',
-            paint: {
-              'raster-saturation': -0.42,
-              'raster-contrast': 0.18,
-              'raster-brightness-min': 0.04,
-              'raster-brightness-max': 0.64,
-            },
-          },
-        ],
-      },
+      style: 'https://tiles.openfreemap.org/styles/liberty',
       center: [78.95, 10.8],
       zoom: 6.05,
       minZoom: 5.35,
@@ -140,6 +159,7 @@ export default function SacredMap({
     map.addControl(new maplibregl.AttributionControl({ compact: true }), 'bottom-left');
 
     map.on('load', () => {
+      recolorBase(map);
       map.fitBounds(
         [[76.72, 7.85], [80.48, 13.48]],
         {
