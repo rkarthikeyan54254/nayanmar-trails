@@ -199,6 +199,9 @@ export default function App() {
   const preserveInitialSiteDeepLink = useRef(
     Boolean(new URLSearchParams(window.location.search).get('site')),
   );
+  const preserveInitialTabDeepLink = useRef(
+    Boolean(new URLSearchParams(window.location.search).get('tab')),
+  );
 
   useEffect(() => {
     if (!graphOpen && !sourcesOpen) return;
@@ -584,6 +587,10 @@ export default function App() {
   useEffect(() => {
     if (!selectedIsManikkavasakar || !tirumurai8?.loci.length) return;
     setSelectedSiteId(tirumurai8.loci[0].site_entity_id);
+    if (preserveInitialTabDeepLink.current) {
+      preserveInitialTabDeepLink.current = false;
+      return;
+    }
     setTab('visits');
   }, [selectedIsManikkavasakar, tirumurai8]);
 
