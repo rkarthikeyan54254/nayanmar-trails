@@ -215,7 +215,13 @@ const MODE_COPY: Record<EvidenceMode, { label: string; short: string; body: stri
   },
 };
 
-function authorityLabel(scope: string) {
+function authorityLabel(scope: string, locale: Locale = 'en') {
+  if (locale === 'ta') {
+    if (scope === 'edition_metadata') return 'தேவாரப் பதிப்புப் பட்டியல்';
+    if (scope === 'traditional_reference') return 'மரபு நூல்';
+    if (scope === 'primary_text_metadata') return 'இலக்கிய மூலச் சான்று';
+    if (scope === 'epigraphic_primary') return 'கல்வெட்டுச் சான்று';
+  }
   if (scope === 'edition_metadata') return 'Tēvāram catalogue';
   if (scope === 'traditional_reference') return 'Traditional source';
   if (scope === 'primary_text_metadata') return 'Literary source';
@@ -223,10 +229,13 @@ function authorityLabel(scope: string) {
   return scope.replace(/_/g, ' ');
 }
 
-function identificationLabel(status: string) {
+function identificationLabel(status: string, locale: Locale = 'en') {
   if (status === 'traditional_talam_not_assumed_single_modern_temple') {
-    return 'Traditional sthalam; no single modern temple identity is asserted.';
+    return locale === 'ta'
+      ? 'மரபில் சொல்லப்படும் தலம்; இன்றைய ஒரே கோயிலுடன் இதை நாங்கள் உறுதியாக அடையாளப்படுத்தவில்லை.'
+      : 'Traditional sthalam; no single modern temple identity is asserted.';
   }
+  if (locale === 'ta') return status.replace(/_/g, ' ');
   return status
     .replace(/_/g, ' ')
     .replace(/^./, (letter) => letter.toUpperCase());
