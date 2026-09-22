@@ -754,7 +754,7 @@ export default function App() {
   const saintRegistryLabel = selectedIsManikkavasakar
     ? tr(locale, 'NAALVAR · TIRUMURAI 8')
     : locale === 'ta'
-      ? `நாயன்மார் ${saint?.ordinal ?? ''}`
+      ? `அறுபத்து மூவரில் ${saint?.ordinal ?? ''}`
       : `NAYANMAR ${saint?.ordinal ?? ''}`;
   const saintNumberLabel = selectedIsManikkavasakar ? 'N4' : saint?.ordinal;
   const activePlaybackStop =
@@ -837,7 +837,7 @@ export default function App() {
                   <GopuramIcon />
                   <span>
                     {localizedSaintName(item, locale)}
-                    <small>{locale === 'ta' ? `நாயன்மார் ${item.ordinal}` : `Nayanmar ${item.ordinal}`}</small>
+                    <small>{locale === 'ta' ? `அறுபத்து மூவரில் ${item.ordinal}` : `Nayanmar ${item.ordinal}`}</small>
                   </span>
                 </button>
               ))}
@@ -897,7 +897,7 @@ export default function App() {
         </div>
         <blockquote className="hero-quote">
           {locale === 'ta'
-            ? <>“வரலாறு மட்டும் அல்ல;<br />உயிருடன் வாழும் பக்தி நிலப்பரப்பு.”</>
+            ? <>“இது பழைய வரலாறு மட்டும் அல்ல;<br />இன்றும் வாழும் பக்தியின் பாதை.”</>
             : <>“Not just history,<br />but a living landscape of devotion.”</>}
         </blockquote>
         <div className="hero-tower right"><GopuramIcon /></div>
@@ -1178,12 +1178,12 @@ export default function App() {
               <Badge kind="tradition"><T>TRADITION PLAYBACK</T></Badge>
               <b>
                 {locale === 'ta'
-                  ? `${traditionalPlaybackStops.length} மரபுத் தலங்கள் ${saintName} உடன் தொடர்புபடுத்தப்படுகின்றன`
+                  ? `${saintName} பற்றிய மரபில் ${traditionalPlaybackStops.length} தலங்கள் சொல்லப்படுகின்றன`
                   : `${traditionalPlaybackStops.length} traditional places are associated with ${saintName}`}
               </b>
               <p>
                 {locale === 'ta'
-                  ? 'அவற்றை ஆராய கீழே உள்ள பயணப் பட்டையைப் பயன்படுத்துங்கள். ஆய்வு செய்யப்பட்ட இடங்கள் கிடைக்கும் வரை புவியியல் பாதை வரையப்படாது.'
+                  ? 'அந்தத் தலங்களை கீழே ஒன்றன்பின் ஒன்றாகப் பாருங்கள். இருப்பிடம் உறுதியாகத் தெரியாத வரை பாதையை ஊகித்து வரைபடத்தில் காட்டமாட்டோம்.'
                   : 'Use the journey strip below to explore them. A geographic route is not drawn until reviewed locations are available.'}
               </p>
             </div>
@@ -1245,7 +1245,7 @@ export default function App() {
                   <div className="temple-shade" />
                   <div className="temple-title">
                     <small><T>CURRENT STHALAM</T></small>
-                    <h2>{selectedSite ? localizedSiteName(selectedSite, locale) : (locale === 'ta' ? 'ஒரு தலத்தைத் தேர்ந்தெடுக்கவும்' : 'Select a sthalam')}</h2>
+                    <h2>{selectedSite ? localizedSiteName(selectedSite, locale) : (locale === 'ta' ? 'ஒரு திருத்தலத்தைத் தேர்ந்தெடுக்கவும்' : 'Select a sthalam')}</h2>
                     <p>{selectedSite && locale === 'en' ? cleanLabel(selectedSite.label) : ''}</p>
                   </div>
                   {templeMedia && (
@@ -1661,8 +1661,8 @@ function TraditionalPlaceDetail({
         <div className="traditional-symbol"><GopuramIcon /></div>
         <div>
           <small><T>TRADITIONAL PLACE REFERENCE</T></small>
-          <h2>{stop?.name || (locale === 'ta' ? 'தலம் தேர்ந்தெடுக்கப்படவில்லை' : 'No place selected')}</h2>
-          <p>{stop?.detail || (locale === 'ta' ? 'தற்போதைய மரபுத் தலக் குறிப்பு இல்லை.' : 'No current traditional-place claim.')}</p>
+          <h2>{stop?.name || (locale === 'ta' ? 'தலம் எதுவும் தேர்ந்தெடுக்கப்படவில்லை' : 'No place selected')}</h2>
+          <p>{stop?.detail || (locale === 'ta' ? 'இப்போது காட்ட மரபுத் தலச் செய்தி இல்லை.' : 'No current traditional-place claim.')}</p>
         </div>
       </div>
 
@@ -1671,14 +1671,14 @@ function TraditionalPlaceDetail({
           <Badge kind="tradition"><T>TRADITION</T></Badge>
           <p>
             {locale === 'ta'
-              ? <>இந்தத் தளம் <b>{saintName}</b> குறித்து <b>{total}</b> மரபுத் தலக் குறிப்புகளைப் பதிவு செய்கிறது. நவீன இடமுறைகள் அல்லது பயணப் பாதையை கற்பனை செய்யாமல் அவை இங்கே காட்டப்படுகின்றன.</>
+              ? <><b>{saintName}</b> பற்றிய மரபில் <b>{total}</b> தலங்கள் சொல்லப்படுகின்றன. அவற்றின் இன்றைய துல்லிய இடமோ பயணப்பாதையோ தெரியாதபோது நாங்கள் ஊகித்து வரைபடத்தில் காட்டுவதில்லை.</>
               : <>This site records <b>{total}</b> traditional place claim{total === 1 ? '' : 's'} for <b>{saintName}</b>. This playback keeps those claims visible without inventing modern coordinates or a travel route.</>}
           </p>
           <div className="evidence-callout muted">
             <GopuramIcon />
             <p>
               {locale === 'ta'
-                ? 'தேர்ந்தெடுக்கப்பட்ட பதிவு ஒரு மரபுத் தொடர்பு. அது தானாகவே நவீன கோயில் அடையாளம், துல்லிய புவியியல் புள்ளி அல்லது தனித்த வரலாற்றுச் சான்றாக மாறாது.'
+                ? 'இது மரபில் வரும் தலத் தொடர்பு. அதனால் மட்டும் இன்றைய எந்தக் கோயில் என்று உறுதி செய்யவோ, துல்லியமான வரைபடப் புள்ளி கொடுக்கவோ, இதை தனித்த வரலாற்றுச் சான்றாகக் கொள்ளவோ முடியாது.'
                 : 'The selected item is a traditional association. It is not automatically a modern temple identification, exact geographic point, or independently verified historical event.'}
             </p>
           </div>
@@ -1689,7 +1689,7 @@ function TraditionalPlaceDetail({
         <div className="text">
           <Badge kind="inference"><T>NO ASSERTED JOURNEY CHRONOLOGY</T></Badge>
           <p>{locale === 'ta'
-            ? 'பிறப்பிடம், தொடர்புத் தலம், முக்தித் தலம் ஆகிய மரபுகள் வாசிப்பு வரிசைக்காக மட்டுமே ஒழுங்குபடுத்தப்பட்டுள்ளன. அவற்றுக்கிடையிலான வரலாற்றுப் பாதையை நாயன்மார் பாதைகள் ஊகிக்காது.'
+            ? 'பிறந்த தலம், தொடர்புடைய தலம், முக்தித் தலம் என்று மரபில் வரும் குறிப்புகளை வாசிக்க வசதியாக மட்டும் வரிசைப்படுத்தியுள்ளோம். அவற்றை இணைக்கும் வரலாற்றுப் பாதையை நாங்கள் ஊகிப்பதில்லை.'
             : 'Birthplace, related-place and mukti-place traditions are ordered only as a reading sequence. Nayanmar Trails does not infer the historical path between them.'}</p>
         </div>
       )}
@@ -1698,14 +1698,14 @@ function TraditionalPlaceDetail({
         <div className="text">
           <Badge kind="tradition"><T>TRADITIONAL SOURCE</T></Badge>
           <p>{locale === 'ta'
-            ? 'ஆய்வு செய்யப்பட்ட இடம் அல்லது வெளிப்படையாகத் தகுதிப்படுத்தப்பட்ட இட வரைபடம் இணைக்கப்படும் வரை வரைபடக் குறியீடு காட்டப்படாது.'
+            ? 'இடம் ஆய்வால் உறுதி செய்யப்பட்டாலோ நம்பகமான வரைபடச் சான்று கிடைத்தாலோ மட்டுமே வரைபடக் குறியீடு சேர்க்கப்படும்.'
             : 'No map marker is shown until a reviewed location is attached or another explicitly qualified location mapping.'}</p>
         </div>
       )}
 
       <div className="traditional-detail-footer">
-        <span>{locale === 'ta' ? `${total} மரபுக் குறிப்புகள்` : `${total} tradition claim${total === 1 ? '' : 's'}`}</span>
-        <span>{locale === 'ta' ? '0 கற்பனை இடமுறைகள்' : '0 invented coordinates'}</span>
+        <span>{locale === 'ta' ? `${total} மரபில் வரும் தலங்கள்` : `${total} tradition claim${total === 1 ? '' : 's'}`}</span>
+        <span>{locale === 'ta' ? 'ஊகித்து சேர்த்த இடங்கள்: 0' : '0 invented coordinates'}</span>
       </div>
     </div>
   );
