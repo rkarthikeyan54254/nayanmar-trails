@@ -483,9 +483,10 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:1px solid 
 .map-vignette{
   position:absolute;inset:0;z-index:3;pointer-events:none;
   background:
-    radial-gradient(ellipse at 50% 44%,transparent 38%,rgba(3,18,26,.1) 64%,rgba(2,13,19,.54) 100%),
-    linear-gradient(180deg,rgba(4,24,33,.26),transparent 17%,transparent 78%,rgba(3,17,24,.5));
-  mix-blend-mode:multiply;
+    radial-gradient(circle at 57% 49%,rgba(65,122,82,.16),transparent 38%),
+    radial-gradient(ellipse at 50% 44%,transparent 38%,rgba(3,18,26,.08) 64%,rgba(2,13,19,.48) 100%),
+    linear-gradient(180deg,rgba(4,24,33,.18),transparent 17%,transparent 78%,rgba(3,17,24,.44));
+  mix-blend-mode:screen;
 }
 .map-compass{
   position:absolute;z-index:8;
@@ -661,12 +662,12 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:1px solid 
   transition:.18s ease;
 }
 .marker-tower{
-  position:absolute;bottom:14px;left:50%;transform:translateX(-50%);
-  width:24px;height:29px;
+  position:absolute;bottom:13px;left:50%;transform:translateX(-50%);
+  width:27px;height:32px;
   display:grid;place-items:center;
   z-index:2;
 }
-.marker-tower svg{width:24px;height:29px;fill:#e5ad51}
+.marker-tower svg{width:27px;height:32px;fill:#e5ad51}
 .marker-tower .door{fill:#51361d}
 .marker-label{
   position:absolute;bottom:-1px;left:50%;transform:translateX(-50%);
@@ -680,8 +681,14 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:1px solid 
 }
 .map-temple-marker:not(.linked):not(.selected){opacity:.54}
 .map-temple-marker.linked .marker-glow{opacity:.72;transform:translateX(-50%) scale(1.25)}
+.map-temple-marker.linked .marker-tower{
+  transform:translateX(-50%) scale(1.08);
+}
 .map-temple-marker.linked .marker-tower svg{fill:#ffc968}
 .map-temple-marker.selected .marker-glow{opacity:1;transform:translateX(-50%) scale(1.55)}
+.map-temple-marker.selected .marker-tower{
+  transform:translateX(-50%) scale(1.16);
+}
 .map-temple-marker.selected .marker-tower svg{fill:#ffe09a}
 .map-temple-marker.selected .marker-label{color:#ffe8ac;border:1px solid rgba(229,174,74,.4)}
 .map-temple-marker.independent::before{
@@ -694,17 +701,38 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:1px solid 
   box-shadow:0 0 9px rgba(111,220,196,.75);
 }
 .map-traveler{
-  width:28px;height:28px;border-radius:50%;
+  width:32px;height:32px;border-radius:50%;
   display:grid;place-items:center;
-  background:radial-gradient(circle,rgba(255,222,145,.95),rgba(243,172,68,.5) 24%,rgba(243,172,68,.12) 56%,transparent 70%);
-  animation:travelerPulse 1.4s ease-in-out infinite;
+  position:relative;
+  background:radial-gradient(circle,rgba(255,222,145,.95),rgba(243,172,68,.5) 24%,rgba(243,172,68,.12) 56%,transparent 72%);
+  animation:travelerPulse 1.5s ease-in-out infinite;
   pointer-events:none;
 }
 .map-traveler span{
   width:7px;height:7px;border-radius:50%;
   background:#fff0be;border:1px solid #a56c22;
 }
-@keyframes travelerPulse{50%{transform:scale(1.25);opacity:.76}}
+.map-traveler.has-image{
+  width:44px;height:44px;
+  padding:3px;
+  border:1px solid rgba(255,213,126,.82);
+  background:radial-gradient(circle,rgba(255,214,124,.38),rgba(218,151,60,.18) 54%,transparent 72%);
+  box-shadow:0 0 18px rgba(240,169,67,.5);
+}
+.map-traveler.has-image img{
+  width:34px;height:34px;
+  object-fit:cover;
+  object-position:center 25%;
+  border-radius:50%;
+  filter:sepia(.25) saturate(.86) contrast(1.08) brightness(.92);
+}
+.map-traveler.has-image span{
+  position:absolute;
+  right:-1px;bottom:-1px;
+  width:8px;height:8px;
+  box-shadow:0 0 7px rgba(255,219,130,.85);
+}
+@keyframes travelerPulse{50%{transform:scale(1.13);opacity:.86}}
 .overlay{
   position:absolute;z-index:40;
   inset:48px 18px 20px;
