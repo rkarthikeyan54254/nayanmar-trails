@@ -411,6 +411,12 @@ export default function App() {
   }, [selectedSaintId]);
 
   useEffect(() => {
+    if (!selectedIsManikkavasakar || !tirumurai8?.loci.length) return;
+    setSelectedSiteId(tirumurai8.loci[0].site_entity_id);
+    setTab('visits');
+  }, [selectedIsManikkavasakar, tirumurai8]);
+
+  useEffect(() => {
     if (!playing || playbackStops.length < 2) return;
     const timer = window.setInterval(() => {
       setProgress((value) => {
@@ -769,18 +775,20 @@ export default function App() {
             <div className="overlay">
               <div className="overlay-head">
                 <div>
-                  <small>SELECTED SAINT</small>
-                  <h3>Saint ↔ Talam Connections</h3>
+                  <small>{selectedIsManikkavasakar ? 'NAALVAR · TIRUMURAI 8' : 'SELECTED NAYANMAR'}</small>
+                  <h3>{selectedIsManikkavasakar ? 'Tirumurai 8 ↔ Talam Loci' : 'Saint ↔ Talam Connections'}</h3>
                 </div>
                 <button onClick={() => setGraphOpen(false)}>Close</button>
               </div>
               <Network
                 saint={saint}
+                centerLabel={selectedIsManikkavasakar ? 'M' : undefined}
                 sites={topLinkedSites.slice(0, 12)}
               />
               <p>
-                Edges are Tēvāram author → patikam → talam relationships from the versioned Pramāṇa export.
-                Layout position has no evidentiary meaning.
+                {selectedIsManikkavasakar
+                  ? 'Edges show the explicitly qualified Tiruvācakam section-to-locus mappings in this pinned product snapshot. They are not a biographical itinerary.'
+                  : 'Edges are Tēvāram author → patikam → talam relationships from the versioned Pramāṇa export. Layout position has no evidentiary meaning.'}
               </p>
             </div>
           )}
