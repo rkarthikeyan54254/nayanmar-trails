@@ -941,8 +941,8 @@ export default function App() {
             <small>{selectedIsManikkavasakar ? tr(locale, 'DEVOTIONAL WORKS') : tr(locale, 'STORY TRADITION')}</small>
             <b>
               {selectedIsManikkavasakar
-                ? 'Tiruvācakam · Tirukkōvaiyār'
-                : periyaPuranamTitle || tr(locale, 'Periya Puranam tradition')}
+                ? (locale === 'ta' ? 'திருவாசகம் · திருக்கோவையார்' : 'Tiruvācakam · Tirukkōvaiyār')
+                : (locale === 'ta' ? (periyaPuranamTitle || tr(locale, 'Periya Puranam tradition')) : 'Periya Puranam tradition')}
             </b>
           </div>
 
@@ -954,7 +954,7 @@ export default function App() {
               </div>
               <p>{locale === 'ta' ? saintCuriosity.hook_ta : saintCuriosity.hook_en}</p>
               <div className="saint-curiosity-source">
-                <b>{periyaPuranamTitle || tr(locale, 'Periya Puranam tradition')}</b>
+                <b>{locale === 'ta' ? (periyaPuranamTitle || tr(locale, 'Periya Puranam tradition')) : 'Periya Puranam tradition'}</b>
                 <small>{tr(locale, 'Traditional narrative — not presented as independently verified biography.')}</small>
               </div>
               <button onClick={() => setSourcesOpen(true)}>
@@ -1070,7 +1070,7 @@ export default function App() {
           <div className="map-toolbar">
             <div className="map-toolbar-left">
               <GopuramIcon />
-              <span>{saintName.split(' · ')[0]} · {selectedIsManikkavasakar ? 'Tirumurai 8' : tr(locale, MODE_COPY[mode].short)}</span>
+              <span>{saintName.split(' · ')[0]} · {selectedIsManikkavasakar ? tr(locale, 'Tirumurai 8') : tr(locale, MODE_COPY[mode].short)}</span>
             </div>
             <div className="map-toolbar-stats">
               <span>
