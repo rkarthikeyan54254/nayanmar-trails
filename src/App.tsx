@@ -1313,7 +1313,7 @@ export default function App() {
 
       <footer>
         <strong><GopuramIcon /> Nayanmar Trails</strong>
-        <span>Data provenance · version {data.meta.source_commit.slice(0, 10)}</span>
+        <button className="footer-source-link" onClick={() => setSourcesOpen(true)}>Sources & methodology</button>
         <span>Map © OpenFreeMap / OpenMapTiles / OpenStreetMap</span>
       </footer>
     </main>
