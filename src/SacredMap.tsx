@@ -174,13 +174,12 @@ export default function SacredMap({
       map.fitBounds(
         [[76.72, 7.85], [80.48, 13.48]],
         {
-          padding: { top: 36, right: 34, bottom: 34, left: 34 },
+          padding: { top: 68, right: 34, bottom: 38, left: 34 },
           duration: 0,
           maxZoom: 6.25,
         },
       );
-      map.setCenter([78.85, 10.72]);
-      map.setZoom(Math.min(map.getZoom() + 0.34, 6.6));
+      map.setZoom(Math.min(map.getZoom() + 0.22, 6.5));
 
       map.addSource('district-coverage', {
         type: 'geojson',
@@ -327,7 +326,6 @@ export default function SacredMap({
         node.innerHTML = `
           <span class="district-marker-glow"></span>
           <span class="district-marker-count">${point.count}</span>
-          <span class="district-marker-label">${point.label}</span>
         `;
         node.title = `${point.label}: ${point.count} Pramāṇa talam nodes in the normalized modern district aggregate`;
         node.setAttribute('aria-label', node.title);
