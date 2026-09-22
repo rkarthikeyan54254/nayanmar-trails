@@ -35,50 +35,6 @@ const gopuramMarkup = `
   <path class="door" d="M25 39h14v21H25z"/>
 </svg>`;
 
-function recolorBase(map: MapLibreMap) {
-  const layers = map.getStyle().layers ?? [];
-  for (const layer of layers) {
-    const id = layer.id.toLowerCase();
-    try {
-      if (layer.type === 'background') {
-        map.setPaintProperty(layer.id, 'background-color', '#061923');
-      } else if (layer.type === 'fill') {
-        if (/water|ocean|lake|river/.test(id)) {
-          map.setPaintProperty(layer.id, 'fill-color', '#062b3a');
-          map.setPaintProperty(layer.id, 'fill-opacity', 0.98);
-        } else if (/park|wood|forest|landcover|landuse|natural/.test(id)) {
-          map.setPaintProperty(layer.id, 'fill-color', '#315b46');
-          map.setPaintProperty(layer.id, 'fill-opacity', 0.56);
-        } else if (/building/.test(id)) {
-          map.setPaintProperty(layer.id, 'fill-color', '#263a34');
-          map.setPaintProperty(layer.id, 'fill-opacity', 0.18);
-        }
-      } else if (layer.type === 'line') {
-        if (/road|highway|street|motorway|trunk|primary|secondary/.test(id)) {
-          map.setPaintProperty(layer.id, 'line-color', '#817652');
-          map.setPaintProperty(layer.id, 'line-opacity', 0.055);
-        } else if (/rail/.test(id)) {
-          map.setPaintProperty(layer.id, 'line-opacity', 0.05);
-        } else if (/boundary/.test(id)) {
-          map.setPaintProperty(layer.id, 'line-color', '#c4ad77');
-          map.setPaintProperty(layer.id, 'line-opacity', 0.24);
-        } else if (/water|river/.test(id)) {
-          map.setPaintProperty(layer.id, 'line-color', '#3f9ab3');
-          map.setPaintProperty(layer.id, 'line-opacity', 0.68);
-        }
-      } else if (layer.type === 'symbol') {
-        if (/road|highway|transit|station|poi|shop|airport|rail|housenumber|village|suburb|neighbourhood/.test(id)) {
-          map.setLayoutProperty(layer.id, 'visibility', 'none');
-        } else if (/place|city|town|state|country/.test(id)) {
-          map.setLayoutProperty(layer.id, 'visibility', 'none');
-        }
-      }
-    } catch {
-      // The public basemap can evolve. Unsupported paint/layout changes are non-fatal.
-    }
-  }
-}
-
 function routeCollection(stops: MapStop[]): FeatureCollection<LineString> {
   return {
     type: 'FeatureCollection',
@@ -146,7 +102,30 @@ export default function SacredMap({
 
     const map = new maplibregl.Map({
       container: mapNode.current,
-      style: 'https://tiles.openfreemap.org/styles/fiord',
+      style: {
+        version: 8,
+        sources: {
+          'sacred-raster': {
+            type: 'raster',
+            tiles: ['https://basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}.png'],
+            tileSize: 256,
+            attribution: '© OpenStreetMap contributors © CARTO',
+          },
+        },
+        layers: [
+          {
+            id: 'sacred-raster',
+            type: 'raster',
+            source: 'sacred-raster',
+            paint: {
+              'raster-saturation': -0.42,
+              'raster-contrast': 0.18,
+              'raster-brightness-min': 0.04,
+              'raster-brightness-max': 0.64,
+            },
+          },
+        ],
+      },
       center: [78.95, 10.8],
       zoom: 6.05,
       minZoom: 5.35,
@@ -161,7 +140,6 @@ export default function SacredMap({
     map.addControl(new maplibregl.AttributionControl({ compact: true }), 'bottom-left');
 
     map.on('load', () => {
-      recolorBase(map);
       map.fitBounds(
         [[76.72, 7.85], [80.48, 13.48]],
         {
