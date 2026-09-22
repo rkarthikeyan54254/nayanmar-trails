@@ -17,7 +17,13 @@ A glowing route is **not** historical proof. Playback is product inference betwe
 
 ## Data source
 
-`public/data/pramana-export-v1.json` is a distilled snapshot of `rkarthikeyan54254/pramana:data/review/nayanmar_tevaram_evidence_graph_v1.json`, pinned by source commit and graph blob SHA inside the export. Pramāṇa itself is not mutated by this product.
+`public/data/pramana-export-v1.json` is a distilled snapshot of `rkarthikeyan54254/pramana:data/review/nayanmar_tevaram_evidence_graph_v1.json`, pinned by source commit and graph blob SHA inside the export.
+
+`public/data/pramana-tirumurai8-v1.json` is the separately pinned Manikkavasakar / Tirumurai 8 product metadata lane.
+
+`public/data/pramana-saiva-literary-place-links-v1.json` carries cross-layer literary/place context that must not mutate formal Tēvāram sthalam membership. It is used, for example, to keep Uttarakosamangai's Tiruvācakam references separate from the 276-site Tēvāram 1–7 catalogue, and to keep Kōḷaṟu Pathigam 2.085's Tirumaraikadu traditional chronology separate from its formal POTU classification.
+
+Pramāṇa itself is not mutated by this product.
 
 ## Local
 

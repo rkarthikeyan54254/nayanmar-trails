@@ -2,6 +2,7 @@ import { readFile } from 'node:fs/promises';
 
 const exportPath = new URL('../public/data/pramana-export-v1.json', import.meta.url);
 const tirumurai8Path = new URL('../public/data/pramana-tirumurai8-v1.json', import.meta.url);
+const saivaPlacesPath = new URL('../public/data/pramana-saiva-literary-place-links-v1.json', import.meta.url);
 const geometryPath = new URL('../src/geometry.ts', import.meta.url);
 const mapPath = new URL('../src/SacredMap.tsx', import.meta.url);
 const appPath = new URL('../src/App.tsx', import.meta.url);
@@ -9,6 +10,7 @@ const stylesPath = new URL('../src/styles.css', import.meta.url);
 
 const doc = JSON.parse(await readFile(exportPath, 'utf8'));
 const tirumurai8 = JSON.parse(await readFile(tirumurai8Path, 'utf8'));
+const saivaPlaces = JSON.parse(await readFile(saivaPlacesPath, 'utf8'));
 const geometryText = await readFile(geometryPath, 'utf8');
 const mapText = await readFile(mapPath, 'utf8');
 const appText = await readFile(appPath, 'utf8');
@@ -60,6 +62,48 @@ if (!tirumurai8.meta?.beta_ready || !tirumurai8.meta?.source_commit) {
 }
 if (!Array.isArray(tirumurai8.loci) || tirumurai8.loci.length < 2) {
   throw new Error('Expected at least two qualified Tirumurai 8 product loci');
+}
+
+if (saivaPlaces.meta?.source_repo !== 'rkarthikeyan54254/pramana' ||
+    !saivaPlaces.meta?.source_commit) {
+  throw new Error('Saiva literary-place snapshot must be pinned to Pramana');
+}
+const uttaraLinks = saivaPlaces.links.filter(
+  (link) => link.object === 'saiva_place.tiru_uttarakosamangai',
+);
+const uttaraSections = uttaraLinks
+  .map((link) => Number(link.subject.match(/\.s(\d+)$/)?.[1]))
+  .sort((a, b) => a - b);
+if (JSON.stringify(uttaraSections) !== JSON.stringify([2, 6, 13, 16, 17, 18, 19, 20, 48])) {
+  throw new Error(`Unexpected Uttarakosamangai Tiruvacakam coverage: ${uttaraSections.join(', ')}`);
+}
+const uttaraComposition = uttaraLinks.filter(
+  (link) => link.predicate === 'SOURCE_HEADER_COMPOSITION_LOCUS',
+);
+if (uttaraComposition.length !== 1 || !uttaraComposition[0].subject.endsWith('.s06')) {
+  throw new Error('Only Tiruvacakam section 6 may be an Uttarakosamangai source-heading composition locus');
+}
+const s17 = uttaraLinks.find((link) => link.subject.endsWith('.s17'));
+if (s17?.predicate !== 'TEXTUALLY_REFERENCES_STHALAM_ALIAS' ||
+    s17.normalized_place_ta !== 'திருஉத்தர கோசமங்கை') {
+  throw new Error('Section 17 Uttara Mangai alias resolution is missing or over-normalized');
+}
+const kolaru = saivaPlaces.links.find(
+  (link) => link.id === 'literary-place.tevaram.2_85.kt125',
+);
+if (!kolaru ||
+    kolaru.predicate !== 'TRADITIONAL_CHRONOLOGY_LOCUS' ||
+    kolaru.formal_tevaram_sthalam_classification !== 'POTU' ||
+    kolaru.object !== 'tevaram_site.KT125') {
+  throw new Error('Kolaru 2.085 traditional chronology/formal POTU boundary is missing');
+}
+const formalKolaru = doc.edges.filter(
+  (edge) =>
+    edge.predicate === 'TEVARAM_PATIKAM_ASSOCIATED_WITH_SITE' &&
+    edge.subject === 'tevaram.ifp.2.85',
+);
+if (formalKolaru.length) {
+  throw new Error('Kolaru 2.085 must not be promoted into the formal Tevaram site graph');
 }
 
 const siteIds = new Set(doc.sites.map((site) => site.site_id));
@@ -161,5 +205,5 @@ console.log(
   `${doc.patikams.length} Tēvāram patikams, ${doc.edges.length} edges; ` +
   `${geometryIds.length} deliberately exact product map seeds; ` +
   `tradition playback covers ${saintsWithTraditionPlayback.size}/63 (62 multi-step, 1 single-stop); ` +
-  `Manikkavasakar remains a separate Naalvar/Tirumurai 8 companion.`,
+  `Manikkavasakar remains a separate Naalvar/Tirumurai 8 companion; Uttarakosamangai spans ${uttaraLinks.length} Tiruvacakam section links; Kolaru 2.085 stays POTU with separate Tirumaraikadu traditional chronology.`,
 );

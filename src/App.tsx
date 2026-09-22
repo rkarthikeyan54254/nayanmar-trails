@@ -53,6 +53,47 @@ type Tirumurai8Snapshot = {
   loci: Tirumurai8Locus[];
 };
 
+type SaivaLiteraryPlace = {
+  id: string;
+  label: string;
+  label_ta: string;
+  aliases: string[];
+  tevaram_site_catalogue_member: boolean;
+  geometry_status: string;
+};
+
+type SaivaLiteraryLink = {
+  id: string;
+  subject: string;
+  predicate: string;
+  object: string;
+  authority_scope: string;
+  historical_verified: boolean;
+  source_key: string;
+  locator: string;
+  source_note_ta?: string;
+  source_header_composition_place_ta?: string;
+  source_form_ta?: string;
+  normalized_place_ta?: string;
+  alias_resolution_source_key?: string;
+  formal_tevaram_sthalam_classification?: string;
+  traditional_place_ta?: string;
+  modern_name_in_ifp_catalogue?: string;
+  display_note: string;
+};
+
+type SaivaLiterarySnapshot = {
+  meta: {
+    export_version: string;
+    source_repo: string;
+    source_commit: string;
+    source_path: string;
+    authority_semantics: Record<string, string>;
+  };
+  places: SaivaLiteraryPlace[];
+  links: SaivaLiteraryLink[];
+};
+
 type PlaybackStop = {
   id: string;
   name: string;
@@ -132,6 +173,7 @@ function siteDisplayName(site: Site) {
 export default function App() {
   const [data, setData] = useState<PramanaExport | null>(null);
   const [tirumurai8, setTirumurai8] = useState<Tirumurai8Snapshot | null>(null);
+  const [saivaPlaces, setSaivaPlaces] = useState<SaivaLiterarySnapshot | null>(null);
   const [selectedSaintId, setSelectedSaintId] = useState(
     () => new URLSearchParams(window.location.search).get('saint') || 'nayanmar.20',
   );
@@ -156,6 +198,9 @@ export default function App() {
   const didInitSaintSelection = useRef(false);
   const preserveInitialSiteDeepLink = useRef(
     Boolean(new URLSearchParams(window.location.search).get('site')),
+  );
+  const preserveInitialTabDeepLink = useRef(
+    Boolean(new URLSearchParams(window.location.search).get('tab')),
   );
 
   useEffect(() => {
@@ -185,10 +230,15 @@ export default function App() {
         if (!response.ok) throw new Error(`Tirumurai 8 export HTTP ${response.status}`);
         return response.json() as Promise<Tirumurai8Snapshot>;
       }),
+      fetch('/data/pramana-saiva-literary-place-links-v1.json').then((response) => {
+        if (!response.ok) throw new Error(`Saiva literary-place export HTTP ${response.status}`);
+        return response.json() as Promise<SaivaLiterarySnapshot>;
+      }),
     ])
-      .then(([graph, t8]) => {
+      .then(([graph, t8, literaryPlaces]) => {
         setData(graph);
         setTirumurai8(t8);
+        setSaivaPlaces(literaryPlaces);
       })
       .catch((error) => console.error('Unable to load Pramāṇa product exports', error));
   }, []);
@@ -466,6 +516,23 @@ export default function App() {
   const selectedSite = siteById.get(selectedSiteId) ?? null;
   const selectedPatikams = siteLinks.get(selectedSiteId) ?? [];
   const selectedTirumurai8Locus = tirumurai8LociBySite.get(selectedSiteId) ?? null;
+  const uttarakosamangai = saivaPlaces?.places.find(
+    (place) => place.id === 'saiva_place.tiru_uttarakosamangai',
+  ) ?? null;
+  const uttarakosamangaiLinks = (saivaPlaces?.links ?? [])
+    .filter((link) => link.object === 'saiva_place.tiru_uttarakosamangai')
+    .sort((a, b) => {
+      const section = (link: SaivaLiteraryLink) =>
+        Number(link.subject.match(/\.s(\d+)$/)?.[1] ?? 0);
+      return section(a) - section(b);
+    });
+  const kolaruContext = (saivaPlaces?.links ?? []).find(
+    (link) => link.id === 'literary-place.tevaram.2_85.kt125',
+  ) ?? null;
+  const selectedSiteKolaruContext =
+    selectedSaintId === 'nayanmar.27' && selectedSiteId === 'tevaram_site.KT125'
+      ? kolaruContext
+      : null;
 
   const episodeCount =
     selectedIsManikkavasakar
@@ -520,6 +587,10 @@ export default function App() {
   useEffect(() => {
     if (!selectedIsManikkavasakar || !tirumurai8?.loci.length) return;
     setSelectedSiteId(tirumurai8.loci[0].site_entity_id);
+    if (preserveInitialTabDeepLink.current) {
+      preserveInitialTabDeepLink.current = false;
+      return;
+    }
     setTab('visits');
   }, [selectedIsManikkavasakar, tirumurai8]);
 
@@ -548,7 +619,7 @@ export default function App() {
     return () => window.clearInterval(timer);
   }, [playing, playbackStops.length]);
 
-  if (!data || !tirumurai8) {
+  if (!data || !tirumurai8 || !saivaPlaces) {
     return (
       <div className="loading">
         <div className="loading-mark"><GopuramIcon /></div>
@@ -872,6 +943,14 @@ export default function App() {
             )}
           </div>
 
+          {selectedIsManikkavasakar && uttarakosamangai && (
+            <LiterarySthalamHighlight
+              place={uttarakosamangai}
+              links={uttarakosamangaiLinks}
+              onExplore={() => setTab('chronology')}
+            />
+          )}
+
           <div className="journey-progress">
             <div>
               <b>Playback progress</b>
@@ -1036,7 +1115,11 @@ export default function App() {
                           />
                         )}
                         {tab === 'chronology' && (
-                          <Tirumurai8Chronology snapshot={tirumurai8} />
+                          <Tirumurai8Chronology
+                            snapshot={tirumurai8}
+                            place={uttarakosamangai}
+                            links={uttarakosamangaiLinks}
+                          />
                         )}
                         {tab === 'evidence' && (
                           <Tirumurai8Evidence
@@ -1056,6 +1139,7 @@ export default function App() {
                             totalPathigams={selectedSiteAllPatikams.length}
                             saintBreakdown={selectedSiteSaintBreakdown}
                             tirumuraiBreakdown={selectedSiteTirumuraiBreakdown}
+                            contextualHymn={selectedSiteKolaruContext}
                           />
                         )}
                         {tab === 'hymns' && (
@@ -1363,6 +1447,38 @@ function Fact({ label, value }: { label: string; value: string | number }) {
 }
 
 
+function LiterarySthalamHighlight({
+  place,
+  links,
+  onExplore,
+}: {
+  place: SaivaLiteraryPlace;
+  links: SaivaLiteraryLink[];
+  onExplore: () => void;
+}) {
+  const composition = links.filter(
+    (link) => link.predicate === 'SOURCE_HEADER_COMPOSITION_LOCUS',
+  );
+
+  return (
+    <button className="literary-place-highlight" onClick={onExplore}>
+      <span className="literary-place-icon"><GopuramIcon /></span>
+      <span>
+        <small>TIRUVĀCAKAM LITERARY STHALAM</small>
+        <b>{place.label}</b>
+        <em>{place.label_ta}</em>
+        <strong>
+          {links.length} sections · {composition.length === 1
+            ? 'section 6 source-heading locus'
+            : composition.length + ' source-heading loci'}
+        </strong>
+      </span>
+      <i>→</i>
+    </button>
+  );
+}
+
+
 function TraditionalPlaceDetail({
   saintName,
   stop,
@@ -1490,17 +1606,64 @@ function Tirumurai8LocusDetail({
   );
 }
 
-function Tirumurai8Chronology({ snapshot }: { snapshot: Tirumurai8Snapshot }) {
+function Tirumurai8Chronology({
+  snapshot,
+  place,
+  links,
+}: {
+  snapshot: Tirumurai8Snapshot;
+  place: SaivaLiteraryPlace | null;
+  links: SaivaLiteraryLink[];
+}) {
+  const compositionLinks = links.filter(
+    (link) => link.predicate === 'SOURCE_HEADER_COMPOSITION_LOCUS',
+  );
+  const textualLinks = links.filter(
+    (link) => link.predicate !== 'SOURCE_HEADER_COMPOSITION_LOCUS',
+  );
+
   return (
     <div className="text">
       <Badge kind="inference">JOURNEY NOTE</Badge>
       <p>
-        The Tiruvācakam/Tirukkōvaiyār corpus preserves section order, but section order is not treated as Manikkavasakar's historical itinerary.
+        The Tiruvācakam/Tirukkōvaiyār corpus preserves section order, but section order is not treated as Manikkavasakar&apos;s historical itinerary.
       </p>
       <div className="evidence-callout">
         <GopuramIcon />
         <p>{snapshot.meta.playback_policy}</p>
       </div>
+
+      {place && links.length > 0 && (
+        <section className="literary-place-detail">
+          <small>BEYOND THE PLOTTED LOCI</small>
+          <h3>{place.label}</h3>
+          <div className="tamil">{place.label_ta}</div>
+          <p>
+            Tiruvācakam connects this sthalam to <b>{links.length} sections</b>.
+            The pinned edition gives <b>{compositionLinks.length === 1 ? 'section 6' : compositionLinks.length + ' sections'}</b> a
+            source-heading composition locus; the other <b>{textualLinks.length}</b> are textual references.
+          </p>
+          <div className="literary-section-grid">
+            {links.map((link) => {
+              const section = Number(link.subject.match(/\.s(\d+)$/)?.[1] ?? 0);
+              return (
+                <span
+                  key={link.id}
+                  className={link.predicate === 'SOURCE_HEADER_COMPOSITION_LOCUS' ? 'composition' : ''}
+                >
+                  <b>{section}</b>
+                  {link.predicate === 'SOURCE_HEADER_COMPOSITION_LOCUS'
+                    ? 'source-heading locus'
+                    : 'textual reference'}
+                </span>
+              );
+            })}
+          </div>
+          <p className="reader-note">
+            Uttarakosamangai is not a member of the formal 276-site Tēvāram 1–7 catalogue, so this view does not invent a Tēvāram marker or travel segment for it.
+          </p>
+        </section>
+      )}
     </div>
   );
 }
@@ -1548,6 +1711,7 @@ function SthalamOverview({
   totalPathigams,
   saintBreakdown,
   tirumuraiBreakdown,
+  contextualHymn,
 }: {
   site: Site;
   saintName: string;
@@ -1555,6 +1719,7 @@ function SthalamOverview({
   totalPathigams: number;
   saintBreakdown: Array<{ saintId: string; saint: Saint | null; count: number }>;
   tirumuraiBreakdown: Array<[number, number]>;
+  contextualHymn?: SaivaLiteraryLink | null;
 }) {
   return (
     <div className="text sthalam-overview">
@@ -1599,6 +1764,25 @@ function SthalamOverview({
           ))}
         </div>
       </section>
+
+      {contextualHymn && (
+        <section className="contextual-hymn">
+          <div className="detail-section-head">
+            <div>
+              <Badge kind="tradition">TRADITIONAL CHRONOLOGY</Badge>
+              <h3>Kōḷaṟu Pathigam · 2.085</h3>
+            </div>
+            <small>{contextualHymn.formal_tevaram_sthalam_classification}</small>
+          </div>
+          <p>
+            A traditional Sambandar chronology places Kōḷaṟu Pathigam at <b>Tirumaraikadu</b>, modern Vedaranyam.
+            The formal Tēvāram edition separately classifies 2.085 as <b>POTU</b>, so it is intentionally not counted among this sthalam&apos;s {totalPathigams} formal pathigams.
+          </p>
+          <p className="reader-note">
+            This preserves both claims without collapsing traditional chronology into formal sthalam metadata.
+          </p>
+        </section>
+      )}
 
       {site.temple_identification_status && (
         <p className="reader-note">
