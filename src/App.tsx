@@ -2296,6 +2296,8 @@ function SourcesModal({
   tirumurai8: Tirumurai8Snapshot;
   onClose: () => void;
 }) {
+  const locale = useLocale();
+
   return (
     <div
       className="graph-backdrop sources-backdrop"
@@ -2308,7 +2310,7 @@ function SourcesModal({
         className="sources-modal"
         role="dialog"
         aria-modal="true"
-        aria-label="Sources and methodology"
+        aria-label={locale === 'ta' ? 'ஆதாரங்கள் மற்றும் தொகுப்பு முறை' : 'Sources and methodology'}
         onMouseDown={(event) => event.stopPropagation()}
       >
         <header className="sources-modal-head">
@@ -2316,24 +2318,31 @@ function SourcesModal({
             <small><T>SOURCES · METHOD · PROVENANCE</T></small>
             <h2><T>Where Nayanmar Trails gets its information</T></h2>
             <p>
-              The site is designed for exploration first. This page explains the source chain behind the map, Tēvāram catalogue and historical notes.
+              {locale === 'ta'
+                ? 'முதலில் சுற்றிப் பார்க்க எளிதாக இந்தத் தளம் வடிவமைக்கப்பட்டுள்ளது. வரைபடம், தேவாரப் பட்டியல், வரலாற்றுக் குறிப்புகள்—இவற்றின் பின்னால் எந்த ஆதாரங்கள் உள்ளன என்பதை இங்கே பார்க்கலாம்.'
+                : 'The site is designed for exploration first. This page explains the source chain behind the map, Tēvāram catalogue and historical notes.'}
             </p>
           </div>
-          <button className="modal-close" onClick={onClose} aria-label="Close sources page">×</button>
+          <button
+            className="modal-close"
+            onClick={onClose}
+            aria-label={locale === 'ta' ? 'ஆதாரங்கள் பக்கத்தை மூடு' : 'Close sources page'}
+          >×</button>
         </header>
 
         <div className="sources-intro">
           <div>
             <b><T>What Pramāṇa contributes</T></b>
             <p>
-              Pramāṇa is the versioned evidence layer behind Nayanmar Trails. Its value is not branding on every screen:
-              it keeps textual tradition, edition metadata, inference and independent historical evidence from being silently merged.
+              {locale === 'ta'
+                ? 'நாயன்மார் பாதைகளின் பின்னணி ஆதாரத் தளம் பிரமாணா. ஒவ்வொரு திரையிலும் அதன் பெயரைச் சொல்லுவது நோக்கம் அல்ல; இலக்கிய மரபு, பதிப்புத் தகவல், ஆய்வு ஊகம், தனித்த வரலாற்றுச் சான்று—இவை ஒன்றோடொன்று கலந்துவிடாமல் வைத்திருப்பதே அதன் பணி.'
+                : 'Pramāṇa is the versioned evidence layer behind Nayanmar Trails. Its value is not branding on every screen: it keeps textual tradition, edition metadata, inference and independent historical evidence from being silently merged.'}
             </p>
           </div>
           <div className="sources-version">
             <span><T>Dataset</T></span>
             <b>{data.meta.export_version}</b>
-            <small>source {data.meta.source_commit.slice(0, 10)}</small>
+            <small>{locale === 'ta' ? 'மூலம்' : 'source'} {data.meta.source_commit.slice(0, 10)}</small>
           </div>
         </div>
 
@@ -2344,8 +2353,9 @@ function SourcesModal({
               <small><T>TĒVĀRAM CATALOGUE</T></small>
               <h3><T>798 numbered pathigams · 276 sthalams</T></h3>
               <p>
-                Saint ↔ pathigam ↔ sthalam relationships are carried from the edition-aligned Tēvāram catalogue.
-                Numbering remains edition-qualified where sources differ.
+                {locale === 'ta'
+                  ? 'நாயன்மார், பதிகம், திருத்தலம் ஆகியவற்றுக்கிடையிலான தொடர்புகள் பதிப்போடு ஒத்திசைக்கப்பட்ட தேவாரப் பட்டியலிலிருந்து வருகின்றன. பதிப்புகள் மாறும் இடங்களில் எண்ணிக்கையும் அதற்கேற்ற குறிப்புடன் வைக்கப்படுகிறது.'
+                  : 'Saint ↔ pathigam ↔ sthalam relationships are carried from the edition-aligned Tēvāram catalogue. Numbering remains edition-qualified where sources differ.'}
               </p>
             </div>
           </article>
@@ -2356,8 +2366,9 @@ function SourcesModal({
               <small><T>PROJECT MADURAI</T></small>
               <h3><T>Source-preserved Tēvāram text layer</T></h3>
               <p>
-                Project Madurai provides the public-text family used for the Tēvāram beta corpus.
-                Known HTML gaps and numbering differences remain explicit rather than being silently repaired.
+                {locale === 'ta'
+                  ? 'தேவாரத்தின் பொதுமக்களுக்கு கிடைக்கும் உரைத் தொகுப்புக்கு Project Madurai பதிப்புகள் அடிப்படையாக உள்ளன. HTML குறைபாடுகளும் எண் வேறுபாடுகளும் மறைக்கப்படாமல் பதிவு செய்யப்படுகின்றன.'
+                  : 'Project Madurai provides the public-text family used for the Tēvāram beta corpus. Known HTML gaps and numbering differences remain explicit rather than being silently repaired.'}
               </p>
             </div>
           </article>
@@ -2368,8 +2379,9 @@ function SourcesModal({
               <small><T>PERIYA PURANAM</T></small>
               <h3><T>Saint story and identity links</T></h3>
               <p>
-                Periya Puranam episode metadata connects individual Nayanmars with their traditional hagiographic chapters.
-                These are devotional-literary sources, not automatically historical proof.
+                {locale === 'ta'
+                  ? 'பெரியபுராண அத்தியாயத் தகவல்கள் ஒவ்வொரு நாயன்மாரையும் அவரவர் மரபுக் கதையுடன் இணைக்கின்றன. இவை பக்தி இலக்கிய ஆதாரங்கள்; தானாகவே வரலாற்றுச் சான்றாக எடுத்துக்கொள்ளப்படுவதில்லை.'
+                  : 'Periya Puranam episode metadata connects individual Nayanmars with their traditional hagiographic chapters. These are devotional-literary sources, not automatically historical proof.'}
               </p>
             </div>
           </article>
@@ -2380,8 +2392,9 @@ function SourcesModal({
               <small><T>DHARMA INSCRIPTIONS</T></small>
               <h3><T>Independent historical records</T></h3>
               <p>
-                Where a reviewed inscription is linked to a mapped site, Nayanmar Trails marks it separately as an
-                independent historical record rather than treating it as the same thing as a literary tradition.
+                {locale === 'ta'
+                  ? 'ஆய்வு செய்யப்பட்ட கல்வெட்டு ஒரு வரைபடத் தலத்துடன் இணைக்கப்பட்டிருந்தால், அதை இலக்கிய மரபிலிருந்து தனியாக வரலாற்றுச் சான்றாகக் காட்டுகிறோம்.'
+                  : 'Where a reviewed inscription is linked to a mapped site, Nayanmar Trails marks it separately as an independent historical record rather than treating it as the same thing as a literary tradition.'}
               </p>
             </div>
           </article>
@@ -2392,9 +2405,19 @@ function SourcesModal({
               <small><T>TIRUMURAI 8</T></small>
               <h3><T>Manikkavasakar as Naalvar</T></h3>
               <p>
-                Tiruvācakam and Tirukkōvaiyār are carried through a separate beta snapshot
-                ({tirumurai8.works.tiruvacakam.sections} Tiruvācakam sections; {tirumurai8.works.tirukkovaiyar.source_order_units} Tirukkōvaiyār units).
-                Manikkavasakar is shown as the fourth Naalvar, not inserted into the numbered 63 Nayanmars.
+                {locale === 'ta' ? (
+                  <>
+                    திருவாசகமும் திருக்கோவையாரும் தனிப் பதிப்பாக இங்கே கொண்டுவரப்பட்டுள்ளன
+                    ({tirumurai8.works.tiruvacakam.sections} திருவாசகப் பகுதிகள்; {tirumurai8.works.tirukkovaiyar.source_order_units} திருக்கோவையார் பாடல்கள்).
+                    மாணிக்கவாசகர் நால்வரில் நான்காமவர்; அறுபத்து மூவரின் எண்ணிக்கைக்குள் சேர்க்கப்படவில்லை.
+                  </>
+                ) : (
+                  <>
+                    Tiruvācakam and Tirukkōvaiyār are carried through a separate beta snapshot
+                    ({tirumurai8.works.tiruvacakam.sections} Tiruvācakam sections; {tirumurai8.works.tirukkovaiyar.source_order_units} Tirukkōvaiyār units).
+                    Manikkavasakar is shown as the fourth Naalvar, not inserted into the numbered 63 Nayanmars.
+                  </>
+                )}
               </p>
             </div>
           </article>
@@ -2408,7 +2431,11 @@ function SourcesModal({
         </div>
 
         <footer className="sources-modal-footer">
-          <span>Read the site as a heritage explorer; open Sources whenever you want the provenance underneath it.</span>
+          <span>
+            {locale === 'ta'
+              ? 'இந்தத் தளத்தை ஒரு பாரம்பரியப் பயணமாக வாசியுங்கள்; எந்தத் தகவலின் பின்னுள்ள ஆதாரம் வேண்டும் என்றாலும் “ஆதாரங்கள்” பகுதியைத் திறக்கலாம்.'
+              : 'Read the site as a heritage explorer; open Sources whenever you want the provenance underneath it.'}
+          </span>
           <button onClick={onClose}><T>Back to exploration</T></button>
         </footer>
       </section>
