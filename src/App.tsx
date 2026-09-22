@@ -149,6 +149,7 @@ export default function App() {
   const [graphOpen, setGraphOpen] = useState(
     () => new URLSearchParams(window.location.search).get('graph') === '1',
   );
+  const [sourcesOpen, setSourcesOpen] = useState(false);
   const [query, setQuery] = useState('');
   const didInitSaintSelection = useRef(false);
   const preserveInitialSiteDeepLink = useRef(
@@ -156,9 +157,12 @@ export default function App() {
   );
 
   useEffect(() => {
-    if (!graphOpen) return;
+    if (!graphOpen && !sourcesOpen) return;
     const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') setGraphOpen(false);
+      if (event.key === 'Escape') {
+        setGraphOpen(false);
+        setSourcesOpen(false);
+      }
     };
     document.addEventListener('keydown', onKeyDown);
     const previousOverflow = document.body.style.overflow;
@@ -167,7 +171,7 @@ export default function App() {
       document.removeEventListener('keydown', onKeyDown);
       document.body.style.overflow = previousOverflow;
     };
-  }, [graphOpen]);
+  }, [graphOpen, sourcesOpen]);
 
   useEffect(() => {
     Promise.all([
