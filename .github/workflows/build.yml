@@ -48,7 +48,7 @@ jobs:
           capture() {
             local name="$1"
             local url="$2"
-            "$BROWSER" \
+            timeout 45s "$BROWSER" \
               --headless \
               --no-sandbox \
               --disable-gpu \
