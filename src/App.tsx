@@ -809,7 +809,7 @@ export default function App() {
         </section>
 
         <aside className="panel detail-card">
-          <div className="tabs">
+          <div className={`tabs ${showTraditionalDetail ? 'three-tabs' : ''}`}>
             {showTraditionalDetail ? (
               (['visits', 'chronology', 'evidence'] as DetailTab[]).map((item) => (
                 <button
