@@ -513,6 +513,23 @@ export default function App() {
   const selectedSite = siteById.get(selectedSiteId) ?? null;
   const selectedPatikams = siteLinks.get(selectedSiteId) ?? [];
   const selectedTirumurai8Locus = tirumurai8LociBySite.get(selectedSiteId) ?? null;
+  const uttarakosamangai = saivaPlaces?.places.find(
+    (place) => place.id === 'saiva_place.tiru_uttarakosamangai',
+  ) ?? null;
+  const uttarakosamangaiLinks = (saivaPlaces?.links ?? [])
+    .filter((link) => link.object === 'saiva_place.tiru_uttarakosamangai')
+    .sort((a, b) => {
+      const section = (link: SaivaLiteraryLink) =>
+        Number(link.subject.match(/\.s(\d+)$/)?.[1] ?? 0);
+      return section(a) - section(b);
+    });
+  const kolaruContext = (saivaPlaces?.links ?? []).find(
+    (link) => link.id === 'literary-place.tevaram.2_85.kt125',
+  ) ?? null;
+  const selectedSiteKolaruContext =
+    selectedSaintId === 'nayanmar.27' && selectedSiteId === 'tevaram_site.KT125'
+      ? kolaruContext
+      : null;
 
   const episodeCount =
     selectedIsManikkavasakar
@@ -919,6 +936,14 @@ export default function App() {
             )}
           </div>
 
+          {selectedIsManikkavasakar && uttarakosamangai && (
+            <LiterarySthalamHighlight
+              place={uttarakosamangai}
+              links={uttarakosamangaiLinks}
+              onExplore={() => setTab('chronology')}
+            />
+          )}
+
           <div className="journey-progress">
             <div>
               <b>Playback progress</b>
@@ -1083,7 +1108,11 @@ export default function App() {
                           />
                         )}
                         {tab === 'chronology' && (
-                          <Tirumurai8Chronology snapshot={tirumurai8} />
+                          <Tirumurai8Chronology
+                            snapshot={tirumurai8}
+                            place={uttarakosamangai}
+                            links={uttarakosamangaiLinks}
+                          />
                         )}
                         {tab === 'evidence' && (
                           <Tirumurai8Evidence
@@ -1103,6 +1132,7 @@ export default function App() {
                             totalPathigams={selectedSiteAllPatikams.length}
                             saintBreakdown={selectedSiteSaintBreakdown}
                             tirumuraiBreakdown={selectedSiteTirumuraiBreakdown}
+                            contextualHymn={selectedSiteKolaruContext}
                           />
                         )}
                         {tab === 'hymns' && (
