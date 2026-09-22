@@ -145,6 +145,10 @@ export default function SacredMap({
     () => new Set(routeStops.map((stop) => stop.siteId)),
     [routeStops],
   );
+  const featuredSiteIds = useMemo(
+    () => new Set(['TO01', 'NA22', 'KV01', 'KT087', 'PA01', 'PA08']),
+    [],
+  );
 
   useEffect(() => {
     if (!mapNode.current || mapRef.current) return;
@@ -175,6 +179,8 @@ export default function SacredMap({
           maxZoom: 6.25,
         },
       );
+      map.setCenter([78.85, 10.72]);
+      map.setZoom(Math.min(map.getZoom() + 0.34, 6.6));
 
       map.addSource('district-coverage', {
         type: 'geojson',
@@ -353,6 +359,7 @@ export default function SacredMap({
         linked ? 'linked' : '',
         independent ? 'independent' : '',
         selected ? 'selected' : '',
+        featuredSiteIds.has(seed.siteId) ? 'featured' : '',
       ].filter(Boolean).join(' ');
       node.innerHTML = `
         <span class="marker-glow"></span>
@@ -386,7 +393,7 @@ export default function SacredMap({
         .addTo(map);
       markerRefs.current.push(marker);
     }
-  }, [coverage, epigraphicSiteIds, linkedSet, mode, progress, routeStops, selectedSiteId, showUnlinkedExemplars, travelerImage]);
+  }, [coverage, epigraphicSiteIds, featuredSiteIds, linkedSet, mode, progress, routeStops, selectedSiteId, showUnlinkedExemplars, travelerImage]);
 
 
 
