@@ -514,7 +514,7 @@ export default function App() {
             <b>Evidence legend</b>
             <span><i className="legend-tower"><GopuramIcon /></i> exact modern centroid for a mapped exemplar</span>
             <span><i className="legend-route" /> route between known endpoints — product inference</span>
-            <span><i className="legend-coverage" /> corpus density by normalized modern district</span>
+            <span><i className="legend-coverage" /> selected-saint linked-talam density by normalized modern district</span>
             <span><i className="legend-independent" /> explicit independent epigraphic support</span>
           </div>
 
