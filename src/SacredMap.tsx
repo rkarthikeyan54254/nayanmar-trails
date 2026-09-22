@@ -215,9 +215,9 @@ export default function SacredMap({
         layout: { 'line-cap': 'round', 'line-join': 'round' },
         paint: {
           'line-color': '#f0aa42',
-          'line-width': 12,
-          'line-opacity': 0.16,
-          'line-blur': 5,
+          'line-width': 7,
+          'line-opacity': 0.08,
+          'line-blur': 4,
         },
       });
       map.addLayer({
@@ -227,8 +227,8 @@ export default function SacredMap({
         layout: { 'line-cap': 'round', 'line-join': 'round' },
         paint: {
           'line-color': '#eab052',
-          'line-width': 3.15,
-          'line-opacity': 0.72,
+          'line-width': 1.8,
+          'line-opacity': 0.46,
           'line-dasharray': [1.3, 2],
         },
       });
@@ -244,9 +244,9 @@ export default function SacredMap({
         layout: { 'line-cap': 'round', 'line-join': 'round' },
         paint: {
           'line-color': '#ffd071',
-          'line-width': 4.2,
-          'line-opacity': 0.98,
-          'line-blur': 0.35,
+          'line-width': 3.4,
+          'line-opacity': 0.96,
+          'line-blur': 0.28,
         },
       });
     });
@@ -317,6 +317,7 @@ export default function SacredMap({
         if (point.count < 2) continue;
         const node = document.createElement('div');
         node.className = 'map-district-marker';
+        node.style.position = 'absolute';
         node.innerHTML = `
           <span class="district-marker-glow"></span>
           <span class="district-marker-tower">${gopuramMarkup}</span>
@@ -347,6 +348,7 @@ export default function SacredMap({
       const selected = selectedSiteId === entityId;
       const node = document.createElement('button');
       node.type = 'button';
+      node.style.position = 'absolute';
       node.className = [
         'map-temple-marker',
         linked ? 'linked' : '',
@@ -376,6 +378,7 @@ export default function SacredMap({
     if (active && (mode === 'all' || mode === 'edition')) {
       const traveler = document.createElement('div');
       traveler.className = travelerImage ? 'map-traveler has-image' : 'map-traveler';
+      traveler.style.position = 'absolute';
       traveler.innerHTML = travelerImage
         ? `<img src="${travelerImage}" alt="" /><span></span>`
         : '<span></span>';
