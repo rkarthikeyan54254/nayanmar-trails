@@ -390,7 +390,7 @@ export default function App() {
   const playbackKind = selectedIsManikkavasakar
     ? 'Tirumurai 8 textual loci'
     : playbackIsGeographic
-      ? 'Mapped Tēvāram loci'
+      ? 'Tēvāram sthalam'
       : 'Traditional place sequence';
 
   const districtCoverage = useMemo<CoveragePoint[]>(() => {
@@ -550,7 +550,7 @@ export default function App() {
     return (
       <div className="loading">
         <div className="loading-mark"><GopuramIcon /></div>
-        <div>Opening the Pramāṇa evidence atlas…</div>
+        <div>Opening Nayanmar Trails…</div>
       </div>
     );
   }
@@ -897,7 +897,7 @@ export default function App() {
             <div className="map-toolbar-stats">
               <span>
                 <b>{selectedIsManikkavasakar ? tirumurai8.loci.length : playbackIsGeographic ? siteLinks.size : traditionalPlaybackStops.length}</b>
-                {selectedIsManikkavasakar ? ' textual loci' : playbackIsGeographic ? ' linked talams' : ' traditional places'}
+                {selectedIsManikkavasakar ? ' textual loci' : playbackIsGeographic ? ' linked sthalams' : ' traditional places'}
               </span>
               <span><b>{saintDistrictCoverage.length}</b> mapped districts</span>
               <span><b>{routeStops.length}</b> exact exemplars</span>
@@ -920,28 +920,27 @@ export default function App() {
           />
 
           <div className="map-legend">
-            <b>Evidence legend</b>
+            <b>Map legend</b>
             <span><i className="legend-tower"><GopuramIcon /></i> exact modern centroid for a mapped exemplar</span>
             {playbackIsGeographic ? (
-              <span><i className="legend-route" /> line between known endpoints — product presentation, not historical road</span>
+              <span><i className="legend-route" /> reconstructed line between known Tēvāram-linked sthalams</span>
             ) : (
               <span><i className="legend-tradition" /> traditional place sequence plays below without invented coordinates</span>
             )}
-            <span><i className="legend-coverage" /> selected-saint linked-talam density by normalized modern district</span>
-            <span><i className="legend-independent" /> explicit independent epigraphic support</span>
+            <span><i className="legend-coverage" /> selected-saint sthalam density by modern district</span>
+            <span><i className="legend-independent" /> independent inscriptional support</span>
           </div>
 
           <div className="map-source-note">
-            OpenFreeMap / OpenStreetMap basemap · Pramāṇa data overlay
+            OpenFreeMap / OpenStreetMap basemap · curated heritage data
           </div>
 
           {!playbackIsGeographic && traditionalPlaybackStops.length > 0 && (
             <div className="map-fallback-note">
               <Badge kind="tradition">TRADITION PLAYBACK</Badge>
-              <b>{traditionalPlaybackStops.length} Pramāṇa place traditions are available for {saintName}</b>
+              <b>{traditionalPlaybackStops.length} traditional place references are available for {saintName}</b>
               <p>
-                They play in the timeline below. Pramāṇa does not yet provide reviewed coordinates for these place nodes,
-                so Nayanmar Trails deliberately does not draw a fake geographic route.
+                They play in the journey strip below. Reviewed coordinates are not yet attached to these traditional place references, so no geographic route is drawn.
               </p>
             </div>
           )}
@@ -1119,7 +1118,7 @@ export default function App() {
               <p>
                 {playbackIsGeographic
                   ? <>Mapped textual loci in presentation order — <b>not a historical road or chronology.</b></>
-                  : <>Pramāṇa birth/related/mukti place traditions — <b>not geocoded or historical chronology.</b></>}
+                  : <>Birthplace, related-place and mukti-place traditions — <b>not geocoded or historical chronology.</b></>}
               </p>
             </div>
             <Badge kind={playbackIsGeographic ? 'inference' : 'tradition'}>
@@ -1170,8 +1169,8 @@ export default function App() {
                 </>
               ) : (
                 <>
-                  <b>No playback evidence yet</b>
-                  <small>No mapped loci or traditional place references are available for this selection.</small>
+                  <b>No journey stops yet</b>
+                  <small>No mapped sthalams or traditional place references are available for this selection.</small>
                 </>
               )}
             </div>
@@ -1252,11 +1251,11 @@ export default function App() {
           <div className="panel graph-mini">
             <div className="section-title">
               <div>
-                <h3>{selectedIsManikkavasakar ? 'Tirumurai 8 – Talam Graph' : 'Saint – Talam Graph'}</h3>
+                <h3>{selectedIsManikkavasakar ? 'Tirumurai 8 – Sthalam Connections' : 'Saint – Sthalam Connections'}</h3>
                 <span>
                   {selectedIsManikkavasakar
                     ? `${tirumurai8.loci.length} textual loci`
-                    : `${siteLinks.size} linked talams`}
+                    : `${siteLinks.size} linked sthalams`}
                 </span>
               </div>
               <button className="graph-expand" onClick={() => setGraphOpen(true)}>Expand ↗</button>
@@ -1274,7 +1273,7 @@ export default function App() {
         <div className="panel density-card">
           <div className="section-title">
             <h3>Corpus Density</h3>
-            <span>all 276 Tēvāram catalog sites</span>
+            <span>276 Tēvāram sthalams</span>
           </div>
           <DensityPanel points={districtCoverage.slice(0, 6)} />
         </div>
@@ -1282,8 +1281,8 @@ export default function App() {
         <div className="panel totals">
           <Stat value={data.meta.counts.saints} label="Nayanmars" />
           <Stat value={4} label="Naalvar" />
-          <Stat value={data.meta.counts.tevaram_patikams} label="Tēvāram patikams" />
-          <Stat value={data.meta.counts.total_edges} label="Typed edges" />
+          <Stat value={data.meta.counts.tevaram_patikams} label="Tēvāram pathigams" />
+          <Stat value={data.meta.counts.total_edges} label="Source links" />
         </div>
       </section>
 
@@ -1306,7 +1305,7 @@ export default function App() {
 
       <footer>
         <strong><GopuramIcon /> Nayanmar Trails</strong>
-        <span>Versioned read-only Pramāṇa export · source commit {data.meta.source_commit.slice(0, 10)}</span>
+        <span>Data provenance · version {data.meta.source_commit.slice(0, 10)}</span>
         <span>Map © OpenFreeMap / OpenMapTiles / OpenStreetMap</span>
       </footer>
     </main>
