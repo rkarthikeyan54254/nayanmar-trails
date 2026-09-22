@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 import { GEO_SEEDS, TAMIL_NADU_SCHEMATIC } from './geometry';
 import { DISTRICT_CENTROIDS, normalizeDistrict } from './coverage';
@@ -136,6 +136,7 @@ export default function App() {
     () => new URLSearchParams(window.location.search).get('graph') === '1',
   );
   const [query, setQuery] = useState('');
+  const didInitSaintSelection = useRef(false);
 
   useEffect(() => {
     if (!graphOpen) return;
@@ -431,7 +432,11 @@ export default function App() {
   useEffect(() => {
     setProgress(0);
     setPlaying(false);
-    setTab('visits');
+    if (didInitSaintSelection.current) {
+      setTab('visits');
+    } else {
+      didInitSaintSelection.current = true;
+    }
   }, [selectedSaintId]);
 
   useEffect(() => {
