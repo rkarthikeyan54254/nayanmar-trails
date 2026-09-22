@@ -7,14 +7,14 @@
     "source_repo": "rkarthikeyan54254/pramana",
     "source_commit": "0f01a1db8f94db489125df8c57cebb294b7529d6",
     "source_basis": "Pramana Periya Puranam v1 episode catalog and traditional narrative layer",
-    "language_policy": "English and Tamil are separate reader modes; source-original text may remain in its original language inside evidence views."
+    "language_policy": "English and Tamil are separate reader modes. Tamil copy is independently authored in a natural devotional-magazine register, not sentence-aligned translation from English; source-original text may remain in its original language inside evidence views."
   },
   "stories": [
     {
       "saint_id": "nayanmar.01",
       "ordinal": 1,
       "hook_en": "A potter by trade, he and his wife are remembered for keeping an extraordinary vow of restraint for years while continuing to share the same home.",
-      "hook_ta": "குயவர் தொழிலில் வாழ்ந்த இவர், மனைவியுடன் ஒரே இல்லத்தில் இருந்தபோதும் பல ஆண்டுகள் கடுமையான தன்னடக்க விரதத்தை காத்தவர் என மரபில் நினைவுகூரப்படுகிறார்.",
+      "hook_ta": "குயவர் குடும்பத்தில் வாழ்ந்த திருநீலகண்டர், மனைவியுடன் ஒரே இல்லத்தில் இருந்தபடியே நீண்டகாலம் கடுமையான தன்னடக்க ஒழுக்கத்தை காத்தார் என்று பெரியபுராண மரபு கூறுகிறது.",
       "authority_scope": "traditional_reference",
       "source_work": "Periya Puranam",
       "presentation_policy": "reader-facing summary of traditional narrative; not independently verified biography"
@@ -23,7 +23,7 @@
       "saint_id": "nayanmar.02",
       "ordinal": 2,
       "hook_en": "When Shiva is said to have arrived disguised as a devotee and made an almost unthinkable request, Iyarpakai chose hospitality to the devotee over social convention.",
-      "hook_ta": "சிவன் அடியார் வேடத்தில் வந்து நினைக்கவே கடினமான வேண்டுகோளை வைத்தபோது, உலக மரபுகளை விட அடியார்க்கு செய்யும் சேவையையே இயற்பகையார் மேலாகக் கொண்டார் எனப் பெரியபுராண மரபு கூறுகிறது.",
+      "hook_ta": "ஒரு சிவனடியார் கேட்டதே யாரும் கேட்கத் தயங்கும் வேண்டுகோள். ஆனால் அடியார்க்கு ‘இல்லை’ என்று சொல்லக்கூடாது என்ற மனநிலையில் இயற்பகையார் உலக வழக்கையே மீறினார் என்று பெரியபுராணம் சொல்கிறது.",
       "authority_scope": "traditional_reference",
       "source_work": "Periya Puranam",
       "presentation_policy": "reader-facing summary of traditional narrative; not independently verified biography"
@@ -32,7 +32,7 @@
       "saint_id": "nayanmar.03",
       "ordinal": 3,
       "hook_en": "Even after losing his wealth, he would not let a guest go unfed; one stormy night, tradition says he gathered sprouting grain from his own field to cook a meal.",
-      "hook_ta": "செல்வம் அனைத்தும் குறைந்த பின்னரும் விருந்தோம்பலை விடாதவர்; மழை இரவில் வயலில் முளைத்த நெல்லையே சேகரித்து அடியார்க்கு உணவு செய்தார் என மரபு கூறுகிறது.",
+      "hook_ta": "செல்வம் கரைந்தும் விருந்தோம்பல் குறையவில்லை. மழை கொட்டிய இரவில் வயலில் முளைத்த நெல்லைச் சேகரித்து அடியார்க்கு அமுது செய்தார் என்று மரபு கூறுகிறது.",
       "authority_scope": "traditional_reference",
       "source_work": "Periya Puranam",
       "presentation_policy": "reader-facing summary of traditional narrative; not independently verified biography"
@@ -41,7 +41,7 @@
       "saint_id": "nayanmar.04",
       "ordinal": 4,
       "hook_en": "A king famed for seeing the sacred in a devotee’s appearance, he is remembered for protecting even the assassin who approached him in an ascetic disguise.",
-      "hook_ta": "அடியார் வேடத்தையே மெய்ப்பொருளாக மதித்த மன்னன்; துறவி வேடத்தில் வந்த கொலையாளியைக் கூட அந்த வேடத்திற்காக காக்கச் சொன்னவர் என நினைவுகூரப்படுகிறார்.",
+      "hook_ta": "அடியார் வேடமே அவருக்கு மெய்ப்பொருள். அந்த வேடத்தில் வந்தவன் தன்னைத் தாக்கினாலும், அவனைப் பாதுகாப்பாக அனுப்பச் சொன்ன மன்னன் மெய்ப்பொருள் நாயனார் என்று பெரியபுராணம் கூறுகிறது.",
       "authority_scope": "traditional_reference",
       "source_work": "Periya Puranam",
       "presentation_policy": "reader-facing summary of traditional narrative; not independently verified biography"
@@ -50,7 +50,7 @@
       "saint_id": "nayanmar.05",
       "ordinal": 5,
       "hook_en": "Viranminda’s story makes a striking claim: reverence for Shiva’s devotees could be demanded even before reverence for famous saints themselves.",
-      "hook_ta": "சிவனடியார்க்கான மரியாதை புகழ்பெற்ற சைவச் சான்றோர்களுக்கான மரியாதைக்கும் முன் வர வேண்டும் என்ற தீவிர நிலைப்பாட்டால் விறன்மிண்டர் நினைவுகூரப்படுகிறார்.",
+      "hook_ta": "சிவனடியாரை வணங்காமல் நேராக இறைவனை நாடுவது அவருக்கு ஏற்றதல்ல. அடியார்க்கு மரியாதை முதலில் வர வேண்டும் என்ற உறுதியால் விறன்மிண்டர் நினைவில் நிற்கிறார்.",
       "authority_scope": "traditional_reference",
       "source_work": "Periya Puranam",
       "presentation_policy": "reader-facing summary of traditional narrative; not independently verified biography"
@@ -59,7 +59,7 @@
       "saint_id": "nayanmar.06",
       "ordinal": 6,
       "hook_en": "A simple loincloth entrusted to him becomes the centre of a miraculous weighing test in which he finally places himself and his family on the balance.",
-      "hook_ta": "ஒரு அடியார் ஒப்படைத்த கோவணம் தராசு சோதனையாக மாற, இறுதியில் தன்னையும் குடும்பத்தையும் தராசில் ஏற்றிய பக்திச் சம்பவத்தால் அமர்நீதி நாயனார் நினைவுகூரப்படுகிறார்.",
+      "hook_ta": "ஒரு அடியார் கொடுத்த கோவணம் காணாமல் போனது தராசுச் சோதனையாக மாறுகிறது. ஈடு கொடுக்க முடியாமல் இறுதியில் தன்னையும் குடும்பத்தையும் தராசில் ஏற்றியவர் அமர்நீதி நாயனார் என்று மரபு சொல்கிறது.",
       "authority_scope": "traditional_reference",
       "source_work": "Periya Puranam",
       "presentation_policy": "reader-facing summary of traditional narrative; not independently verified biography"
@@ -68,7 +68,7 @@
       "saint_id": "nayanmar.07",
       "ordinal": 7,
       "hook_en": "When a royal elephant destroyed a devotee’s flower offering, Eripathar’s fierce defence of that service led even the Chola king to offer his own life in atonement.",
-      "hook_ta": "அடியாரின் பூக்கூடை அரச யானையால் சேதமடைந்தபோது, அந்தத் தொண்டை காக்க எழுந்த எறிபத்தரின் தீவிரம் சோழ மன்னனையே தன் உயிரை ஈடாகக் கொடுக்க முனையச் செய்ததாக மரபு கூறுகிறது.",
+      "hook_ta": "அடியாரின் பூக்கூடை அரச யானை சிதைத்ததும் எறிபத்தர் வெகுண்டெழுந்தார். அந்தச் சம்பவம் சோழ மன்னனையே தன் உயிரை ஈடாக அளிக்க முனையச் செய்ததாக பெரியபுராணம் கூறுகிறது.",
       "authority_scope": "traditional_reference",
       "source_work": "Periya Puranam",
       "presentation_policy": "reader-facing summary of traditional narrative; not independently verified biography"
@@ -77,7 +77,7 @@
       "saint_id": "nayanmar.08",
       "ordinal": 8,
       "hook_en": "A renowned swordsman, he is remembered for refusing the fatal blow when an opponent used sacred ash to appear as a devotee of Shiva.",
-      "hook_ta": "போர்க்கலையில் வல்லவராக இருந்தும், எதிரி திருநீறு பூசி சிவனடியார் தோற்றம் எடுத்தவுடன் கொல்ல மறுத்தவர் என ஏனாதிநாதர் நினைவுகூரப்படுகிறார்.",
+      "hook_ta": "போரில் எதிரியை வெல்லத் தயங்காத ஏனாதிநாதர், எதிரி திருநீறு பூசி வந்ததும் ஆயுதத்தை நிறுத்தினார்; சிவனடியார் தோற்றத்தையே காயப்படுத்த மனமில்லை என்று மரபு கூறுகிறது.",
       "authority_scope": "traditional_reference",
       "source_work": "Periya Puranam",
       "presentation_policy": "reader-facing summary of traditional narrative; not independently verified biography"
@@ -86,7 +86,7 @@
       "saint_id": "nayanmar.09",
       "ordinal": 9,
       "hook_en": "The hunter Kannappar’s worship ignores formal ritual: meat, water carried in his mouth, and finally the offer of his own eyes become signs of absolute devotion in the traditional story.",
-      "hook_ta": "வேட்டுவனான கண்ணப்பரின் வழிபாடு ஆகம முறைகளை மீறியது; இறைச்சி, வாயில் கொண்டுவந்த நீர், இறுதியில் தன் கண்களையே அர்ப்பணிக்கத் துணிந்த அன்பு ஆகியவை அவரது கதையின் மையமாகின்றன.",
+      "hook_ta": "கண்ணப்பருக்கு ஆகம முறை தெரியாது; அன்பு மட்டும் தெரிந்தது. வேட்டையாடிய இறைச்சி, வாயில் கொண்டுவந்த நீர், இறுதியில் தன் கண்களையே சிவனுக்காக அர்ப்பணிக்கத் துணிந்த அன்புதான் அவரது கதையின் உயிர்.",
       "authority_scope": "traditional_reference",
       "source_work": "Periya Puranam",
       "presentation_policy": "reader-facing summary of traditional narrative; not independently verified biography"
@@ -95,7 +95,7 @@
       "saint_id": "nayanmar.10",
       "ordinal": 10,
       "hook_en": "Even in poverty he would not stop offering fragrant incense to Shiva; another famous tradition connects him with the leaning linga at Tiruppanandal.",
-      "hook_ta": "வறுமையிலும் சிவனுக்கு குங்கிலியத் தூபம் செலுத்தும் தொண்டை விடாதவர்; திருப்பனந்தாளில் சாய்ந்திருந்த லிங்கத்தைச் சார்ந்த பக்திக் கதையுடனும் அவர் தொடர்புபடுத்தப்படுகிறார்.",
+      "hook_ta": "வீட்டில் வறுமை இருந்தாலும் சிவனுக்கு குங்கிலியம் ஏற்றும் தொண்டு நின்றதில்லை. திருப்பனந்தாளில் சாய்ந்திருந்த லிங்கத்தைச் சார்ந்த பக்திச் சம்பவத்துடனும் குங்கிலியக் கலயர் நினைவில் நிற்கிறார்.",
       "authority_scope": "traditional_reference",
       "source_work": "Periya Puranam",
       "presentation_policy": "reader-facing summary of traditional narrative; not independently verified biography"
@@ -104,7 +104,7 @@
       "saint_id": "nayanmar.11",
       "ordinal": 11,
       "hook_en": "On his daughter’s wedding day, a devotee’s request for her hair became a test of whether service to Shiva’s devotees truly came before family pride.",
-      "hook_ta": "மகளின் திருமண நாளிலேயே அவளது கூந்தலை அடியார் ஒருவர் கேட்ட சம்பவம், குடும்பப் பெருமையை விட சிவனடியார் சேவை மேலா என்ற சோதனையாக மாணக்கஞ்சாறரின் கதையில் வருகிறது.",
+      "hook_ta": "மகளின் திருமண நாளில் ஒரு சிவனடியார் அவளது கூந்தலை கேட்டார். குடும்ப கௌரவத்தைவிட அடியார் சேவையே மேலென்று கருதிய மாணக்கஞ்சாறர் தயங்கவில்லை என்று பெரியபுராணம் கூறுகிறது.",
       "authority_scope": "traditional_reference",
       "source_work": "Periya Puranam",
       "presentation_policy": "reader-facing summary of traditional narrative; not independently verified biography"
@@ -113,7 +113,7 @@
       "saint_id": "nayanmar.12",
       "ordinal": 12,
       "hook_en": "When the food he had prepared for Shiva’s service was ruined, Arivattayar is remembered as being so stricken that the Lord had to stop his desperate act.",
-      "hook_ta": "சிவத்தொண்டுக்காக வைத்திருந்த உணவு கெட்டபோது, தாங்க முடியாத வருத்தத்தில் உயிரையே விட முனைந்த அவரை இறைவன் தடுத்ததாக அரிவாட்டாய நாயனாரின் மரபுக் கதை கூறுகிறது.",
+      "hook_ta": "சிவத்தொண்டுக்காக வைத்திருந்த உணவு கெட்டுப்போனதே அரிவாட்டாயருக்கு தாங்காத துயரம். அந்த வேதனையில் உயிரை விடத் துணிந்தபோது இறைவன் தடுத்தார் என்று மரபு கூறுகிறது.",
       "authority_scope": "traditional_reference",
       "source_work": "Periya Puranam",
       "presentation_policy": "reader-facing summary of traditional narrative; not independently verified biography"
@@ -122,7 +122,7 @@
       "saint_id": "nayanmar.13",
       "ordinal": 13,
       "hook_en": "Anaya was a cowherd and flute player; tradition says the five-syllabled name of Shiva flowed through his music so beautifully that even nature seemed to pause and listen.",
-      "hook_ta": "மாடுகளை மேய்த்த ஆனாயர் குழல் இசையில் நமச்சிவாயம் ஒலித்ததாகவும், அந்த இசையை கேட்க இயற்கையே நின்றதுபோல் அமைந்ததாகவும் மரபு கூறுகிறது.",
+      "hook_ta": "ஆனாயர் ஊதிய குழலில் ‘நமச்சிவாய’மே இசையாக ஒலித்தது; அதை கேட்டு உயிர்களும் இயற்கையும் நின்றதுபோல் அமைந்ததாக பெரியபுராணம் வர்ணிக்கிறது.",
       "authority_scope": "traditional_reference",
       "source_work": "Periya Puranam",
       "presentation_policy": "reader-facing summary of traditional narrative; not independently verified biography"
@@ -131,7 +131,7 @@
       "saint_id": "nayanmar.14",
       "ordinal": 14,
       "hook_en": "Denied sandalwood for worship, Murthi is remembered for rubbing his own arm on the stone rather than allowing Shiva’s sandal service to stop.",
-      "hook_ta": "சந்தனம் கிடைக்காதபோது சிவபூஜை நிற்கக் கூடாது என்று தன் கையையே சந்தனக்கல்லில் தேய்த்தவர் என மூர்த்தி நாயனார் நினைவுகூரப்படுகிறார்.",
+      "hook_ta": "சிவபூஜைக்கு சந்தனம் கிடைக்கவில்லை. பூஜை நின்றுவிடக் கூடாது என்பதற்காகத் தன் கையையே சந்தனக்கல்லில் தேய்த்தார் மூர்த்தி நாயனார் என்று மரபு கூறுகிறது.",
       "authority_scope": "traditional_reference",
       "source_work": "Periya Puranam",
       "presentation_policy": "reader-facing summary of traditional narrative; not independently verified biography"
@@ -140,7 +140,7 @@
       "saint_id": "nayanmar.15",
       "ordinal": 15,
       "hook_en": "Muruga Nayanar’s memorable path was not dramatic conquest but constancy: gathering flowers and making garlands for Shiva day after day.",
-      "hook_ta": "பெரும் அதிசயத்தை விட நாள்தோறும் மலர்கள் சேகரித்து சிவனுக்கு மாலை செய்வதில் நிலைத்த தொண்டே முருக நாயனாரின் நினைவுச் சின்னமாகிறது.",
+      "hook_ta": "முருக நாயனாரின் பெருமை ஒரு அதிசயத்தில் இல்லை; தினமும் மலர் சேகரித்து சிவனுக்கு மாலை சூட்டிய ஒழுங்கான தொண்டில்தான் என்று பெரியபுராண மரபு நினைவூட்டுகிறது.",
       "authority_scope": "traditional_reference",
       "source_work": "Periya Puranam",
       "presentation_policy": "reader-facing summary of traditional narrative; not independently verified biography"
@@ -149,7 +149,7 @@
       "saint_id": "nayanmar.16",
       "ordinal": 16,
       "hook_en": "Rudra Pasupathi is remembered standing in water and reciting the Sri Rudram with intense concentration—devotion expressed as disciplined repetition.",
-      "hook_ta": "நீரில் நின்றபடி ஸ்ரீருத்ரத்தை தீவிர ஒருமைப்பாட்டுடன் ஜபித்தவர் என உருத்திர பசுபதி நாயனார் நினைவுகூரப்படுகிறார்; ஒழுக்கமான திருப்பணியே அவரது வழி.",
+      "hook_ta": "நீரில் நின்றபடி ஸ்ரீருத்ரம் ஓதிய உருத்திர பசுபதியார், தீவிரமான ஜபமும் ஒழுக்கமான சிவபூஜையும் கொண்ட வாழ்வால் நினைவில் நிற்கிறார்.",
       "authority_scope": "traditional_reference",
       "source_work": "Periya Puranam",
       "presentation_policy": "reader-facing summary of traditional narrative; not independently verified biography"
@@ -158,7 +158,7 @@
       "saint_id": "nayanmar.17",
       "ordinal": 17,
       "hook_en": "Known as Nandanar, the devotee who kept saying he would go to Chidambaram ‘tomorrow’ is also linked to the beloved Tiruppungur tradition in which Nandi moves aside for his darshan.",
-      "hook_ta": "நந்தனார் எனப் பிரபலமான திருநாளைப்போவார், ‘நாளை போவேன்’ என்று சிதம்பர தரிசனத்தை ஏங்கியவர்; திருப்புங்கூரில் நந்தி விலகி தரிசனம் தந்த மரபுக் கதையுடனும் இணைகிறார்.",
+      "hook_ta": "‘நாளைச் சிதம்பரம் போவேன்’ என்ற ஏக்கம் அவருக்கு பெயராகவே நிலைத்தது. திருப்புங்கூரில் நந்தி விலகி தரிசனம் தந்ததும், சிதம்பரத்தை நோக்கிய நந்தனாரின் ஏக்கமும் அவரது கதையின் இதயம்.",
       "authority_scope": "traditional_reference",
       "source_work": "Periya Puranam",
       "presentation_policy": "reader-facing summary of traditional narrative; not independently verified biography"
@@ -167,7 +167,7 @@
       "saint_id": "nayanmar.18",
       "ordinal": 18,
       "hook_en": "A washerman devoted to serving Shiva’s devotees, he is remembered for trying to fulfil an entrusted task even when relentless rain made it impossible.",
-      "hook_ta": "சிவனடியார்களின் ஆடைகளைத் துவைத்து சேவை செய்த இவர், இடைவிடாத மழையால் பணியை முடிக்க முடியாதபோதும் தன் வாக்கை காப்பதற்காக தன்னைத் தண்டிக்க முனைந்தவர் என மரபு கூறுகிறது.",
+      "hook_ta": "சிவனடியார்களின் ஆடைகளைத் துவைப்பதே திருக்குறிப்புத் தொண்டரின் சேவை. மழையால் ஒரு அடியாரின் ஆடையை நேரத்தில் கொடுக்க முடியாமல் போனபோது, சொல் தவறியதற்கே தன்னைத் தண்டிக்க முனைந்தார் என்று மரபு கூறுகிறது.",
       "authority_scope": "traditional_reference",
       "source_work": "Periya Puranam",
       "presentation_policy": "reader-facing summary of traditional narrative; not independently verified biography"
@@ -176,7 +176,7 @@
       "saint_id": "nayanmar.19",
       "ordinal": 19,
       "hook_en": "As a boy he poured cows’ milk over a sand linga; when his father disrupted the worship, the fierce episode ended with Shiva receiving him as Chandesha, guardian of sacred offerings.",
-      "hook_ta": "சிறுவனாக மணல் லிங்கத்திற்கு பாலை அபிஷேகம் செய்த விசாரசருமரின் வழிபாட்டைத் தந்தை குலைத்த சம்பவம், இறுதியில் அவரைச் சண்டேசராக சிவன் ஏற்றுக் கொண்ட கதையாகப் பெரியபுராணத்தில் விளங்குகிறது.",
+      "hook_ta": "மணலில் செய்த சிவலிங்கத்துக்கு பால் அபிஷேகம் செய்த சிறுவன் விசாரசருமன். தந்தை அந்த வழிபாட்டைத் தடுத்த சம்பவத்திற்குப் பின் சிவன் அவரைச் சண்டேசராக ஏற்றார் என்று பெரியபுராணம் கூறுகிறது.",
       "authority_scope": "traditional_reference",
       "source_work": "Periya Puranam",
       "presentation_policy": "reader-facing summary of traditional narrative; not independently verified biography"
@@ -185,7 +185,7 @@
       "saint_id": "nayanmar.20",
       "ordinal": 20,
       "hook_en": "Appar’s life turns dramatically from Jain monk to Tēvāram saint; among the best-known traditions are the stone tied to him sinking while he floats safely, and his tireless temple-cleaning service with the uzhavāram.",
-      "hook_ta": "சமணத் துறவிலிருந்து தேவார நாயன்மாராக மாறிய அப்பரின் வாழ்க்கையில், கல்லுடன் கடலில் வீசப்பட்டும் மிதந்த சம்பவமும் உழவாரத்தால் கோயில்களைத் தூய்மைப்படுத்திய தொண்டும் புகழ்பெற்றவை.",
+      "hook_ta": "சமணத் துறவியிலிருந்து சிவபக்தரான அப்பரின் வாழ்க்கை முழுவதும் திருப்பம் நிறைந்தது. கல்லோடு கடலில் வீசப்பட்டும் உயிர் தப்பியது முதல் உழவாரத்தால் கோயில்களைச் சுத்தம் செய்த தொண்டு வரை—அவரது பாதை பாடலும் பணியும் சேர்ந்த ஒன்று.",
       "authority_scope": "traditional_reference",
       "source_work": "Periya Puranam",
       "presentation_policy": "reader-facing summary of traditional narrative; not independently verified biography"
@@ -194,7 +194,7 @@
       "saint_id": "nayanmar.21",
       "ordinal": 21,
       "hook_en": "As minister to the Pandya court, Kulachirai is remembered alongside Queen Mangayarkkarasi for sustaining Shaiva devotion and helping bring Sambandar to Madurai.",
-      "hook_ta": "பாண்டிய அரசவையின் அமைச்சரான குலச்சிறையார், மங்கையர்க்கரசியாருடன் இணைந்து சைவத்தை காத்து சம்பந்தரை மதுரைக்கு வரவழைத்த மரபில் முக்கிய இடம் பெறுகிறார்.",
+      "hook_ta": "பாண்டிய அரசவையில் சைவ மரபு மங்காதபடி காத்தவர் குலச்சிறையார். மங்கையர்க்கரசியாருடன் இணைந்து சம்பந்தரை மதுரைக்கு வரவழைத்ததில் அவர் முக்கிய பங்கு வகித்தார் என்று மரபு கூறுகிறது.",
       "authority_scope": "traditional_reference",
       "source_work": "Periya Puranam",
       "presentation_policy": "reader-facing summary of traditional narrative; not independently verified biography"
@@ -203,7 +203,7 @@
       "saint_id": "nayanmar.22",
       "ordinal": 22,
       "hook_en": "His devotion was directed especially toward Sundarar; tradition says Perumizhalai Kurumbar perceived Sundarar’s coming ascent and sought to reach Shiva before his beloved saint departed.",
-      "hook_ta": "சுந்தரர்மீது ஆழ்ந்த பக்தி கொண்ட பெருமிழலைக் குறும்பர், சுந்தரரின் கைலாசப் பயணத்தை முன்னரே உணர்ந்து தாமும் சிவபதம் அடைந்தார் என மரபு கூறுகிறது.",
+      "hook_ta": "சுந்தரர்மீது கொண்ட பக்தி பெருமிழலைக் குறும்பருக்கு அத்தனை ஆழமானது; சுந்தரரின் கைலாசப் பயணத்தை முன்கூட்டியே உணர்ந்து தாமும் சிவபதம் அடைந்தார் என்று பெரியபுராணம் கூறுகிறது.",
       "authority_scope": "traditional_reference",
       "source_work": "Periya Puranam",
       "presentation_policy": "reader-facing summary of traditional narrative; not independently verified biography"
@@ -212,7 +212,7 @@
       "saint_id": "nayanmar.23",
       "ordinal": 23,
       "hook_en": "Karaikkal Ammaiyar asked not for beauty but for a form fit for total renunciation; tradition famously pictures her travelling to Kailasa on her head rather than placing her feet on the sacred mountain.",
-      "hook_ta": "அழகை வேண்டாமல் முழுத் துறவுக்கேற்ற பேயுருவை வேண்டிய காரைக்கால் அம்மையார், கைலாச மண்ணில் கால்வைக்காமல் தலையால் நடந்துச் சென்றார் என மரபு புகழ்கிறது.",
+      "hook_ta": "அழகான உடல் வேண்டாம்; முழுத் துறவுக்கேற்ற பேயுருவே வேண்டும் என்று சிவனை வேண்டியவர் காரைக்கால் அம்மையார். கைலாச மண்ணை காலால் மிதிக்காமல் தலையால் நடந்துச் சென்றார் என்ற மரபு அவரது பக்தியின் தீவிரத்தைச் சொல்கிறது.",
       "authority_scope": "traditional_reference",
       "source_work": "Periya Puranam",
       "presentation_policy": "reader-facing summary of traditional narrative; not independently verified biography"
@@ -221,7 +221,7 @@
       "saint_id": "nayanmar.24",
       "ordinal": 24,
       "hook_en": "Long before meeting Appar, Appudhi Adigal had named his household charities after him; when tragedy struck during Appar’s visit, the story became one of service without self-display.",
-      "hook_ta": "அப்பரை நேரில் காணும் முன்பே தன் அறச்சாலைகள் அனைத்துக்கும் அவரது பெயரை வைத்த அப்பூதி அடிகள், அப்பர் வருகையிலே நேர்ந்த குடும்பத் துயரத்தையும் மறைத்து தொண்டை முன்னிலைப்படுத்தியவர் என நினைவுகூரப்படுகிறார்.",
+      "hook_ta": "அப்பரை ஒருபோதும் பார்த்திருக்காதபோதே தன் தண்ணீர்ப்பந்தல், அறச்சாலை எல்லாவற்றுக்கும் அவரது பெயரை வைத்தார் அப்பூதி அடிகள். அப்பர் வீட்டுக்கு வந்த நாளிலேயே குடும்பத் துயரம் நேர்ந்தபோதும் தொண்டை நிறுத்தவில்லை என்று பெரியபுராணம் கூறுகிறது.",
       "authority_scope": "traditional_reference",
       "source_work": "Periya Puranam",
       "presentation_policy": "reader-facing summary of traditional narrative; not independently verified biography"
@@ -230,7 +230,7 @@
       "saint_id": "nayanmar.25",
       "ordinal": 25,
       "hook_en": "When his wife instinctively blew away a spider threatening the linga, Nilanakkar first saw ritual impurity; the traditional story turns that moment into a lesson about intention and devotion.",
-      "hook_ta": "லிங்கத்தின் மேல் இருந்த சிலந்தியை அகற்ற மனைவி வாயால் ஊதியதை முதலில் ஆசாரக் குறையாகக் கண்ட நீலநக்கர், பின்னர் அன்பின் நோக்கம் ஆசார வடிவத்தை விட ஆழமானது என்பதை உணர்ந்தார் என மரபு கூறுகிறது.",
+      "hook_ta": "சிவலிங்கத்தின் மேல் இருந்த சிலந்தியை மனைவி வாயால் ஊதி அகற்றியதை முதலில் ஆசாரக் குறையாகக் கண்டார் நீலநக்கர். பின்னர் அன்பின் உள்ளார்ந்த நோக்கம் வெளிப்புற முறையைவிட உயர்ந்தது என்பதை உணர்ந்தார் என்று மரபு கூறுகிறது.",
       "authority_scope": "traditional_reference",
       "source_work": "Periya Puranam",
       "presentation_policy": "reader-facing summary of traditional narrative; not independently verified biography"
@@ -239,7 +239,7 @@
       "saint_id": "nayanmar.26",
       "ordinal": 26,
       "hook_en": "When oil was denied for temple lamps, Naminandi is remembered for lighting them with water—one of the most striking lamp-service miracles in Nayanmar tradition.",
-      "hook_ta": "கோயில் விளக்கிற்கு எண்ணெய் மறுக்கப்பட்டபோது நீரையே கொண்டு விளக்கேற்றினார் என நமிநந்தி அடிகள் பற்றிய புகழ்பெற்ற மரபுக் கதை கூறுகிறது.",
+      "hook_ta": "கோயில் விளக்குக்கு எண்ணெய் தர மறுத்தபோது நமிநந்தி அடிகள் நீரையே ஊற்றி விளக்கேற்றினார் என்று புகழ்பெற்ற மரபுக் கதை கூறுகிறது.",
       "authority_scope": "traditional_reference",
       "source_work": "Periya Puranam",
       "presentation_policy": "reader-facing summary of traditional narrative; not independently verified biography"
@@ -248,7 +248,7 @@
       "saint_id": "nayanmar.27",
       "ordinal": 27,
       "hook_en": "Sambandar enters the tradition as a small child fed divine milk by Uma at Sirkali; his first hymn begins immediately after, making poetry itself the sign of grace.",
-      "hook_ta": "சீர்காழியில் உமையம்மையால் ஞானப்பால் ஊட்டப்பட்ட சிறுவனாக சம்பந்தர் மரபில் தோன்றுகிறார்; அதனைத் தொடர்ந்து பிறந்த முதல் தேவாரப் பாடலே அருளின் அடையாளமாகக் கருதப்படுகிறது.",
+      "hook_ta": "சீர்காழியில் உமையம்மை ஊட்டிய ஞானப்பால்—அதிலிருந்தே சிறுவன் சம்பந்தரின் தேவாரப் பயணம் தொடங்குகிறது என்று மரபு சொல்கிறது. முதல் பாடலே அந்த அருளின் பதிலாக மலர்ந்தது.",
       "authority_scope": "traditional_reference",
       "source_work": "Periya Puranam",
       "presentation_policy": "reader-facing summary of traditional narrative; not independently verified biography"
@@ -257,7 +257,7 @@
       "saint_id": "nayanmar.28",
       "ordinal": 28,
       "hook_en": "Eyarkon Kalikamar’s fierce reverence made him outraged that Sundarar could use Shiva as a messenger; the story eventually turns conflict between devotees into reconciliation.",
-      "hook_ta": "சிவனைத் தூதராக அனுப்பிய சுந்தரரின் செயலை ஏற்க முடியாமல் கடும் கோபம் கொண்ட ஏயர்கோன் கலிக்காமரின் கதை, இறுதியில் இரு அடியார்களும் இணையும் சமரசமாக மாறுகிறது.",
+      "hook_ta": "சிவனைத் தூதராக அனுப்பிய சுந்தரரின் செயல் ஏயர்கோன் கலிக்காமருக்கு ஏற்றதாக இல்லை; அதனால் எழுந்த கோபமும், இறுதியில் இரு அடியார்களும் ஒன்றுபடும் சமரசமும் அவரது கதையின் மையம்.",
       "authority_scope": "traditional_reference",
       "source_work": "Periya Puranam",
       "presentation_policy": "reader-facing summary of traditional narrative; not independently verified biography"
@@ -266,7 +266,7 @@
       "saint_id": "nayanmar.29",
       "ordinal": 29,
       "hook_en": "Thirumular’s defining legend begins when a yogi enters the body of the dead cowherd Mulan so that his grieving cattle will not be abandoned; the Tirumantiram is then linked to his long meditation.",
-      "hook_ta": "இறந்த மூலன் என்ற இடையனின் உடலில் யோகி புகுந்தது, அவனது மாடுகள் துயரத்தில் தவிக்காமல் இருக்கவே என திருமூலர் மரபு கூறுகிறது; பின்னர் நீண்ட யோகநிலையுடன் திருமந்திரம் இணைக்கப்படுகிறது.",
+      "hook_ta": "இறந்த இடையன் மூலனின் உடலில் யோகி புகுந்தது, அவன் மாடுகள் துயரப்படாமல் இருக்கவே என்று திருமூலர் மரபு கூறுகிறது. அந்தச் சம்பவத்திலிருந்து தொடங்கி திருமந்திரத்துடன் இணையும் நீண்ட யோக மரபு உருவாகிறது.",
       "authority_scope": "traditional_reference",
       "source_work": "Periya Puranam",
       "presentation_policy": "reader-facing summary of traditional narrative; not independently verified biography"
@@ -275,7 +275,7 @@
       "saint_id": "nayanmar.30",
       "ordinal": 30,
       "hook_en": "Blind Dandi Adigal is remembered not for withdrawing from temple work but for undertaking the difficult restoration of a sacred tank despite his blindness.",
-      "hook_ta": "கண் பார்வையில்லாத தண்டியடிகள், அதனால் திருப்பணியை விட்டு விலகவில்லை; கோயில் குளத்தைத் திருத்திய கடினத் தொண்டால் நினைவுகூரப்படுகிறார்.",
+      "hook_ta": "கண் பார்வை இல்லாதது தண்டியடிகளின் திருப்பணிக்கு தடையாகவில்லை. கோயில் குளத்தைத் திருத்திய கடின உழைப்பால் அவர் நினைவில் நிற்கிறார்.",
       "authority_scope": "traditional_reference",
       "source_work": "Periya Puranam",
       "presentation_policy": "reader-facing summary of traditional narrative; not independently verified biography"
@@ -284,7 +284,7 @@
       "saint_id": "nayanmar.31",
       "ordinal": 31,
       "hook_en": "Muruga—better known as Murkha Nayanar in the tradition—used gambling winnings to feed Shiva’s devotees and reacted fiercely when opponents cheated.",
-      "hook_ta": "மூர்க்க நாயனார் சூதாட்டத்தில் பெற்ற பொருளை சிவனடியார்களுக்கு அமுது செய்யப் பயன்படுத்தியவர் என்றும், மோசடியை கடுமையாக எதிர்த்தவர் என்றும் மரபு நினைவுகூருகிறது.",
+      "hook_ta": "சூதாட்டத்தில் வென்ற பணத்தைத் தனக்காக வைத்துக்கொள்ளாமல் சிவனடியார்களுக்கு அமுது செய்யச் செலவிட்டவர் மூர்க்க நாயனார் என்று மரபு கூறுகிறது; ஆட்டத்தில் ஏமாற்றத்தையும் அவர் சகித்ததில்லை.",
       "authority_scope": "traditional_reference",
       "source_work": "Periya Puranam",
       "presentation_policy": "reader-facing summary of traditional narrative; not independently verified biography"
@@ -293,7 +293,7 @@
       "saint_id": "nayanmar.32",
       "ordinal": 32,
       "hook_en": "Somasi Mara wanted Shiva himself to accept the offering at his sacrifice; the traditional tale becomes memorable because the Lord arrives in a form the assembled ritualists did not expect.",
-      "hook_ta": "சோமாசிமாறர் நடத்திய யாகத்தில் சிவனே நேரில் வந்து அவிர்பாகம் ஏற்க வேண்டும் என விரும்பினார்; இறைவன் எதிர்பாராத சமூக வடிவில் வந்ததாகக் கூறும் சம்பவமே கதையின் மையம்.",
+      "hook_ta": "தான் செய்த யாகத்தில் சிவனே வந்து அவிர்பாகம் ஏற்க வேண்டும் என்பதே சோமாசிமாறரின் ஆசை. இறைவன் யாரும் எதிர்பாராத வேடத்தில் வந்தார் என்று பெரியபுராணம் கூறுகிறது.",
       "authority_scope": "traditional_reference",
       "source_work": "Periya Puranam",
       "presentation_policy": "reader-facing summary of traditional narrative; not independently verified biography"
@@ -302,7 +302,7 @@
       "saint_id": "nayanmar.33",
       "ordinal": 33,
       "hook_en": "Though associated with the Sakya path, he worshipped a linga by throwing a stone each day with love—turning an outwardly rough act into an inward offering.",
-      "hook_ta": "சாக்கிய மரபுடன் தொடர்புடையவராக இருந்தும், தினமும் அன்புடன் லிங்கத்தின் மீது கல்லை எறிந்து வழிபட்டார்; வெளியில் கடினமாகத் தோன்றிய செயல் உள்ளார்ந்த பூஜையாக மாறியது.",
+      "hook_ta": "சாக்கிய மரபில் இருந்தபோதும் தினமும் சிவலிங்கத்தை நோக்கிக் கல்லெறிந்தார் சாக்கிய நாயனார்; வெளியில் கல்லெறிதலாகத் தோன்றியது, அவரது உள்ளத்தில் அன்பான பூஜை என்று மரபு கூறுகிறது.",
       "authority_scope": "traditional_reference",
       "source_work": "Periya Puranam",
       "presentation_policy": "reader-facing summary of traditional narrative; not independently verified biography"
@@ -311,7 +311,7 @@
       "saint_id": "nayanmar.34",
       "ordinal": 34,
       "hook_en": "Sirappuli’s remembered form of devotion was expansive hospitality: feeding Shiva’s devotees and giving generously as a daily spiritual discipline.",
-      "hook_ta": "சிவனடியார்களுக்கு உணவளித்தலும் தானம் செய்தலும் நாள்தோறும் ஆன்மிக ஒழுக்கமாக இருந்த விருந்தோம்பலால் சிறப்புலி நாயனார் நினைவுகூரப்படுகிறார்.",
+      "hook_ta": "சிவனடியாருக்கு உணவும் உதவியும் அளிப்பது சிறப்புலியாருக்கு விசேஷ நாள் தொண்டு அல்ல; அன்றாட வாழ்க்கையே அது. அந்த இடைவிடாத விருந்தோம்பல்தான் அவரை நினைவில் நிறுத்துகிறது.",
       "authority_scope": "traditional_reference",
       "source_work": "Periya Puranam",
       "presentation_policy": "reader-facing summary of traditional narrative; not independently verified biography"
@@ -320,7 +320,7 @@
       "saint_id": "nayanmar.35",
       "ordinal": 35,
       "hook_en": "Siruthondar, traditionally identified with the general Paranjothi, faces one of the Periya Puranam’s most severe tests when a mysterious guest asks for an impossible meal involving his only son.",
-      "hook_ta": "பரஞ்சோதியார் என அடையாளப்படுத்தப்படும் சிறுத்தொண்டர், மர்மமான அடியார் ஒருவர் ஒரே மகனைச் சார்ந்த இயலாத விருந்தை கேட்டபோது பெரியபுராணத்தின் மிகக் கடுமையான பக்திச் சோதனைகளில் ஒன்றை எதிர்கொள்கிறார்.",
+      "hook_ta": "சிறுத்தொண்டர் எனப்படும் பரஞ்சோதியாரின் கதையில் வரும் சோதனை மிகக் கடினமானது: விருந்தினராக வந்த மர்மமான அடியார், அவரது ஒரே மகனைச் சார்ந்த இயலாத விருந்தைக் கேட்கிறார். பக்தி எவ்வளவு கடுமையாகச் சோதிக்கப்படுகிறது என்பதைச் சொல்லும் பெரியபுராணக் கதைகளில் இதுவும் ஒன்று.",
       "authority_scope": "traditional_reference",
       "source_work": "Periya Puranam",
       "presentation_policy": "reader-facing summary of traditional narrative; not independently verified biography"
@@ -329,7 +329,7 @@
       "saint_id": "nayanmar.36",
       "ordinal": 36,
       "hook_en": "Cheraman Perumal is remembered as king, poet and intimate friend of Sundarar; their companionship culminates in the famous tradition of their journey toward Kailasa.",
-      "hook_ta": "மன்னன், கவிஞன், சுந்தரரின் நெருங்கிய தோழன் எனச் சேரமான் பெருமாள் நினைவுகூரப்படுகிறார்; இருவரின் நட்பு கைலாசப் பயண மரபில் உச்சத்தை அடைகிறது.",
+      "hook_ta": "சேரமான் பெருமாள்—மன்னன், புலவர், சுந்தரரின் நெருங்கிய தோழன். இவர்களிருவரின் நட்பு கைலாசப் பயண மரபில் உச்சத்தை அடைகிறது.",
       "authority_scope": "traditional_reference",
       "source_work": "Periya Puranam",
       "presentation_policy": "reader-facing summary of traditional narrative; not independently verified biography"
@@ -338,7 +338,7 @@
       "saint_id": "nayanmar.37",
       "ordinal": 37,
       "hook_en": "Gananatha’s special service was to train and organise other devotees in the practical work of temple worship—devotion multiplied by teaching others how to serve.",
-      "hook_ta": "கோயில் திருப்பணிகளைச் செய்ய மற்ற அடியார்களைப் பயிற்றுவித்து ஒழுங்குபடுத்திய தொண்டே கணநாதரின் சிறப்பு; தானே செய்வதோடு பிறரையும் தொண்டில் உருவாக்கியவர்.",
+      "hook_ta": "தானே திருப்பணி செய்வதோடு நின்றவர் அல்ல கணநாதர்; மற்றவர்களையும் பயிற்றுவித்து கோயில் தொண்டில் ஈடுபடுத்தியவர். பிறரையும் தொண்டில் வளர்த்ததே அவரது தனிச்சிறப்பு.",
       "authority_scope": "traditional_reference",
       "source_work": "Periya Puranam",
       "presentation_policy": "reader-facing summary of traditional narrative; not independently verified biography"
@@ -347,7 +347,7 @@
       "saint_id": "nayanmar.38",
       "ordinal": 38,
       "hook_en": "A warrior-chief who desired royal consecration, Kootruva is remembered for accepting Shiva’s feet themselves as the only crown that ultimately mattered.",
-      "hook_ta": "அரச முடிசூட்டலை விரும்பிய வீரத் தலைவனான கூற்றுவர், இறுதியில் சிவனது திருவடிகளையே தமக்குரிய உண்மையான முடியாக ஏற்றவர் என மரபு நினைவுகூருகிறது.",
+      "hook_ta": "மன்னர்முடியை விரும்பிய கூற்றுவர், இறுதியில் சிவனின் திருவடிகளையே தன் உண்மையான முடியாக ஏற்றார் என்று பெரியபுராண மரபு கூறுகிறது.",
       "authority_scope": "traditional_reference",
       "source_work": "Periya Puranam",
       "presentation_policy": "reader-facing summary of traditional narrative; not independently verified biography"
@@ -356,7 +356,7 @@
       "saint_id": "nayanmar.39",
       "ordinal": 39,
       "hook_en": "After victory in war, Pugazh Chola saw a severed head with the marks of a Shiva devotee among the trophies; his horror and remorse transformed triumph into self-judgment.",
-      "hook_ta": "போர்வெற்றிக்குப் பின் கொண்டுவந்த தலைகளில் சிவனடியாரின் அடையாளம் கொண்ட தலையைக் கண்ட புகழ்ச்சோழர், வெற்றியை மகிழ்ச்சியாக அல்ல ஆழ்ந்த பாவச்சுமையாகக் கண்டார் என மரபு கூறுகிறது.",
+      "hook_ta": "போரில் வென்ற பின் கொண்டுவந்த தலைகளில் சிவனடியாரின் அடையாளம் தெரிந்ததும் புகழ்ச்சோழருக்கு வெற்றி மகிழ்ச்சியாக இல்லை; பெரும் பாவச்சுமையாக மாறியது என்று மரபு கூறுகிறது.",
       "authority_scope": "traditional_reference",
       "source_work": "Periya Puranam",
       "presentation_policy": "reader-facing summary of traditional narrative; not independently verified biography"
@@ -365,7 +365,7 @@
       "saint_id": "nayanmar.40",
       "ordinal": 40,
       "hook_en": "Narasinga Munaiyaraiyar, traditionally Sundarar’s foster-father, is remembered for honouring Shiva’s devotees without judging them by outward appearance.",
-      "hook_ta": "சுந்தரரின் வளர்ப்புத் தந்தையாக மரபில் கூறப்படும் நரசிங்க முனையரையர், அடியார்களின் வெளிப்புற தோற்றத்தை வைத்து மதிப்பிடாமல் அவர்களைப் போற்றியவர் என நினைவுகூரப்படுகிறார்.",
+      "hook_ta": "சுந்தரரின் வளர்ப்புத் தந்தை என்று மரபில் சொல்லப்படும் நரசிங்க முனையரையர், அடியாரை தோற்றம் பார்த்து மதிப்பிடாமல் மரியாதை செய்தவர் என்று நினைவில் நிற்கிறார்.",
       "authority_scope": "traditional_reference",
       "source_work": "Periya Puranam",
       "presentation_policy": "reader-facing summary of traditional narrative; not independently verified biography"
@@ -374,7 +374,7 @@
       "saint_id": "nayanmar.41",
       "ordinal": 41,
       "hook_en": "A fisherman, Adipathar offered the first catch of every day to Shiva; tradition says he released even a precious golden fish rather than break that vow.",
-      "hook_ta": "மீனவரான அதிபத்தர் தினமும் முதல் மீனை சிவனுக்காக விடுவித்தார்; பொன்னான அரிய மீன் கிடைத்தபோதும் விரதத்தை மீறாமல் அதையும் விட்டார் என மரபு கூறுகிறது.",
+      "hook_ta": "மீனவரான அதிபத்தர் தினம் பிடித்த முதல் மீனை சிவனுக்கென்று கடலிலே விட்டுவிடுவார். ஒருநாள் அரிய பொன் மீன் கிடைத்தபோதும் அந்த நேர்த்தியை மாற்றவில்லை என்று மரபு கூறுகிறது.",
       "authority_scope": "traditional_reference",
       "source_work": "Periya Puranam",
       "presentation_policy": "reader-facing summary of traditional narrative; not independently verified biography"
@@ -383,7 +383,7 @@
       "saint_id": "nayanmar.42",
       "ordinal": 42,
       "hook_en": "Kalikkambar’s story makes hospitality uncompromising: even hesitation in serving a Shiva devotee becomes a severe test of what equal reverence really means.",
-      "hook_ta": "சிவனடியார் சேவையில் சிறிதளவு தயக்கம்கூட இடம் பெறக்கூடாது என்ற கடுமையான அளவுகோலைக் காட்டும் கதையால் கலிக்கம்பர் நினைவுகூரப்படுகிறார்.",
+      "hook_ta": "சிவனடியாருக்கு செய்யும் சேவையில் தயக்கமே இருக்கக்கூடாது—கலிக்கம்பரின் பெரியபுராணக் கதை இந்தக் கடுமையான நெறியைத்தான் முன்வைக்கிறது.",
       "authority_scope": "traditional_reference",
       "source_work": "Periya Puranam",
       "presentation_policy": "reader-facing summary of traditional narrative; not independently verified biography"
@@ -392,7 +392,7 @@
       "saint_id": "nayanmar.43",
       "ordinal": 43,
       "hook_en": "When poverty threatened his temple-lamp service, Kaliya is remembered as ready to use his own life-blood rather than allow the light before Shiva to go out.",
-      "hook_ta": "வறுமையால் கோயில் விளக்கு அணைய நேர்ந்தபோதும், அது அணைய விடாமல் தன் உயிரையே எண்ணெயாக அர்ப்பணிக்கத் துணிந்தவர் என கலிய நாயனார் மரபில் நினைவுகூரப்படுகிறார்.",
+      "hook_ta": "கோயில் விளக்கு அணையப் போகிறது; எண்ணெய் வாங்க வழியில்லை. அப்போது தன் இரத்தத்தையே எண்ணெயாகக் கொடுக்கத் துணிந்தார் கலிய நாயனார் என்று மரபு கூறுகிறது.",
       "authority_scope": "traditional_reference",
       "source_work": "Periya Puranam",
       "presentation_policy": "reader-facing summary of traditional narrative; not independently verified biography"
@@ -401,7 +401,7 @@
       "saint_id": "nayanmar.44",
       "ordinal": 44,
       "hook_en": "Satti Nayanar represents the fierce edge of the tradition: he would not tolerate speech that insulted Shiva’s devotees.",
-      "hook_ta": "சிவனடியார்களை இழிவாகப் பேசுவதை எந்த நிலையிலும் பொறுக்காத கடுமையான பக்தியின் வடிவாக சத்தி நாயனார் மரபில் நினைவுகூரப்படுகிறார்.",
+      "hook_ta": "சிவனடியாரை இழிவாகப் பேசுவதை சத்தி நாயனார் ஒருபோதும் பொறுத்ததில்லை. அவரது கதை பக்தியின் கடுமையான முகத்தை வெளிப்படுத்துகிறது.",
       "authority_scope": "traditional_reference",
       "source_work": "Periya Puranam",
       "presentation_policy": "reader-facing summary of traditional narrative; not independently verified biography"
@@ -410,7 +410,7 @@
       "saint_id": "nayanmar.45",
       "ordinal": 45,
       "hook_en": "A Pallava ruler who renounced kingship, Aiyadigal Kadavarkon turned pilgrimage itself into literature, composing verses on Shiva’s sacred places.",
-      "hook_ta": "பல்லவ மன்னராக இருந்து ஆட்சியைத் துறந்த ஐயடிகள் காடவர்கோன், சிவத்தல யாத்திரையைப் பாடலாக மாற்றியவர் என நினைவுகூரப்படுகிறார்.",
+      "hook_ta": "அரியணையை விட்டுத் திருத்தலப் பயணத்தைத் தேர்ந்தெடுத்த பல்லவ மன்னன் ஐயடிகள் காடவர்கோன். சென்ற சிவத்தலங்களைப் பாடலாக்கியவர் என்று அவர் நினைவில் நிற்கிறார்.",
       "authority_scope": "traditional_reference",
       "source_work": "Periya Puranam",
       "presentation_policy": "reader-facing summary of traditional narrative; not independently verified biography"
@@ -419,7 +419,7 @@
       "saint_id": "nayanmar.46",
       "ordinal": 46,
       "hook_en": "Kanampulla sold what he could to keep temple lamps burning; when even lamp-wicks failed, tradition says he offered his own hair as the wick.",
-      "hook_ta": "கோயில் விளக்கு அணையாமல் இருக்க உடமைகளை விற்ற கணம்புல்லர், திரி கூட இல்லாதபோது தன் தலைமுடியையே திரியாக்க முனைந்தார் என மரபு கூறுகிறது.",
+      "hook_ta": "கோயில் விளக்கு அணையக்கூடாது என்பதற்காக உடமைகளை விற்றார் கணம்புல்லர். திரி கூட இல்லாதபோது தன் தலைமுடியையே திரியாக்க முனைந்தார் என்று மரபு கூறுகிறது.",
       "authority_scope": "traditional_reference",
       "source_work": "Periya Puranam",
       "presentation_policy": "reader-facing summary of traditional narrative; not independently verified biography"
@@ -428,7 +428,7 @@
       "saint_id": "nayanmar.47",
       "ordinal": 47,
       "hook_en": "Kari used his skill as a poet to win gifts from rulers, then redirected that wealth toward Shiva temples and the service of devotees.",
-      "hook_ta": "கவிதைத் திறனால் மன்னர்களிடமிருந்து பெற்ற செல்வத்தைத் தனக்காக அல்ல, சிவாலயங்களுக்கும் அடியார் சேவைக்கும் செலவிட்டவர் என காரி நாயனார் நினைவுகூரப்படுகிறார்.",
+      "hook_ta": "கவிதையால் மன்னர்களிடமிருந்து பெற்ற பொருளை தனக்காகச் சேர்க்காமல், சிவாலயங்களுக்கும் அடியார்ச் சேவைக்கும் செலவிட்டவர் காரி நாயனார் என்று மரபு கூறுகிறது.",
       "authority_scope": "traditional_reference",
       "source_work": "Periya Puranam",
       "presentation_policy": "reader-facing summary of traditional narrative; not independently verified biography"
@@ -437,7 +437,7 @@
       "saint_id": "nayanmar.48",
       "ordinal": 48,
       "hook_en": "The Pandya king Nedumaran stands at the centre of the Madurai conversion tradition, where Sambandar, Queen Mangayarkkarasi and Minister Kulachirai all intersect.",
-      "hook_ta": "மதுரையில் நடந்த சமய மாற்ற மரபின் மையத்தில் பாண்டிய மன்னன் நெடுமாறர் நிற்கிறார்; சம்பந்தர், மங்கையர்க்கரசியார், குலச்சிறையார் ஆகியோரின் கதைகள் இங்கே ஒன்றிணைகின்றன.",
+      "hook_ta": "மதுரையின் சமய மாற்றக் கதையில் நெடுமாற பாண்டியன் மையப் பாத்திரம். சம்பந்தர், மங்கையர்க்கரசியார், குலச்சிறையார்—மூவரின் மரபுக் கதைகளும் இவரிடம் வந்து சந்திக்கின்றன.",
       "authority_scope": "traditional_reference",
       "source_work": "Periya Puranam",
       "presentation_policy": "reader-facing summary of traditional narrative; not independently verified biography"
@@ -446,7 +446,7 @@
       "saint_id": "nayanmar.49",
       "ordinal": 49,
       "hook_en": "Vayilar’s temple had no stone walls at all: he is remembered for constructing and worshipping an elaborate shrine entirely within the mind.",
-      "hook_ta": "வாயிலார் கட்டிய கோயிலுக்கு கல் சுவர்கள் இல்லை; மனத்திற்குள் முழுமையான ஆலயத்தை அமைத்து அங்கேயே சிவனை வழிபட்டவர் என நினைவுகூரப்படுகிறார்.",
+      "hook_ta": "வாயிலாரின் கோயிலுக்கு கல்லும் சுவரும் இல்லை; மனமே ஆலயம். உள்ளத்தில் கோயிலை எழுப்பி அங்கேயே சிவனை வழிபட்டவர் என்று பெரியபுராணம் கூறுகிறது.",
       "authority_scope": "traditional_reference",
       "source_work": "Periya Puranam",
       "presentation_policy": "reader-facing summary of traditional narrative; not independently verified biography"
@@ -455,7 +455,7 @@
       "saint_id": "nayanmar.50",
       "ordinal": 50,
       "hook_en": "A warrior by profession, Munaiyaduvar is remembered for using what he earned through battle to support Shiva’s devotees rather than merely enrich himself.",
-      "hook_ta": "போர்தொழிலால் பெற்ற வருமானத்தைத் தனச் செல்வமாக அல்ல, சிவனடியார் சேவைக்குப் பயன்படுத்திய வீரராக முனையடுவார் நினைவுகூரப்படுகிறார்.",
+      "hook_ta": "போரில் பெற்ற கூலியைத் தன் செல்வமாகச் சேர்க்காமல், சிவனடியார்களின் தேவைக்குச் செலவிட்ட வீரர் முனையடுவார் என்று மரபு கூறுகிறது.",
       "authority_scope": "traditional_reference",
       "source_work": "Periya Puranam",
       "presentation_policy": "reader-facing summary of traditional narrative; not independently verified biography"
@@ -464,7 +464,7 @@
       "saint_id": "nayanmar.51",
       "ordinal": 51,
       "hook_en": "Kazharsinga’s royal story is bound to an uncompromising rule about flowers reserved for Shiva, showing how sacred ownership could override even palace privilege.",
-      "hook_ta": "சிவனுக்காக ஒதுக்கப்பட்ட மலரை அரச மாளிகை உரிமையும் மீற முடியாது என்ற கடுமையான நெறியோடு கழற்சிங்கரின் மரபுக் கதை இணைகிறது.",
+      "hook_ta": "சிவனுக்காக வைத்த மலருக்கு அரச மாளிகையிலும் விதிவிலக்கு இல்லை—கழற்சிங்கரின் கதை இந்தக் கடுமையான ஆலய நெறியைச் சுற்றியே அமைந்துள்ளது.",
       "authority_scope": "traditional_reference",
       "source_work": "Periya Puranam",
       "presentation_policy": "reader-facing summary of traditional narrative; not independently verified biography"
@@ -473,7 +473,7 @@
       "saint_id": "nayanmar.52",
       "ordinal": 52,
       "hook_en": "When a devotee was caught taking grain from the royal stores to feed Shiva’s servants, King Idangazhi responded not with punishment but by opening the granaries for that service.",
-      "hook_ta": "சிவனடியார்களுக்கு உணவளிக்க அரச களஞ்சியத்தில் இருந்து நெல் எடுத்த தொண்டரைத் தண்டிக்காமல், களஞ்சியத்தையே அந்தத் தொண்டுக்காகத் திறந்த மன்னன் இடங்கழியார் என மரபு கூறுகிறது.",
+      "hook_ta": "சிவனடியார்களுக்கு உணவளிக்க அரச களஞ்சியத்திலிருந்து நெல் எடுத்த தொண்டரை இடங்கழியார் தண்டிக்கவில்லை; மாறாக களஞ்சியத்தையே அந்தத் தொண்டுக்குத் திறந்தார் என்று மரபு கூறுகிறது.",
       "authority_scope": "traditional_reference",
       "source_work": "Periya Puranam",
       "presentation_policy": "reader-facing summary of traditional narrative; not independently verified biography"
@@ -482,7 +482,7 @@
       "saint_id": "nayanmar.53",
       "ordinal": 53,
       "hook_en": "Seruthunai’s fierce temple discipline centres on a flower reserved for Shiva and a queen who smelled it before offering—an episode meant to show absolute sacred exclusivity.",
-      "hook_ta": "சிவனுக்காக வைத்திருந்த மலரை அர்ப்பணிப்பதற்கு முன் அரசி முகர்ந்த சம்பவத்தைச் சுற்றியே செருத்துணையாரின் கடுமையான ஆலய ஒழுக்கக் கதை அமைந்துள்ளது.",
+      "hook_ta": "சிவனுக்காக வைத்த மலரை அர்ப்பணிப்பதற்கு முன் அரசி முகர்ந்தாள்; அந்த ஒரு சம்பவத்திலிருந்து செருத்துணையாரின் கடுமையான ஆலய ஒழுக்கக் கதை விரிகிறது.",
       "authority_scope": "traditional_reference",
       "source_work": "Periya Puranam",
       "presentation_policy": "reader-facing summary of traditional narrative; not independently verified biography"
@@ -491,7 +491,7 @@
       "saint_id": "nayanmar.54",
       "ordinal": 54,
       "hook_en": "Even in severe poverty, Pugazhthunai continued temple worship; tradition remembers divine help arriving as a daily coin when his strength had nearly failed.",
-      "hook_ta": "கடுமையான வறுமையிலும் கோயில் பூஜையை விடாத புகழ்த்துணையாருக்கு, உடல் சக்தி குறைந்தபோது தினமும் ஒரு நாணயம் அருளாகக் கிடைத்ததாக மரபு கூறுகிறது.",
+      "hook_ta": "வறுமை வந்தும் புகழ்த்துணையார் கோயில் பூஜையை விடவில்லை. உடல் வலிமை குறைந்தபோது தினமும் ஒரு நாணயம் இறையருளாகக் கிடைத்தது என்று மரபு கூறுகிறது.",
       "authority_scope": "traditional_reference",
       "source_work": "Periya Puranam",
       "presentation_policy": "reader-facing summary of traditional narrative; not independently verified biography"
@@ -500,7 +500,7 @@
       "saint_id": "nayanmar.55",
       "ordinal": 55,
       "hook_en": "Kotpuli, a military commander, had set aside grain specifically for Shiva’s devotees; the terrible family conflict that follows is remembered as an extreme story of a vow treated as inviolable.",
-      "hook_ta": "படைத்தளபதியான கோட்புலி, சிவனடியார்களுக்காக ஒதுக்கிய நெல்லை யாரும் தொடக்கூடாது என்ற விரதத்தை மாற்றமறக் காத்ததால் ஏற்பட்ட கடுமையான குடும்பச் சம்பவத்தால் நினைவுகூரப்படுகிறார்.",
+      "hook_ta": "சிவனடியார்களுக்கு என்று ஒதுக்கிய நெல்லை யாரும் தொடக்கூடாது என்பதில் கோட்புலி உறுதியாக இருந்தார். அந்த விரதத்தைச் சுற்றிய கடுமையான குடும்பச் சம்பவமே அவரது பெரியபுராணக் கதையின் மையம்.",
       "authority_scope": "traditional_reference",
       "source_work": "Periya Puranam",
       "presentation_policy": "reader-facing summary of traditional narrative; not independently verified biography"
@@ -509,7 +509,7 @@
       "saint_id": "nayanmar.56",
       "ordinal": 56,
       "hook_en": "Pusalar had no wealth to raise a stone temple, so he designed and consecrated one completely in his mind; tradition says Shiva chose that inner consecration over a king’s grand ceremony.",
-      "hook_ta": "கல் கோயில் கட்ட செல்வமில்லாத பூசலார், மனத்திற்குள் ஆலயத்தை முழுமையாகக் கட்டி கும்பாபிஷேகம் செய்தார்; மன்னனின் பிரமாண்ட விழாவை விட அந்த மனக்கோயில் விழாவையே சிவன் முன்னுரிமை தந்தார் என மரபு கூறுகிறது.",
+      "hook_ta": "கோயில் கட்டப் பணமில்லை; ஆனால் பூசலார் மனத்தில் ஒரு ஆலயத்தை எழுப்பினார். நாள் பார்த்து குடமுழுக்கையும் மனத்திலேயே நடத்தினார்; மன்னனின் பிரமாண்ட விழாவை விட இந்த மனக்கோயிலுக்கே சிவன் முன்னுரிமை தந்தார் என்று மரபு கூறுகிறது.",
       "authority_scope": "traditional_reference",
       "source_work": "Periya Puranam",
       "presentation_policy": "reader-facing summary of traditional narrative; not independently verified biography"
@@ -518,7 +518,7 @@
       "saint_id": "nayanmar.57",
       "ordinal": 57,
       "hook_en": "Queen Mangayarkkarasi is remembered for quietly sustaining Shaiva devotion at the Pandya court and, with Kulachirai, helping bring Sambandar to Madurai.",
-      "hook_ta": "பாண்டிய அரசவையில் சைவ பக்தியை உறுதியாகக் காத்த மங்கையர்க்கரசியார், குலச்சிறையாருடன் இணைந்து சம்பந்தரை மதுரைக்கு வரவழைத்தவர் என நினைவுகூரப்படுகிறார்.",
+      "hook_ta": "பாண்டிய அரசவையில் சைவ மரபு குன்றாமல் காத்தவர் மங்கையர்க்கரசியார். குலச்சிறையாருடன் இணைந்து சம்பந்தரை மதுரைக்கு வரவழைத்ததில் அவர் முக்கியப் பங்கு வகித்தார் என்று மரபு கூறுகிறது.",
       "authority_scope": "traditional_reference",
       "source_work": "Periya Puranam",
       "presentation_policy": "reader-facing summary of traditional narrative; not independently verified biography"
@@ -527,7 +527,7 @@
       "saint_id": "nayanmar.58",
       "ordinal": 58,
       "hook_en": "A weaver by profession, Nesa Nayanar turned his craft into worship by making and giving clothing to Shiva’s devotees.",
-      "hook_ta": "நெசவுத் தொழிலாளியான நேச நாயனார், தன் தொழிலையே திருத்தொண்டாக மாற்றி சிவனடியார்களுக்கு ஆடைகள் செய்து அளித்தவர்.",
+      "hook_ta": "நெசவுதான் நேச நாயனாரின் தொழில்; அதையே திருத்தொண்டாக மாற்றினார். சிவனடியார்களுக்கு ஆடைகள் நெய்து அளித்தவர் என்று பெரியபுராணம் கூறுகிறது.",
       "authority_scope": "traditional_reference",
       "source_work": "Periya Puranam",
       "presentation_policy": "reader-facing summary of traditional narrative; not independently verified biography"
@@ -536,7 +536,7 @@
       "saint_id": "nayanmar.59",
       "ordinal": 59,
       "hook_en": "Kochengat Chola is linked to the famous spider-and-elephant previous-birth tradition and to elevated māṭakkōvil temples designed so elephants could not enter.",
-      "hook_ta": "முந்தைய பிறவியில் சிலந்தி-யானை பக்திப் போட்டியுடன் கோச்செங்கட் சோழர் இணைக்கப்படுகிறார்; யானைகள் நுழைய முடியாத உயர்ந்த மாடக்கோயில்களை கட்டிய மன்னனாகவும் புகழ்பெற்றவர்.",
+      "hook_ta": "கோச்செங்கட் சோழரின் மரபுக் கதை முந்தைய பிறவியின் சிலந்தி–யானை பக்திப் போட்டியிலிருந்து தொடங்குகிறது. யானைகள் நுழைய முடியாத உயர்ந்த மாடக்கோயில்களை எழுப்பிய மன்னனாகவும் அவர் புகழப்படுகிறார்.",
       "authority_scope": "traditional_reference",
       "source_work": "Periya Puranam",
       "presentation_policy": "reader-facing summary of traditional narrative; not independently verified biography"
@@ -545,7 +545,7 @@
       "saint_id": "nayanmar.60",
       "ordinal": 60,
       "hook_en": "Thirunilakanta Yazhpanar carried the yāzh and travelled with Sambandar, giving us a vivid reminder that the Tēvāram world was sung and accompanied, not merely written.",
-      "hook_ta": "யாழை ஏந்தி சம்பந்தருடன் பயணித்த திருநீலகண்ட யாழ்ப்பாணர், தேவாரம் எழுதப்பட்ட இலக்கியம் மட்டுமல்ல—இசையுடன் வாழ்ந்த பாடல் மரபும் என்பதை நினைவூட்டுகிறார்.",
+      "hook_ta": "சம்பந்தருடன் யாழ் ஏந்திப் பயணித்தவர் திருநீலகண்ட யாழ்ப்பாணர். தேவாரம் வாசிக்கப்படும் நூல் மட்டும் அல்ல; இசையோடு வாழ்ந்த பாடல் மரபு என்பதையும் அவரது வாழ்க்கை நினைவூட்டுகிறது.",
       "authority_scope": "traditional_reference",
       "source_work": "Periya Puranam",
       "presentation_policy": "reader-facing summary of traditional narrative; not independently verified biography"
@@ -554,7 +554,7 @@
       "saint_id": "nayanmar.61",
       "ordinal": 61,
       "hook_en": "Sadaiya Nayanar is remembered as Sundarar’s father, showing that the Nayanmar tradition also sanctifies the household and lineage that nurtured a great devotee.",
-      "hook_ta": "சுந்தரரின் தந்தையான சடைய நாயனார், பெரும் அடியாரை உருவாக்கிய குடும்ப வாழ்வும் நாயன்மார் மரபில் புனிதமாக நினைவுகூரப்படுவதைக் காட்டுகிறார்.",
+      "hook_ta": "சுந்தரரின் தந்தை சடைய நாயனார். பெரிய அடியாரை வளர்த்த குடும்பமும் நாயன்மார் மரபில் புனித இடம் பெறுகிறது என்பதை அவரது சேர்க்கை நினைவூட்டுகிறது.",
       "authority_scope": "traditional_reference",
       "source_work": "Periya Puranam",
       "presentation_policy": "reader-facing summary of traditional narrative; not independently verified biography"
@@ -563,7 +563,7 @@
       "saint_id": "nayanmar.62",
       "ordinal": 62,
       "hook_en": "Isaignaniyar, Sundarar’s mother, is one of the women honoured among the 63—her place in the list turns motherhood and household devotion into part of the sacred lineage.",
-      "hook_ta": "சுந்தரரின் தாயாரான இசைஞானியார், அறுபத்து மூவரில் போற்றப்படும் பெண்களில் ஒருவர்; தாய்மையும் இல்லற பக்தியும் புனித மரபின் ஓர் அங்கம் என்பதை அவரது இடம் காட்டுகிறது.",
+      "hook_ta": "சுந்தரரின் தாயார் இசைஞானியார், அறுபத்து மூவரில் இடம்பெற்ற பெண்களில் ஒருவர். தாய்மையும் இல்லற பக்தியும் இந்த மரபில் தனித்த மதிப்பு பெறுகின்றன என்பதை அவரது இடம் சொல்கிறது.",
       "authority_scope": "traditional_reference",
       "source_work": "Periya Puranam",
       "presentation_policy": "reader-facing summary of traditional narrative; not independently verified biography"
@@ -572,7 +572,7 @@
       "saint_id": "nayanmar.63",
       "ordinal": 63,
       "hook_en": "Sundarar’s saintly journey begins, in tradition, when Shiva interrupts his wedding with an old palm-leaf claim that Sundarar is already his servant; their relationship thereafter is strikingly intimate and conversational.",
-      "hook_ta": "சுந்தரரின் திருமணத்தை சிவன் முதியவர் வேடத்தில் வந்து பழைய ஓலை ஆவணத்தால் நிறுத்தி, ‘இவன் எனது அடியான்’ என்று உரிமை கொண்டாடும் சம்பவத்திலிருந்து அவரது பக்திப் பயணம் தொடங்குகிறது என மரபு கூறுகிறது.",
+      "hook_ta": "திருமண மேடையில் இருந்த சுந்தரரை, முதியவர் வேடத்தில் வந்த சிவன் ஒரு பழைய ஓலையைக் காட்டி ‘இவன் என் அடியான்’ என்று உரிமை கொண்டாடுகிறார்—அங்கிருந்தே சுந்தரரின் பக்திப் பயணம் தொடங்குகிறது என்று பெரியபுராணம் கூறுகிறது.",
       "authority_scope": "traditional_reference",
       "source_work": "Periya Puranam",
       "presentation_policy": "reader-facing summary of traditional narrative; not independently verified biography"
