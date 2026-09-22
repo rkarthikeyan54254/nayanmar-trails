@@ -641,22 +641,32 @@ export default function App() {
       return routeStops.map((stop) => ({
         id: `mapped:${stop.siteId}`,
         name: stop.name,
-        detail: selectedIsManikkavasakar
-          ? `${stop.hymnIds.length} Tiruvācakam section locus${stop.hymnIds.length === 1 ? '' : 'i'}`
-          : `${stop.hymnIds.length} Tēvāram pathigam${stop.hymnIds.length === 1 ? '' : 's'}`,
+        detail: locale === 'ta'
+          ? selectedIsManikkavasakar
+            ? `${stop.hymnIds.length} திருவாசகப் பகுதிகள்`
+            : `${stop.hymnIds.length} தேவாரப் பதிகங்கள்`
+          : selectedIsManikkavasakar
+            ? `${stop.hymnIds.length} Tiruvācakam section locus${stop.hymnIds.length === 1 ? '' : 'i'}`
+            : `${stop.hymnIds.length} Tēvāram pathigam${stop.hymnIds.length === 1 ? '' : 's'}`,
         kind: 'exact_text_locus' as const,
         siteId: stop.siteId,
       }));
     }
     return traditionalPlaybackStops;
-  }, [routeStops, selectedIsManikkavasakar, traditionalPlaybackStops]);
+  }, [locale, routeStops, selectedIsManikkavasakar, traditionalPlaybackStops]);
 
   const playbackIsGeographic = routeStops.length >= 2;
-  const playbackKind = selectedIsManikkavasakar
-    ? 'Tirumurai 8 journey'
-    : playbackIsGeographic
-      ? 'Pilgrimage'
-      : 'Traditional place';
+  const playbackKind = locale === 'ta'
+    ? selectedIsManikkavasakar
+      ? 'திருமுறை 8 தல வரிசை'
+      : playbackIsGeographic
+        ? 'திருத்தலப் பயணம்'
+        : 'மரபில் வரும் தலங்கள்'
+    : selectedIsManikkavasakar
+      ? 'Tirumurai 8 journey'
+      : playbackIsGeographic
+        ? 'Pilgrimage'
+        : 'Traditional place';
 
   const districtCoverage = useMemo<CoveragePoint[]>(() => {
     if (!data) return [];
@@ -1460,7 +1470,7 @@ export default function App() {
         <div className="panel timeline">
           <div className="section-head">
             <div>
-              <h3>{playbackKind} playback</h3>
+              <h3>{locale === 'ta' ? playbackKind : `${playbackKind} playback`}</h3>
               <p>
                 {playbackIsGeographic
                   ? <><T>Follow the selected sthalams in an exploratory sequence.</T><b><T>The line is not a claimed ancient road.</T></b></>
