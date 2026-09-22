@@ -443,6 +443,123 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:1px solid 
 .major-temples button:hover{color:#f0c472}
 .major-temples svg{width:13px;height:13px;fill:#d9a44d}
 .major-temples small{color:#758c85;font-size:6px}
+.literary-place-highlight{
+  width:100%;
+  display:grid;
+  grid-template-columns:28px 1fr 12px;
+  gap:8px;
+  align-items:center;
+  margin:8px 0 3px;
+  padding:8px;
+  border:1px solid rgba(202,156,76,.3);
+  border-radius:8px;
+  background:linear-gradient(135deg,rgba(199,148,65,.1),rgba(5,28,37,.58));
+  color:#aebdb7;
+  text-align:left;
+  cursor:pointer;
+}
+.literary-place-highlight:hover{border-color:rgba(223,177,91,.58)}
+.literary-place-icon{
+  width:26px;height:26px;
+  display:grid;place-items:center;
+  border-radius:50%;
+  background:rgba(205,158,77,.1);
+}
+.literary-place-icon svg{width:16px;height:16px;fill:#e2ad50}
+.literary-place-highlight>span:nth-child(2){min-width:0}
+.literary-place-highlight small{
+  display:block;
+  color:#738d85;
+  font-size:5.3px;
+  letter-spacing:.11em;
+}
+.literary-place-highlight b{
+  display:block;
+  margin-top:2px;
+  color:#e3c17b;
+  font:700 10px "Cormorant Garamond",serif;
+}
+.literary-place-highlight em{
+  display:block;
+  color:#a5b3ad;
+  font:7px "Noto Serif Tamil","Cormorant Garamond",serif;
+  font-style:normal;
+}
+.literary-place-highlight strong{
+  display:block;
+  margin-top:3px;
+  color:#7e958e;
+  font-size:5.8px;
+  font-weight:500;
+}
+.literary-place-highlight>i{color:#d9aa55;font-style:normal}
+
+.literary-place-detail{
+  margin-top:10px;
+  padding:10px;
+  border:1px solid rgba(207,159,79,.24);
+  border-radius:9px;
+  background:linear-gradient(135deg,rgba(198,145,61,.07),rgba(3,21,29,.52));
+}
+.literary-place-detail>small{
+  color:#718a83;
+  font-size:5.5px;
+  letter-spacing:.14em;
+}
+.literary-place-detail h3{
+  margin:4px 0 0;
+  color:#e5c47f;
+  font:700 17px "Cormorant Garamond",serif;
+}
+.literary-place-detail .tamil{
+  margin-top:1px;
+  color:#b3bdb8;
+  font:8.2px "Noto Serif Tamil","Cormorant Garamond",serif;
+}
+.literary-place-detail>p{margin:7px 0;color:#8fa19b;font-size:7px;line-height:1.5}
+.literary-section-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:4px;
+  margin-top:7px;
+}
+.literary-section-grid span{
+  min-height:34px;
+  display:flex;
+  flex-direction:column;
+  padding:5px 6px;
+  border:1px solid rgba(70,135,145,.16);
+  border-radius:6px;
+  background:rgba(4,24,32,.64);
+  color:#758c85;
+  font-size:5.6px;
+}
+.literary-section-grid span.composition{
+  border-color:rgba(221,170,78,.42);
+  background:rgba(188,131,47,.08);
+  color:#c5a66b;
+}
+.literary-section-grid b{
+  color:#e0bc72;
+  font:700 10px "Cormorant Garamond",serif;
+}
+
+.contextual-hymn{
+  margin-top:10px;
+  padding:9px;
+  border:1px solid rgba(182,139,201,.24);
+  border-radius:8px;
+  background:linear-gradient(135deg,rgba(103,69,121,.09),rgba(4,22,30,.52));
+}
+.contextual-hymn .detail-section-head{margin-bottom:5px}
+.contextual-hymn .detail-section-head h3{font-size:14px}
+.contextual-hymn>p{
+  margin:5px 0;
+  color:#99aaa4;
+  font-size:7.2px;
+  line-height:1.5;
+}
+
 .journey-progress{margin:7px 0;color:#79918a;font-size:6.5px}
 .journey-progress>div:first-child{display:flex;justify-content:space-between}
 .journey-progress b{color:#ceb06f;font:600 9px "Cormorant Garamond",serif}
