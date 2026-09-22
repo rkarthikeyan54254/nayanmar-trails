@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 import { GEO_SEEDS, TAMIL_NADU_SCHEMATIC } from './geometry';
 import { DISTRICT_CENTROIDS, normalizeDistrict } from './coverage';
@@ -98,20 +98,35 @@ function authorityLabel(scope: string) {
   return scope.replace(/_/g, ' ');
 }
 
+function identificationLabel(status: string) {
+  if (status === 'traditional_talam_not_assumed_single_modern_temple') {
+    return 'Traditional talam; no single modern temple identity is asserted.';
+  }
+  return status
+    .replace(/_/g, ' ')
+    .replace(/^./, (letter) => letter.toUpperCase());
+}
+
 function cleanLabel(label: string) {
-  return label.replace(/\s*\([^)]*\)/g, '').trim();
+  return label
+    .replace(/\s*\([^)]*\)/g, '')
+    .replace(/\s*\[[^\]]*\]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
 }
 
 function modernShort(value: string | null | undefined) {
   if (!value) return '';
   let current = value.trim().replace(/^\([^)]*\)\s*/, '');
   if (current.includes('[[')) current = current.split('[[')[0].trim();
+  current = current.replace(/\s*\[[^\]]*\]\s*$/, '').trim();
   const beforeParen = current.split('(')[0].trim();
   return beforeParen || current;
 }
 
 function siteDisplayName(site: Site) {
-  return modernShort(site.modern_name_nic) || cleanLabel(site.label);
+  const mapped = GEO_SEEDS.find((seed) => seed.siteId === site.site_id);
+  return mapped?.name || modernShort(site.modern_name_nic) || cleanLabel(site.label);
 }
 
 export default function App() {
@@ -120,13 +135,39 @@ export default function App() {
   const [selectedSaintId, setSelectedSaintId] = useState(
     () => new URLSearchParams(window.location.search).get('saint') || 'nayanmar.20',
   );
-  const [selectedSiteId, setSelectedSiteId] = useState('tevaram_site.KV01');
+  const [selectedSiteId, setSelectedSiteId] = useState(() => {
+    const site = new URLSearchParams(window.location.search).get('site');
+    return site ? (site.startsWith('tevaram_site.') ? site : `tevaram_site.${site}`) : 'tevaram_site.KV01';
+  });
   const [mode, setMode] = useState<EvidenceMode>('all');
-  const [tab, setTab] = useState<DetailTab>('visits');
+  const [tab, setTab] = useState<DetailTab>(() => {
+    const value = new URLSearchParams(window.location.search).get('tab');
+    return value === 'hymns' || value === 'chronology' || value === 'evidence' ? value : 'visits';
+  });
   const [playing, setPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
-  const [graphOpen, setGraphOpen] = useState(false);
+  const [graphOpen, setGraphOpen] = useState(
+    () => new URLSearchParams(window.location.search).get('graph') === '1',
+  );
   const [query, setQuery] = useState('');
+  const didInitSaintSelection = useRef(false);
+  const preserveInitialSiteDeepLink = useRef(
+    Boolean(new URLSearchParams(window.location.search).get('site')),
+  );
+
+  useEffect(() => {
+    if (!graphOpen) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setGraphOpen(false);
+    };
+    document.addEventListener('keydown', onKeyDown);
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.removeEventListener('keydown', onKeyDown);
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [graphOpen]);
 
   useEffect(() => {
     Promise.all([
@@ -358,7 +399,7 @@ export default function App() {
       }))
       .filter((item): item is { site: Site; count: number } => Boolean(item.site))
       .sort((a, b) => b.count - a.count || b.site.patikam_count - a.site.patikam_count)
-      .slice(0, 6);
+      .slice(0, 12);
   }, [selectedIsManikkavasakar, siteById, siteLinks, tirumurai8]);
 
   const selectedSite = siteById.get(selectedSiteId) ?? null;
@@ -408,6 +449,11 @@ export default function App() {
   useEffect(() => {
     setProgress(0);
     setPlaying(false);
+    if (didInitSaintSelection.current) {
+      setTab('visits');
+    } else {
+      didInitSaintSelection.current = true;
+    }
   }, [selectedSaintId]);
 
   useEffect(() => {
@@ -415,6 +461,17 @@ export default function App() {
     setSelectedSiteId(tirumurai8.loci[0].site_entity_id);
     setTab('visits');
   }, [selectedIsManikkavasakar, tirumurai8]);
+
+  useEffect(() => {
+    if (!playbackIsGeographic || !routeStops.length) return;
+    if (preserveInitialSiteDeepLink.current) {
+      preserveInitialSiteDeepLink.current = false;
+      return;
+    }
+    const active = routeStops[Math.min(progress, routeStops.length - 1)];
+    if (!active) return;
+    setSelectedSiteId(`tevaram_site.${active.siteId}`);
+  }, [playbackIsGeographic, progress, routeStops, selectedSaintId]);
 
   useEffect(() => {
     if (!playing || playbackStops.length < 2) return;
@@ -458,6 +515,7 @@ export default function App() {
   const selectedGeoSeed = selectedSite
     ? GEO_SEEDS.find((seed) => seed.siteId === selectedSite.site_id)
     : undefined;
+  const showTraditionalDetail = !selectedIsManikkavasakar && !playbackIsGeographic;
 
   return (
     <main className="app">
@@ -475,8 +533,19 @@ export default function App() {
           <button onClick={() => document.querySelector('.timeline')?.scrollIntoView({ behavior: 'smooth' })}>Timeline</button>
           <button onClick={() => setTab('visits')}>Temples</button>
           <button onClick={() => setTab('hymns')}>Hymns</button>
-          <button onClick={() => setGraphOpen(true)}>Routes</button>
-          <button onClick={() => setTab('evidence')}>Stories</button>
+          <button
+            onClick={() => {
+              if (showTraditionalDetail) {
+                document.querySelector('.timeline')?.scrollIntoView({ behavior: 'smooth' });
+              } else {
+                setGraphOpen(true);
+              }
+            }}
+            title={showTraditionalDetail ? 'No mapped route is asserted; open tradition playback below' : 'Open talam connections'}
+          >
+            Routes
+          </button>
+          <button onClick={() => setTab('evidence')}>Evidence</button>
         </nav>
 
         <div className="header-search">
@@ -566,7 +635,13 @@ export default function App() {
 
       <section className="filters">
         <Filter label="Saint">
-          <select value={selectedSaintId} onChange={(event) => setSelectedSaintId(event.target.value)}>
+          <select
+            value={selectedSaintId}
+            onChange={(event) => {
+              setSelectedSaintId(event.target.value);
+              setGraphOpen(false);
+            }}
+          >
             <optgroup label="Naalvar">
               <option value="nayanmar.20">Appar · Tirunavukkarasar</option>
               <option value="nayanmar.27">Sambandar</option>
@@ -583,27 +658,24 @@ export default function App() {
           </select>
         </Filter>
 
-        <Filter label="Century">
-          <select defaultValue="unasserted">
-            <option value="unasserted">Not asserted in v1</option>
-          </select>
-        </Filter>
+        <div className="naalvar-switcher" aria-label="Naalvar quick selection">
+          <span>Naalvar</span>
+          {NAALVAR.map((id) => (
+            <button
+              key={id}
+              className={selectedSaintId === id ? 'active' : ''}
+              onClick={() => {
+                setSelectedSaintId(id);
+                setGraphOpen(false);
+              }}
+            >
+              {id === MANIKKAVASAKAR_ID ? 'Manikkavasakar' : SAINT_EN[id]?.split(' · ')[0]}
+            </button>
+          ))}
+        </div>
 
-        <Filter label="Region">
-          <select defaultValue="tn">
-            <option value="tn">Tamil Nadu</option>
-          </select>
-        </Filter>
-
-        <Filter label="Evidence lens">
-          <select value={mode} onChange={(event) => setMode(event.target.value as EvidenceMode)}>
-            {(Object.keys(MODE_COPY) as EvidenceMode[]).map((item) => (
-              <option key={item} value={item}>{MODE_COPY[item].label}</option>
-            ))}
-          </select>
-        </Filter>
-
-        <div className="mode-pills">
+        <div className="mode-pills" aria-label="Evidence lens">
+          <span className="mode-label">Evidence</span>
           {(Object.keys(MODE_COPY) as EvidenceMode[]).map((item) => (
             <button
               key={item}
@@ -677,22 +749,61 @@ export default function App() {
 
           <div className="major-temples">
             <div className="section-title">
-              <h3>{selectedIsManikkavasakar ? 'Tirumurai 8 textual loci' : 'Major linked talams'}</h3>
-              <span>{selectedIsManikkavasakar ? tirumurai8.loci.length : siteLinks.size} total</span>
+              <h3>
+                {showTraditionalDetail
+                  ? 'Traditional place claims'
+                  : selectedIsManikkavasakar
+                    ? 'Tirumurai 8 textual loci'
+                    : 'Major linked talams'}
+              </h3>
+              <span>
+                {showTraditionalDetail
+                  ? traditionalPlaybackStops.length
+                  : selectedIsManikkavasakar
+                    ? tirumurai8.loci.length
+                    : siteLinks.size} total
+              </span>
             </div>
-            {topLinkedSites.map(({ site, count }) => (
-              <button
-                key={site.id}
-                onClick={() => {
-                  setSelectedSiteId(site.id);
-                  setTab('visits');
-                }}
-              >
-                <GopuramIcon />
-                <span>{siteDisplayName(site)}</span>
-                <small>{count}</small>
-              </button>
-            ))}
+            {showTraditionalDetail ? (
+              traditionalPlaybackStops.slice(0, 6).map((stop, index) => (
+                <button
+                  key={stop.id}
+                  className={index === progress ? 'active-tradition-place' : ''}
+                  onClick={() => {
+                    setProgress(index);
+                    setTab('visits');
+                  }}
+                >
+                  <i className="tradition-place-dot" />
+                  <span className="major-talam-copy">
+                    <b>{stop.name}</b>
+                    <em>{stop.detail}</em>
+                  </span>
+                  <small>{index + 1}</small>
+                </button>
+              ))
+            ) : (
+              topLinkedSites.slice(0, 6).map(({ site, count }) => {
+                const primary = siteDisplayName(site);
+                const canonical = cleanLabel(site.label);
+                return (
+                  <button
+                    key={site.id}
+                    onClick={() => {
+                      setSelectedSiteId(site.id);
+                      setTab('visits');
+                    }}
+                  >
+                    <GopuramIcon />
+                    <span className="major-talam-copy">
+                      <b>{primary}</b>
+                      {canonical.toLowerCase() !== primary.toLowerCase() && <em>{canonical}</em>}
+                    </span>
+                    <small>{count}</small>
+                  </button>
+                );
+              })
+            )}
           </div>
 
           <div className="journey-progress">
@@ -737,7 +848,7 @@ export default function App() {
             progress={progress}
             epigraphicSiteIds={epigraphicSiteIds}
             travelerImage={saintMedia?.src}
-            showUnlinkedExemplars={playbackIsGeographic}
+            showUnlinkedExemplars={false}
             onSelect={(siteId) => {
               setSelectedSiteId(siteId);
               setTab('visits');
@@ -771,143 +882,145 @@ export default function App() {
             </div>
           )}
 
-          {graphOpen && (
-            <div className="overlay">
-              <div className="overlay-head">
-                <div>
-                  <small>{selectedIsManikkavasakar ? 'NAALVAR · TIRUMURAI 8' : 'SELECTED NAYANMAR'}</small>
-                  <h3>{selectedIsManikkavasakar ? 'Tirumurai 8 ↔ Talam Loci' : 'Saint ↔ Talam Connections'}</h3>
-                </div>
-                <button onClick={() => setGraphOpen(false)}>Close</button>
-              </div>
-              <Network
-                saint={saint}
-                centerLabel={selectedIsManikkavasakar ? 'M' : undefined}
-                sites={topLinkedSites.slice(0, 12)}
-              />
-              <p>
-                {selectedIsManikkavasakar
-                  ? 'Edges show the explicitly qualified Tiruvācakam section-to-locus mappings in this pinned product snapshot. They are not a biographical itinerary.'
-                  : 'Edges are Tēvāram author → patikam → talam relationships from the versioned Pramāṇa export. Layout position has no evidentiary meaning.'}
-              </p>
-            </div>
-          )}
         </section>
 
         <aside className="panel detail-card">
-          <div className="tabs">
-            {(['hymns', 'chronology', 'visits', 'evidence'] as DetailTab[]).map((item) => (
-              <button
-                key={item}
-                className={tab === item ? 'active' : ''}
-                onClick={() => setTab(item)}
-              >
-                {item === 'visits'
-                  ? selectedIsManikkavasakar ? 'Textual Loci' : 'Temple Visits'
-                  : item[0].toUpperCase() + item.slice(1)}
-              </button>
-            ))}
+          <div className={`tabs ${showTraditionalDetail ? 'three-tabs' : ''}`}>
+            {showTraditionalDetail ? (
+              (['visits', 'chronology', 'evidence'] as DetailTab[]).map((item) => (
+                <button
+                  key={item}
+                  className={tab === item ? 'active' : ''}
+                  onClick={() => setTab(item)}
+                >
+                  {item === 'visits' ? 'Tradition' : item[0].toUpperCase() + item.slice(1)}
+                </button>
+              ))
+            ) : (
+              (['hymns', 'chronology', 'visits', 'evidence'] as DetailTab[]).map((item) => (
+                <button
+                  key={item}
+                  className={tab === item ? 'active' : ''}
+                  onClick={() => setTab(item)}
+                >
+                  {item === 'visits'
+                    ? selectedIsManikkavasakar ? 'Textual Loci' : 'Temple Visits'
+                    : item[0].toUpperCase() + item.slice(1)}
+                </button>
+              ))
+            )}
           </div>
 
           <div className="detail">
-            <div className={`temple-visual ${templeMedia ? 'has-photo' : ''}`}>
-              {templeMedia ? (
-                <img src={templeMedia.src} alt="" />
-              ) : (
-                <div className="temple-art"><GopuramIcon /></div>
-              )}
-              <div className="temple-shade" />
-              <div className="temple-title">
-                <small>CURRENT TALAM</small>
-                <h2>{selectedSite ? siteDisplayName(selectedSite) : 'Select a talam'}</h2>
-                <p>{selectedSite ? `${cleanLabel(selectedSite.label)}${selectedSite.label_ta ? ` · ${selectedSite.label_ta}` : ''}` : ''}</p>
-              </div>
-              {templeMedia && (
-                <span className="temple-credit">{templeMedia.source} · {templeMedia.license}</span>
-              )}
-            </div>
-
-            {selectedSite && (
+            {showTraditionalDetail ? (
+              <TraditionalPlaceDetail
+                saintName={saintName}
+                stop={activePlaybackStop}
+                total={traditionalPlaybackStops.length}
+                tab={tab}
+              />
+            ) : (
               <>
-                <div className="chips">
-                  <span>{selectedSite.site_id}</span>
-                  <span>{selectedSite.patikam_count} site patikams</span>
-                  {selectedIsManikkavasakar ? (
-                    <span>
-                      {selectedTirumurai8Locus
-                        ? `${selectedTirumurai8Locus.section_numbers.length} Tiruvācakam section ${selectedTirumurai8Locus.section_numbers.length === 1 ? 'locus' : 'loci'}`
-                        : 'no mapped Tirumurai 8 locus'}
-                    </span>
+                <div className={`temple-visual ${templeMedia ? 'has-photo' : ''}`}>
+                  {templeMedia ? (
+                    <img src={templeMedia.src} alt="" />
                   ) : (
-                    <span>{selectedPatikams.length} by {saintName.split(' · ')[0]}</span>
+                    <div className="temple-art"><GopuramIcon /></div>
+                  )}
+                  <div className="temple-shade" />
+                  <div className="temple-title">
+                    <small>CURRENT TALAM</small>
+                    <h2>{selectedSite ? siteDisplayName(selectedSite) : 'Select a talam'}</h2>
+                    <p>{selectedSite ? `${cleanLabel(selectedSite.label)}${selectedSite.label_ta ? ` · ${selectedSite.label_ta}` : ''}` : ''}</p>
+                  </div>
+                  {templeMedia && (
+                    <span className="temple-credit">{templeMedia.source} · {templeMedia.license}</span>
                   )}
                 </div>
 
-                {selectedIsManikkavasakar ? (
+                {selectedSite && (
                   <>
-                    {(tab === 'visits' || tab === 'hymns') && (
-                      <Tirumurai8LocusDetail
-                        locus={selectedTirumurai8Locus}
-                        view={tab}
+                    <div className="chips">
+                      <span>{selectedSite.site_id}</span>
+                      <span>{selectedSite.patikam_count} site patikams</span>
+                      {selectedIsManikkavasakar ? (
+                        <span>
+                          {selectedTirumurai8Locus
+                            ? `${selectedTirumurai8Locus.section_numbers.length} Tiruvācakam section ${selectedTirumurai8Locus.section_numbers.length === 1 ? 'locus' : 'loci'}`
+                            : 'no mapped Tirumurai 8 locus'}
+                        </span>
+                      ) : (
+                        <span>{selectedPatikams.length} by {saintName.split(' · ')[0]}</span>
+                      )}
+                    </div>
+
+                    {selectedIsManikkavasakar ? (
+                      <>
+                        {(tab === 'visits' || tab === 'hymns') && (
+                          <Tirumurai8LocusDetail
+                            locus={selectedTirumurai8Locus}
+                            view={tab}
+                          />
+                        )}
+                        {tab === 'chronology' && (
+                          <Tirumurai8Chronology snapshot={tirumurai8} />
+                        )}
+                        {tab === 'evidence' && (
+                          <Tirumurai8Evidence
+                            locus={selectedTirumurai8Locus}
+                            site={selectedSite}
+                            snapshot={tirumurai8}
+                          />
+                        )}
+                      </>
+                    ) : (
+                      <>
+                        {tab === 'visits' && (
+                          <Visits
+                            site={selectedSite}
+                            saintName={saintName}
+                            count={selectedPatikams.length}
+                            patikamIds={selectedPatikams}
+                            patikamById={patikamById}
+                          />
+                        )}
+                        {tab === 'hymns' && (
+                          <Hymns ids={selectedPatikams} patikamById={patikamById} />
+                        )}
+                        {tab === 'chronology' && <Chronology />}
+                        {tab === 'evidence' && <Evidence site={selectedSite} data={data} />}
+                      </>
+                    )}
+
+                    <div className="temple-facts">
+                      <Fact label="Traditional class" value={selectedSite.traditional_location_class || 'Not supplied'} />
+                      <Fact label="Modern catalog" value={selectedSite.modern_name_nic || selectedSite.district || 'Not supplied'} />
+                      <Fact label="Map geometry" value={selectedGeoSeed ? 'Exact modern centroid exemplar' : 'District-level corpus context only'} />
+                      <Fact
+                        label="Selected-saint evidence"
+                        value={
+                          selectedIsManikkavasakar
+                            ? selectedTirumurai8Locus
+                              ? 'Tirumurai 8 textual locus'
+                              : 'No mapped Tirumurai 8 locus'
+                            : authorityLabel(selectedSite.authority_scope)
+                        }
                       />
-                    )}
-                    {tab === 'chronology' && (
-                      <Tirumurai8Chronology snapshot={tirumurai8} />
-                    )}
-                    {tab === 'evidence' && (
-                      <Tirumurai8Evidence
-                        locus={selectedTirumurai8Locus}
-                        site={selectedSite}
-                        snapshot={tirumurai8}
-                      />
-                    )}
-                  </>
-                ) : (
-                  <>
-                    {tab === 'visits' && (
-                      <Visits
-                        site={selectedSite}
-                        saintName={saintName}
-                        count={selectedPatikams.length}
-                        patikamIds={selectedPatikams}
-                        patikamById={patikamById}
-                      />
-                    )}
-                    {tab === 'hymns' && (
-                      <Hymns ids={selectedPatikams} patikamById={patikamById} />
-                    )}
-                    {tab === 'chronology' && <Chronology />}
-                    {tab === 'evidence' && <Evidence site={selectedSite} data={data} />}
+                    </div>
+
+                    <button
+                      className="focus"
+                      onClick={() =>
+                        document.querySelector('.map-card')?.scrollIntoView({
+                          behavior: 'smooth',
+                          block: 'center',
+                        })
+                      }
+                    >
+                      <GopuramIcon /> View on static map →
+                    </button>
                   </>
                 )}
-
-                <div className="temple-facts">
-                  <Fact label="Traditional class" value={selectedSite.traditional_location_class || 'Not supplied'} />
-                  <Fact label="Modern catalog" value={selectedSite.modern_name_nic || selectedSite.district || 'Not supplied'} />
-                  <Fact label="Map geometry" value={selectedGeoSeed ? 'Exact modern centroid exemplar' : 'District-level corpus context only'} />
-                  <Fact
-                    label="Selected-saint evidence"
-                    value={
-                      selectedIsManikkavasakar
-                        ? selectedTirumurai8Locus
-                          ? 'Tirumurai 8 textual locus'
-                          : 'No mapped Tirumurai 8 locus'
-                        : authorityLabel(selectedSite.authority_scope)
-                    }
-                  />
-                </div>
-
-                <button
-                  className="focus"
-                  onClick={() =>
-                    document.querySelector('.map-card')?.scrollIntoView({
-                      behavior: 'smooth',
-                      block: 'center',
-                    })
-                  }
-                >
-                  <GopuramIcon /> View on static map →
-                </button>
               </>
             )}
           </div>
@@ -1022,21 +1135,57 @@ export default function App() {
           </div>
         </div>
 
-        <div className="panel graph-mini">
-          <div className="section-title">
-            <h3>{selectedIsManikkavasakar ? 'Tirumurai 8 – Talam Graph' : 'Saint – Talam Graph'}</h3>
-            <span>
-              {selectedIsManikkavasakar
-                ? `${tirumurai8.loci.length} textual loci`
-                : `${siteLinks.size} linked talams`}
-            </span>
+        {showTraditionalDetail ? (
+          <div className="panel tradition-mini">
+            <div className="section-title">
+              <div>
+                <h3>Traditional Place Claims</h3>
+                <span>{traditionalPlaybackStops.length} Pramāṇa references</span>
+              </div>
+              <Badge kind="tradition">TRADITION</Badge>
+            </div>
+            <div className="tradition-mini-list">
+              {traditionalPlaybackStops.slice(0, 4).map((stop, index) => (
+                <button
+                  key={stop.id}
+                  className={index === progress ? 'active' : ''}
+                  onClick={() => {
+                    setProgress(index);
+                    setTab('visits');
+                  }}
+                >
+                  <span>{index + 1}</span>
+                  <div>
+                    <b>{stop.name}</b>
+                    <small>{stop.detail}</small>
+                  </div>
+                </button>
+              ))}
+            </div>
+            <p>Shown as claims, not coordinates or a reconstructed road.</p>
           </div>
-          <Network
-            saint={saint}
-            centerLabel={selectedIsManikkavasakar ? 'M' : undefined}
-            sites={topLinkedSites.slice(0, 8)}
-          />
-        </div>
+        ) : (
+          <div className="panel graph-mini">
+            <div className="section-title">
+              <div>
+                <h3>{selectedIsManikkavasakar ? 'Tirumurai 8 – Talam Graph' : 'Saint – Talam Graph'}</h3>
+                <span>
+                  {selectedIsManikkavasakar
+                    ? `${tirumurai8.loci.length} textual loci`
+                    : `${siteLinks.size} linked talams`}
+                </span>
+              </div>
+              <button className="graph-expand" onClick={() => setGraphOpen(true)}>Expand ↗</button>
+            </div>
+            <button className="graph-preview-button" onClick={() => setGraphOpen(true)} aria-label="Open expanded connection graph">
+              <Network
+                saint={saint}
+                centerLabel={selectedIsManikkavasakar ? 'M' : undefined}
+                sites={topLinkedSites.slice(0, 8)}
+              />
+            </button>
+          </div>
+        )}
 
         <div className="panel density-card">
           <div className="section-title">
@@ -1053,6 +1202,23 @@ export default function App() {
           <Stat value={data.meta.counts.total_edges} label="Typed edges" />
         </div>
       </section>
+
+      {graphOpen && (
+        <ConnectionModal
+          saint={saint}
+          saintName={saintName}
+          selectedIsManikkavasakar={selectedIsManikkavasakar}
+          sites={topLinkedSites}
+          centerLabel={selectedIsManikkavasakar ? 'M' : undefined}
+          totalConnections={selectedIsManikkavasakar ? tirumurai8.loci.length : siteLinks.size}
+          onClose={() => setGraphOpen(false)}
+          onSelect={(site) => {
+            setSelectedSiteId(site.id);
+            setTab('visits');
+            setGraphOpen(false);
+          }}
+        />
+      )}
 
       <footer>
         <strong><GopuramIcon /> Nayanmar Trails</strong>
@@ -1103,6 +1269,73 @@ function Fact({ label, value }: { label: string; value: string | number }) {
   );
 }
 
+
+function TraditionalPlaceDetail({
+  saintName,
+  stop,
+  total,
+  tab,
+}: {
+  saintName: string;
+  stop: PlaybackStop | undefined;
+  total: number;
+  tab: DetailTab;
+}) {
+  return (
+    <div className="traditional-detail">
+      <div className="traditional-visual">
+        <div className="traditional-symbol"><GopuramIcon /></div>
+        <div>
+          <small>TRADITIONAL PLACE REFERENCE</small>
+          <h2>{stop?.name || 'No place selected'}</h2>
+          <p>{stop?.detail || 'No current traditional-place claim.'}</p>
+        </div>
+      </div>
+
+      {tab === 'visits' && (
+        <div className="text">
+          <Badge kind="tradition">TRADITION</Badge>
+          <p>
+            Pramāṇa records <b>{total}</b> traditional place claim{total === 1 ? '' : 's'} for <b>{saintName}</b>.
+            This playback keeps those claims visible without inventing modern coordinates or a travel route.
+          </p>
+          <div className="evidence-callout muted">
+            <GopuramIcon />
+            <p>
+              The selected item is a traditional association. It is not automatically a modern temple identification,
+              exact geographic point, or independently verified historical event.
+            </p>
+          </div>
+        </div>
+      )}
+
+      {tab === 'chronology' && (
+        <div className="text">
+          <Badge kind="inference">NO ASSERTED JOURNEY CHRONOLOGY</Badge>
+          <p>
+            Birthplace, related-place and mukti-place traditions are ordered only as a reading sequence.
+            Nayanmar Trails does not infer the historical path between them.
+          </p>
+        </div>
+      )}
+
+      {tab === 'evidence' && (
+        <div className="text">
+          <Badge kind="tradition">TRADITIONAL_REFERENCE</Badge>
+          <p>
+            This surface is intentionally fail-closed: no map marker appears until Pramāṇa carries reviewed geometry
+            or another explicitly qualified location mapping.
+          </p>
+        </div>
+      )}
+
+      <div className="traditional-detail-footer">
+        <span>{total} tradition claim{total === 1 ? '' : 's'}</span>
+        <span>0 invented coordinates</span>
+      </div>
+    </div>
+  );
+}
 
 function Tirumurai8LocusDetail({
   locus,
@@ -1255,7 +1488,9 @@ function Visits({
         </p>
       </div>
       {site.temple_identification_status && (
-        <p className="microcopy">Temple identification status: {site.temple_identification_status}</p>
+        <p className="microcopy">
+          <b>Identification:</b> {identificationLabel(site.temple_identification_status)}
+        </p>
       )}
     </div>
   );
@@ -1345,38 +1580,173 @@ function Evidence({ site, data }: { site: Site; data: PramanaExport }) {
   );
 }
 
+function ConnectionModal({
+  saint,
+  saintName,
+  selectedIsManikkavasakar,
+  sites,
+  centerLabel,
+  totalConnections,
+  onClose,
+  onSelect,
+}: {
+  saint: Saint | null;
+  saintName: string;
+  selectedIsManikkavasakar: boolean;
+  sites: Array<{ site: Site; count: number }>;
+  centerLabel?: string;
+  totalConnections: number;
+  onClose: () => void;
+  onSelect: (site: Site) => void;
+}) {
+  return (
+    <div
+      className="graph-backdrop"
+      role="presentation"
+      onMouseDown={(event) => {
+        if (event.currentTarget === event.target) onClose();
+      }}
+    >
+      <section
+        className="graph-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-label={selectedIsManikkavasakar ? 'Tirumurai 8 talam connections' : 'Saint talam connections'}
+        onMouseDown={(event) => event.stopPropagation()}
+      >
+        <header className="graph-modal-head">
+          <div>
+            <small>{selectedIsManikkavasakar ? 'NAALVAR · TIRUMURAI 8' : 'SELECTED NAYANMAR'}</small>
+            <h2>{saintName}</h2>
+            <p>
+              {selectedIsManikkavasakar
+                ? 'Qualified Tiruvācakam textual loci from the pinned Pramāṇa snapshot.'
+                : `${totalConnections} Tēvāram-linked talams in the current Pramāṇa graph.`}
+            </p>
+          </div>
+          <button className="modal-close" onClick={onClose} aria-label="Close connection graph">×</button>
+        </header>
+
+        <div className="graph-modal-grid">
+          <div className="graph-stage">
+            <Network
+              saint={saint}
+              centerLabel={centerLabel}
+              sites={sites.slice(0, 12)}
+              expanded
+              onSelect={onSelect}
+            />
+            <div className="graph-stage-caption">
+              Node size reflects linked patikam or section count. Layout is a reading aid, not geography or chronology.
+            </div>
+          </div>
+
+          <aside className="graph-ranking">
+            <div className="graph-ranking-head">
+              <small>TOP CONNECTIONS</small>
+              <b>{sites.length ? 'Select a talam to inspect it' : 'No mapped talam connections'}</b>
+            </div>
+            <div className="graph-ranking-list">
+              {sites.slice(0, 12).map(({ site, count }, index) => {
+                const primary = siteDisplayName(site);
+                const canonical = cleanLabel(site.label);
+                return (
+                  <button key={site.id} onClick={() => onSelect(site)}>
+                    <span className="graph-rank">{String(index + 1).padStart(2, '0')}</span>
+                    <span className="graph-rank-copy">
+                      <b>{primary}</b>
+                      {canonical.toLowerCase() !== primary.toLowerCase() && <small>{canonical}</small>}
+                    </span>
+                    <strong>{count}</strong>
+                  </button>
+                );
+              })}
+            </div>
+          </aside>
+        </div>
+
+        <div className="graph-modal-note">
+          <Badge kind={selectedIsManikkavasakar ? 'edition' : 'edition'}>
+            {selectedIsManikkavasakar ? 'TEXTUAL LOCI' : 'EDITION METADATA'}
+          </Badge>
+          <p>
+            {selectedIsManikkavasakar
+              ? 'These connections do not establish Manikkavasakar’s historical itinerary.'
+              : 'These edges express author → patikam → talam relationships; they do not establish a historical travel route.'}
+          </p>
+        </div>
+      </section>
+    </div>
+  );
+}
+
 function Network({
   saint,
   sites,
   centerLabel,
+  expanded = false,
+  onSelect,
 }: {
   saint: Saint | null;
   sites: Array<{ site: Site; count: number }>;
   centerLabel?: string;
+  expanded?: boolean;
+  onSelect?: (site: Site) => void;
 }) {
-  const width = 360;
-  const height = 148;
-  const cx = 180;
-  const cy = 73;
-  const rx = 137;
-  const ry = 52;
+  const width = expanded ? 720 : 360;
+  const height = expanded ? 360 : 148;
+  const cx = width / 2;
+  const cy = expanded ? 170 : 73;
+  const rx = expanded ? 255 : 137;
+  const ry = expanded ? 120 : 52;
 
   return (
-    <svg className="network" viewBox={`0 0 ${width} ${height}`} role="img" aria-label="Saint to talam graph">
+    <svg
+      className={`network ${expanded ? 'expanded' : ''}`}
+      viewBox={`0 0 ${width} ${height}`}
+      role="img"
+      aria-label="Saint to talam graph"
+    >
       {sites.map(({ site, count }, index) => {
         const angle = (index / Math.max(sites.length, 1)) * Math.PI * 2 - Math.PI / 2;
         const x = cx + Math.cos(angle) * rx;
         const y = cy + Math.sin(angle) * ry;
+        const label = siteDisplayName(site);
+        const radius = (expanded ? 8 : 4) + Math.min(count, 9) * (expanded ? .72 : .8);
+
         return (
-          <g key={site.id}>
+          <g
+            key={site.id}
+            className={onSelect ? 'network-node interactive' : 'network-node'}
+            onClick={() => onSelect?.(site)}
+            onKeyDown={(event) => {
+              if (!onSelect) return;
+              if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                onSelect(site);
+              }
+            }}
+            role={onSelect ? 'button' : undefined}
+            tabIndex={onSelect ? 0 : undefined}
+            aria-label={onSelect ? `${label}, ${count} linked items` : undefined}
+          >
             <line x1={cx} y1={cy} x2={x} y2={y} />
-            <circle cx={x} cy={y} r={4 + Math.min(count, 7) * .8} />
-            <text x={x} y={y + 16} textAnchor="middle">{cleanLabel(site.label).slice(0, 13)}</text>
+            <circle cx={x} cy={y} r={radius} />
+            {expanded && <text className="node-count" x={x} y={y + 3} textAnchor="middle">{count}</text>}
+            <text
+              className="node-label"
+              x={x}
+              y={y + (expanded ? radius + 18 : 16)}
+              textAnchor="middle"
+            >
+              {label.slice(0, expanded ? 22 : 13)}
+            </text>
           </g>
         );
       })}
-      <circle className="center" cx={cx} cy={cy} r="16" />
-      <text className="center-text" x={cx} y={cy + 3} textAnchor="middle">
+      <circle className="center-halo" cx={cx} cy={cy} r={expanded ? 34 : 20} />
+      <circle className="center" cx={cx} cy={cy} r={expanded ? 25 : 16} />
+      <text className="center-text" x={cx} y={cy + (expanded ? 5 : 3)} textAnchor="middle">
         {centerLabel ?? saint?.ordinal ?? '—'}
       </text>
     </svg>

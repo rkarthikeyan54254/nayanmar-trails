@@ -145,6 +145,10 @@ export default function SacredMap({
     () => new Set(routeStops.map((stop) => stop.siteId)),
     [routeStops],
   );
+  const featuredSiteIds = useMemo(
+    () => new Set(['TO01', 'NA22', 'KV01', 'KT087', 'PA01', 'PA08']),
+    [],
+  );
 
   useEffect(() => {
     if (!mapNode.current || mapRef.current) return;
@@ -170,11 +174,12 @@ export default function SacredMap({
       map.fitBounds(
         [[76.72, 7.85], [80.48, 13.48]],
         {
-          padding: { top: 36, right: 34, bottom: 34, left: 34 },
+          padding: { top: 68, right: 34, bottom: 38, left: 34 },
           duration: 0,
           maxZoom: 6.25,
         },
       );
+      map.setZoom(Math.min(map.getZoom() + 0.22, 6.5));
 
       map.addSource('district-coverage', {
         type: 'geojson',
@@ -215,9 +220,9 @@ export default function SacredMap({
         layout: { 'line-cap': 'round', 'line-join': 'round' },
         paint: {
           'line-color': '#f0aa42',
-          'line-width': 12,
-          'line-opacity': 0.16,
-          'line-blur': 5,
+          'line-width': 7,
+          'line-opacity': 0.08,
+          'line-blur': 4,
         },
       });
       map.addLayer({
@@ -227,8 +232,8 @@ export default function SacredMap({
         layout: { 'line-cap': 'round', 'line-join': 'round' },
         paint: {
           'line-color': '#eab052',
-          'line-width': 3.15,
-          'line-opacity': 0.72,
+          'line-width': 1.8,
+          'line-opacity': 0.46,
           'line-dasharray': [1.3, 2],
         },
       });
@@ -244,9 +249,9 @@ export default function SacredMap({
         layout: { 'line-cap': 'round', 'line-join': 'round' },
         paint: {
           'line-color': '#ffd071',
-          'line-width': 4.2,
-          'line-opacity': 0.98,
-          'line-blur': 0.35,
+          'line-width': 3.4,
+          'line-opacity': 0.96,
+          'line-blur': 0.28,
         },
       });
     });
@@ -313,15 +318,14 @@ export default function SacredMap({
     if (mode === 'tradition') return;
 
     if (mode === 'all' || mode === 'edition') {
-      for (const point of coverage.slice(0, 16)) {
-        if (point.count < 2) continue;
+      for (const point of coverage.slice(0, 10)) {
+        if (point.count < 3) continue;
         const node = document.createElement('div');
         node.className = 'map-district-marker';
+        node.style.position = 'absolute';
         node.innerHTML = `
           <span class="district-marker-glow"></span>
-          <span class="district-marker-tower">${gopuramMarkup}</span>
           <span class="district-marker-count">${point.count}</span>
-          <span class="district-marker-label">${point.label}</span>
         `;
         node.title = `${point.label}: ${point.count} Pramāṇa talam nodes in the normalized modern district aggregate`;
         node.setAttribute('aria-label', node.title);
@@ -347,11 +351,13 @@ export default function SacredMap({
       const selected = selectedSiteId === entityId;
       const node = document.createElement('button');
       node.type = 'button';
+      node.style.position = 'absolute';
       node.className = [
         'map-temple-marker',
         linked ? 'linked' : '',
         independent ? 'independent' : '',
         selected ? 'selected' : '',
+        featuredSiteIds.has(seed.siteId) ? 'featured' : '',
       ].filter(Boolean).join(' ');
       node.innerHTML = `
         <span class="marker-glow"></span>
@@ -376,6 +382,7 @@ export default function SacredMap({
     if (active && (mode === 'all' || mode === 'edition')) {
       const traveler = document.createElement('div');
       traveler.className = travelerImage ? 'map-traveler has-image' : 'map-traveler';
+      traveler.style.position = 'absolute';
       traveler.innerHTML = travelerImage
         ? `<img src="${travelerImage}" alt="" /><span></span>`
         : '<span></span>';
@@ -384,7 +391,7 @@ export default function SacredMap({
         .addTo(map);
       markerRefs.current.push(marker);
     }
-  }, [coverage, epigraphicSiteIds, linkedSet, mode, progress, routeStops, selectedSiteId, showUnlinkedExemplars, travelerImage]);
+  }, [coverage, epigraphicSiteIds, featuredSiteIds, linkedSet, mode, progress, routeStops, selectedSiteId, showUnlinkedExemplars, travelerImage]);
 
 
 

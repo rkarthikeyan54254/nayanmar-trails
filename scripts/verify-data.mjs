@@ -5,12 +5,14 @@ const tirumurai8Path = new URL('../public/data/pramana-tirumurai8-v1.json', impo
 const geometryPath = new URL('../src/geometry.ts', import.meta.url);
 const mapPath = new URL('../src/SacredMap.tsx', import.meta.url);
 const appPath = new URL('../src/App.tsx', import.meta.url);
+const stylesPath = new URL('../src/styles.css', import.meta.url);
 
 const doc = JSON.parse(await readFile(exportPath, 'utf8'));
 const tirumurai8 = JSON.parse(await readFile(tirumurai8Path, 'utf8'));
 const geometryText = await readFile(geometryPath, 'utf8');
 const mapText = await readFile(mapPath, 'utf8');
 const appText = await readFile(appPath, 'utf8');
+const stylesText = await readFile(stylesPath, 'utf8');
 
 const required = [
   'traditional_reference',
@@ -93,6 +95,36 @@ if (!mapText.includes('interactive: false')) {
 }
 if (mapText.includes('.easeTo(') || mapText.includes('NavigationControl')) {
   throw new Error('Static atlas regression: camera movement or navigation controls reintroduced');
+}
+
+for (const markerClass of ['map-temple-marker', 'map-district-marker', 'map-traveler']) {
+  const absoluteRule = new RegExp('\\.' + markerClass + '[^{]*\\{[^}]*position\\s*:\\s*absolute', 's');
+  if (!absoluteRule.test(stylesText) && !mapText.includes("style.position = 'absolute'")) {
+    throw new Error(`MapLibre marker positioning regression: ${markerClass} must remain absolutely positioned`);
+  }
+}
+
+const travelerBlocks = [...stylesText.matchAll(/\.map-traveler\s*\{([^}]*)\}/gs)].map((match) => match[1]);
+if (travelerBlocks.some((block) => /animation\s*:\s*(?!none)/.test(block))) {
+  throw new Error('MapLibre traveler root must not animate transform; animate child elements instead');
+}
+
+const geometryRows = [...geometryText.matchAll(
+  /siteId:\s*'([^']+)'[^\n]*lng:\s*([0-9.]+),\s*lat:\s*([0-9.]+)/g,
+)].map((match) => ({ siteId: match[1], lng: Number(match[2]), lat: Number(match[3]) }));
+const geometryById = new Map(geometryRows.map((row) => [row.siteId, row]));
+const kanchipuram = geometryById.get('TO01');
+const chidambaram = geometryById.get('KV01');
+const madurai = geometryById.get('PA01');
+const rameswaram = geometryById.get('PA08');
+if (!kanchipuram || !chidambaram || !madurai || !rameswaram) {
+  throw new Error('Missing geography sanity anchors');
+}
+if (!(kanchipuram.lat > chidambaram.lat && chidambaram.lat > madurai.lat && madurai.lat > rameswaram.lat)) {
+  throw new Error('Geography sanity failed: Kanchipuram → Chidambaram → Madurai → Rameswaram must descend southward');
+}
+if (kanchipuram.lat < 12 || kanchipuram.lng < 79 || kanchipuram.lng > 80.5) {
+  throw new Error('Geography sanity failed: Kanchipuram centroid is outside the expected northern Tamil Nadu envelope');
 }
 
 const traditionPredicates = new Set([
