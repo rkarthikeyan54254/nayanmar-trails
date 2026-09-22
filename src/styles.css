@@ -738,7 +738,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:1px solid 
   display:grid;place-items:center;
   position:relative;
   background:radial-gradient(circle,rgba(255,222,145,.95),rgba(243,172,68,.5) 24%,rgba(243,172,68,.12) 56%,transparent 72%);
-  animation:travelerPulse 1.5s ease-in-out infinite;
+  animation:none;
   pointer-events:none;
 }
 .map-traveler span{
