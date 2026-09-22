@@ -419,7 +419,7 @@ export default function SacredMap({
           <strong>{locale === 'ta' ? 'மரபில் வரும் தலங்கள்' : 'Tradition layer'}</strong>
           <p>
             {locale === 'ta'
-              ? 'மரபில் தொடர்புபடுத்தப்படும் தலங்களை மட்டும் காட்டுகிறோம்; தெரியாத இடங்களை ஊகித்து வரைபடத்தில் புள்ளியாகச் சேர்ப்பதில்லை.'
+              ? 'மரபில் தொடர்புடையதாகச் சொல்லப்படும் தலங்களை மட்டும் காட்டுகிறோம்; தெரியாத இடங்களை ஊகித்து வரைபடத்தில் புள்ளியாகச் சேர்ப்பதில்லை.'
               : 'Traditional place associations are shown without fabricating precise coordinates for them.'}
           </p>
         </div>
