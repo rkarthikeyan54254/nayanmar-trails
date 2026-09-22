@@ -39,3 +39,17 @@ Production:
 npm run build
 npm run start
 ```
+
+
+## Reader language policy
+
+Nayanmar Trails uses explicit reader modes rather than mixing Tamil and English as interface copy.
+
+- `EN` keeps navigation, explanations and curated story summaries in English.
+- `தமிழ்` keeps the reader-facing experience in Tamil where reviewed Tamil copy exists.
+- Canonical source text may remain in its original language inside evidence/source views; this is source fidelity, not UI mixing.
+- A language is not exposed until its product copy is complete enough to avoid a half-translated experience.
+
+## Saint curiosity layer
+
+`public/data/pramana-saint-curiosities-v1.json` contains one bilingual curiosity hook for each of the 63 Nayanmars. These are concise reader-facing retellings of the Periya Puranam traditional narrative layer. They are explicitly scoped as `traditional_reference` and are not presented as independently verified historical biography. Product verification requires exactly 63 records, English + Tamil copy for each record, and an exact match to the Pramāṇa 63-saint registry.
