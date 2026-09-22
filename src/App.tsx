@@ -501,7 +501,7 @@ export default function App() {
           </div>
 
           <div className="map-source-note">
-            OpenFreeMap / OpenStreetMap basemap · Pramāṇa data overlay
+            CARTO / OpenStreetMap basemap · Pramāṇa data overlay
           </div>
 
           {graphOpen && (
@@ -710,7 +710,7 @@ export default function App() {
       <footer>
         <strong><GopuramIcon /> Nayanmar Trails</strong>
         <span>Versioned read-only Pramāṇa export · source commit {data.meta.source_commit.slice(0, 10)}</span>
-        <span>Map © OpenFreeMap / OpenMapTiles / OpenStreetMap</span>
+        <span>Map © OpenStreetMap contributors · © CARTO</span>
       </footer>
     </main>
   );
