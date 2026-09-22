@@ -1698,3 +1698,21 @@ button,select,input,.text,.chips,.fact,.search-results{
   border-color:#f1c87a;
   box-shadow:0 0 8px rgba(218,163,74,.5);
 }
+
+
+/* MapLibre owns the marker root transform. Animate children only. */
+.map-traveler{
+  animation:none!important;
+}
+.map-traveler>span{
+  animation:travelerDotPulse 1.5s ease-in-out infinite;
+}
+.map-traveler.has-image img{
+  animation:travelerImagePulse 1.5s ease-in-out infinite;
+}
+@keyframes travelerDotPulse{
+  50%{transform:scale(1.35);opacity:.82}
+}
+@keyframes travelerImagePulse{
+  50%{transform:scale(1.06);filter:sepia(.2) saturate(.9) contrast(1.08) brightness(1)}
+}
