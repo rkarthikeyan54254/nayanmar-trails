@@ -1,0 +1,170 @@
+{
+  "meta": {
+    "export_version": "pramana-saiva-literary-place-product-v1",
+    "source_repo": "rkarthikeyan54254/pramana",
+    "source_commit": "8a4019581f3ecf0487d166b199cdbbe42543c326",
+    "source_path": "data/review/saiva_literary_place_links_v1.json",
+    "authority_semantics": {
+      "source_header_composition_locus": "Edition/source metadata only; not independent historical proof.",
+      "textual_reference": "Text names or invokes the place; this is not automatically a composition or travel claim.",
+      "textual_alias_reference": "Text uses a shortened form resolved by separately pinned reference metadata; not a composition claim.",
+      "traditional_chronology_locus": "Traditional chronological placement only; does not rewrite formal Tevaram sthalam metadata."
+    }
+  },
+  "version": "1.0",
+  "layer_id": "saiva-literary-place-links-v1",
+  "generated_from_audit": "data/review/saiva_place_locus_audit_v1.json",
+  "authority_policy": {
+    "source_header_composition_locus": "primary_text_metadata_only_not_independent_historical_proof",
+    "textual_reference": "primary_text_metadata_only_not_composition_claim",
+    "traditional_chronology_locus": "traditional_reference_only_not_formal_tevaram_site_association",
+    "formal_tevaram_site_association": "remains_exclusively_in_nayanmar_tevaram_evidence_graph_v1",
+    "textual_alias_reference": "primary_text_metadata_plus_pinned_alias_resolution_reference_not_composition_claim"
+  },
+  "places": [
+    {
+      "id": "saiva_place.tiru_uttarakosamangai",
+      "label": "Tiru Uttarakosamangai",
+      "label_ta": "திருஉத்தரகோசமங்கை",
+      "aliases": [
+        "Uttarakosamangai",
+        "Uthirakosamangai",
+        "Uttarakośamaṅgai",
+        "Tiruvuttarakosamangai",
+        "உத்தரகோசமங்கை",
+        "திருஉத்தரகோசமங்கை",
+        "உத்திரகோசமங்கை",
+        "திருஉத்திரகோசமங்கை"
+      ],
+      "tevaram_site_catalogue_member": false,
+      "geometry_status": "not_curated_in_tevaram_product_geometry"
+    }
+  ],
+  "links": [
+    {
+      "id": "literary-place.tiruvacakam.s02.uttarakosamangai",
+      "subject": "tirumurai8.tiruvacakam.s02",
+      "predicate": "TEXTUALLY_REFERENCES_STHALAM",
+      "object": "saiva_place.tiru_uttarakosamangai",
+      "authority_scope": "primary_text_metadata",
+      "historical_verified": false,
+      "source_key": "pm-tiruvacakam-p1",
+      "locator": "section 2; cumulative 2-2",
+      "source_header_composition_place_ta": "தில்லை",
+      "display_note": "Section 2 explicitly names Uttarakosamangai in the poem while the source header says it was composed at Tillai. This is a textual sthalam reference, not an Uttarakosamangai composition claim."
+    },
+    {
+      "id": "literary-place.tiruvacakam.s06.uttarakosamangai",
+      "subject": "tirumurai8.tiruvacakam.s06",
+      "predicate": "SOURCE_HEADER_COMPOSITION_LOCUS",
+      "object": "saiva_place.tiru_uttarakosamangai",
+      "authority_scope": "primary_text_metadata",
+      "historical_verified": false,
+      "source_key": "pm-tiruvacakam-p1",
+      "locator": "section 6; cumulative 105-154",
+      "source_note_ta": "(திருஉத்தரகோசமங்கையில் அருளியது- கட்டளைக் கலித்துறை)",
+      "display_note": "The pinned Project Madurai edition explicitly preserves Uttarakosamangai in the section-6 source heading. This is edition/source metadata, not independent proof of a historical composition event."
+    },
+    {
+      "id": "literary-place.tiruvacakam.s13.uttarakosamangai",
+      "subject": "tirumurai8.tiruvacakam.s13",
+      "predicate": "TEXTUALLY_REFERENCES_STHALAM",
+      "object": "saiva_place.tiru_uttarakosamangai",
+      "authority_scope": "primary_text_metadata",
+      "historical_verified": false,
+      "source_key": "pm-tiruvacakam-p2",
+      "locator": "section 13; cumulative 275-294",
+      "source_header_composition_place_ta": "தில்லை",
+      "display_note": "Section 13 names Uttarakosamangai at cumulative 293, while the edition header places composition at Tillai."
+    },
+    {
+      "id": "literary-place.tiruvacakam.s16.uttarakosamangai",
+      "subject": "tirumurai8.tiruvacakam.s16",
+      "predicate": "TEXTUALLY_REFERENCES_STHALAM",
+      "object": "saiva_place.tiru_uttarakosamangai",
+      "authority_scope": "primary_text_metadata",
+      "historical_verified": false,
+      "source_key": "pm-tiruvacakam-p2",
+      "locator": "section 16; cumulative 329-337",
+      "source_header_composition_place_ta": "தில்லை",
+      "display_note": "Section 16 repeatedly praises Uttarakosamangai, but the same edition heading says it was composed at Tillai. It must not be promoted to an Uttarakosamangai composition locus."
+    },
+    {
+      "id": "literary-place.tiruvacakam.s17.uttarakosamangai",
+      "subject": "tirumurai8.tiruvacakam.s17",
+      "predicate": "TEXTUALLY_REFERENCES_STHALAM_ALIAS",
+      "object": "saiva_place.tiru_uttarakosamangai",
+      "authority_scope": "primary_text_metadata",
+      "historical_verified": false,
+      "source_key": "pm-tiruvacakam-p2",
+      "locator": "section 17; cumulative 338-347",
+      "source_header_composition_place_ta": "தில்லை",
+      "source_form_ta": "உத்தர மங்கையர்",
+      "normalized_place_ta": "திருஉத்தர கோசமங்கை",
+      "alias_resolution_source_key": "tamilvu-tiruvacakam-uttara-mangai-gloss",
+      "display_note": "Section 17 uses the shortened form 'உத்தர மங்கை'. Tamil Virtual Academy commentary explicitly glosses this as shortened 'உத்தரகோச மங்கை'. The alias resolution is reference metadata; it does not create a composition claim."
+    },
+    {
+      "id": "literary-place.tiruvacakam.s18.uttarakosamangai",
+      "subject": "tirumurai8.tiruvacakam.s18",
+      "predicate": "TEXTUALLY_REFERENCES_STHALAM",
+      "object": "saiva_place.tiru_uttarakosamangai",
+      "authority_scope": "primary_text_metadata",
+      "historical_verified": false,
+      "source_key": "pm-tiruvacakam-p2",
+      "locator": "section 18; cumulative 348-357",
+      "source_header_composition_place_ta": "தில்லை",
+      "display_note": "Section 18 explicitly names Tiru Uttarakosamangai at cumulative 350, while the edition header places composition at Tillai."
+    },
+    {
+      "id": "literary-place.tiruvacakam.s19.uttarakosamangai",
+      "subject": "tirumurai8.tiruvacakam.s19",
+      "predicate": "TEXTUALLY_REFERENCES_STHALAM",
+      "object": "saiva_place.tiru_uttarakosamangai",
+      "authority_scope": "primary_text_metadata",
+      "historical_verified": false,
+      "source_key": "pm-tiruvacakam-p2",
+      "locator": "section 19; cumulative 358-367",
+      "source_header_composition_place_ta": "தில்லை",
+      "display_note": "Section 19 explicitly names Uttarakosamangai as the Lord's town at cumulative 360, while the edition header places composition at Tillai."
+    },
+    {
+      "id": "literary-place.tiruvacakam.s20.uttarakosamangai",
+      "subject": "tirumurai8.tiruvacakam.s20",
+      "predicate": "TEXTUALLY_REFERENCES_STHALAM",
+      "object": "saiva_place.tiru_uttarakosamangai",
+      "authority_scope": "primary_text_metadata",
+      "historical_verified": false,
+      "source_key": "pm-tiruvacakam-p2",
+      "locator": "section 20; cumulative 368-377",
+      "source_header_composition_place_ta": "திருப்பெருந்துறை",
+      "display_note": "Section 20 directly addresses the Lord of Tiru Uttarakosamangai at cumulative 374, while the edition header places composition at Tirupperunturai."
+    },
+    {
+      "id": "literary-place.tiruvacakam.s48.uttarakosamangai",
+      "subject": "tirumurai8.tiruvacakam.s48",
+      "predicate": "TEXTUALLY_REFERENCES_STHALAM",
+      "object": "saiva_place.tiru_uttarakosamangai",
+      "authority_scope": "primary_text_metadata",
+      "historical_verified": false,
+      "source_key": "pm-tiruvacakam-p2",
+      "locator": "section 48; cumulative 628-634",
+      "source_header_composition_place_ta": "திருப்பெருந்துறை",
+      "display_note": "Section 48 explicitly names Uttarakosamangai at cumulative 632, while the edition header places composition at Tirupperunturai."
+    },
+    {
+      "id": "literary-place.tevaram.2_85.kt125",
+      "subject": "tevaram.ifp.2.85",
+      "predicate": "TRADITIONAL_CHRONOLOGY_LOCUS",
+      "object": "tevaram_site.KT125",
+      "authority_scope": "traditional_reference",
+      "historical_verified": false,
+      "source_key": "shaivam-sambandar-varalatru-murai",
+      "locator": "chronology row 253",
+      "formal_tevaram_sthalam_classification": "POTU",
+      "traditional_place_ta": "திருமறைக்காடு",
+      "modern_name_in_ifp_catalogue": "Vedaranyam",
+      "display_note": "Shaivam's traditional historical-order table places Kolaru Pathigam 2.085 at Tirumaraikadu. The IFP/PIFI edition separately classifies the hymn as POTU; this link does not rewrite formal Tēvāram sthalam metadata."
+    }
+  ]
+}
