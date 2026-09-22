@@ -1,5 +1,11 @@
 export type AuthorityScope = 'traditional_reference' | 'primary_text_metadata' | 'edition_metadata' | 'epigraphic_primary' | string;
 
+export interface EvidenceRef {
+  source_key: string;
+  locator: string;
+  evidence_scope: string;
+}
+
 export interface Saint {
   id: string;
   ordinal: number;
@@ -22,6 +28,7 @@ export interface Site {
   temple_identification_status?: string | null;
   patikam_count: number;
   authority_scope: AuthorityScope;
+  evidence?: EvidenceRef[];
 }
 
 export interface Patikam {
@@ -31,6 +38,7 @@ export interface Patikam {
   author_saint_id: string;
   site_linked: boolean;
   authority_scope: AuthorityScope;
+  evidence?: EvidenceRef[];
 }
 
 export interface Edge {
@@ -42,6 +50,7 @@ export interface Edge {
   authority_scope: AuthorityScope;
   historical_verified: boolean | null;
   confidence_basis: string | null;
+  evidence?: EvidenceRef[];
 }
 
 export interface TraditionalPlace {
@@ -63,6 +72,7 @@ export interface Inscription {
   ifp_site_id: string | null;
   temple_name: string | null;
   historical_scope: string | null;
+  evidence?: EvidenceRef[];
 }
 
 export interface PramanaExport {
