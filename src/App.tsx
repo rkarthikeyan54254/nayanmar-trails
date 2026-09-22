@@ -122,11 +122,30 @@ export default function App() {
   );
   const [selectedSiteId, setSelectedSiteId] = useState('tevaram_site.KV01');
   const [mode, setMode] = useState<EvidenceMode>('all');
-  const [tab, setTab] = useState<DetailTab>('visits');
+  const [tab, setTab] = useState<DetailTab>(() => {
+    const value = new URLSearchParams(window.location.search).get('tab');
+    return value === 'hymns' || value === 'chronology' || value === 'evidence' ? value : 'visits';
+  });
   const [playing, setPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
-  const [graphOpen, setGraphOpen] = useState(false);
+  const [graphOpen, setGraphOpen] = useState(
+    () => new URLSearchParams(window.location.search).get('graph') === '1',
+  );
   const [query, setQuery] = useState('');
+
+  useEffect(() => {
+    if (!graphOpen) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setGraphOpen(false);
+    };
+    document.addEventListener('keydown', onKeyDown);
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.removeEventListener('keydown', onKeyDown);
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [graphOpen]);
 
   useEffect(() => {
     Promise.all([
@@ -476,7 +495,7 @@ export default function App() {
           <button onClick={() => setTab('visits')}>Temples</button>
           <button onClick={() => setTab('hymns')}>Hymns</button>
           <button onClick={() => setGraphOpen(true)}>Routes</button>
-          <button onClick={() => setTab('evidence')}>Stories</button>
+          <button onClick={() => setTab('evidence')}>Evidence</button>
         </nav>
 
         <div className="header-search">
@@ -566,7 +585,13 @@ export default function App() {
 
       <section className="filters">
         <Filter label="Saint">
-          <select value={selectedSaintId} onChange={(event) => setSelectedSaintId(event.target.value)}>
+          <select
+            value={selectedSaintId}
+            onChange={(event) => {
+              setSelectedSaintId(event.target.value);
+              setGraphOpen(false);
+            }}
+          >
             <optgroup label="Naalvar">
               <option value="nayanmar.20">Appar · Tirunavukkarasar</option>
               <option value="nayanmar.27">Sambandar</option>
@@ -583,27 +608,24 @@ export default function App() {
           </select>
         </Filter>
 
-        <Filter label="Century">
-          <select defaultValue="unasserted">
-            <option value="unasserted">Not asserted in v1</option>
-          </select>
-        </Filter>
+        <div className="naalvar-switcher" aria-label="Naalvar quick selection">
+          <span>Naalvar</span>
+          {NAALVAR.map((id) => (
+            <button
+              key={id}
+              className={selectedSaintId === id ? 'active' : ''}
+              onClick={() => {
+                setSelectedSaintId(id);
+                setGraphOpen(false);
+              }}
+            >
+              {id === MANIKKAVASAKAR_ID ? 'Manikkavasakar' : SAINT_EN[id]?.split(' · ')[0]}
+            </button>
+          ))}
+        </div>
 
-        <Filter label="Region">
-          <select defaultValue="tn">
-            <option value="tn">Tamil Nadu</option>
-          </select>
-        </Filter>
-
-        <Filter label="Evidence lens">
-          <select value={mode} onChange={(event) => setMode(event.target.value as EvidenceMode)}>
-            {(Object.keys(MODE_COPY) as EvidenceMode[]).map((item) => (
-              <option key={item} value={item}>{MODE_COPY[item].label}</option>
-            ))}
-          </select>
-        </Filter>
-
-        <div className="mode-pills">
+        <div className="mode-pills" aria-label="Evidence lens">
+          <span className="mode-label">Evidence</span>
           {(Object.keys(MODE_COPY) as EvidenceMode[]).map((item) => (
             <button
               key={item}
