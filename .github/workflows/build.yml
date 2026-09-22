@@ -45,9 +45,10 @@ jobs:
             exit 1
           fi
 
-          capture() {
+          capture_at() {
             local name="$1"
             local url="$2"
+            local viewport="$3"
             timeout 45s "$BROWSER" \
               --headless \
               --no-sandbox \
@@ -56,10 +57,14 @@ jobs:
               --hide-scrollbars \
               --run-all-compositor-stages-before-draw \
               --virtual-time-budget=12000 \
-              --window-size=1600,1050 \
+              --window-size="$viewport" \
               --screenshot="artifacts/$name.png" \
               "$url"
             test -s "artifacts/$name.png"
+          }
+
+          capture() {
+            capture_at "$1" "$2" "1600,1050"
           }
 
           capture "appar-mapped-playback" "http://127.0.0.1:4173/?saint=nayanmar.20"
@@ -67,6 +72,8 @@ jobs:
           capture "appar-connections-modal" "http://127.0.0.1:4173/?saint=nayanmar.20&graph=1"
           capture "appar-sthalam-overview" "http://127.0.0.1:4173/?saint=nayanmar.20&site=TO20"
           capture "appar-native-ta" "http://127.0.0.1:4173/?saint=nayanmar.20&lang=ta"
+          capture_at "tamil-header-wide" "http://127.0.0.1:4173/?saint=nayanmar.20&lang=ta" "2048,700"
+          capture_at "tamil-header-laptop" "http://127.0.0.1:4173/?saint=nayanmar.20&lang=ta" "1366,850"
           capture "appar-sthalam-overview-ta" "http://127.0.0.1:4173/?saint=nayanmar.20&site=TO20&lang=ta"
           capture "appar-thevaram-panel" "http://127.0.0.1:4173/?saint=nayanmar.20&site=TO20&tab=hymns"
           capture "sources-methodology" "http://127.0.0.1:4173/?sources=1"
