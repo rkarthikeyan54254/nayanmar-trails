@@ -800,27 +800,6 @@ export default function App() {
             </div>
           )}
 
-          {graphOpen && (
-            <div className="overlay">
-              <div className="overlay-head">
-                <div>
-                  <small>{selectedIsManikkavasakar ? 'NAALVAR · TIRUMURAI 8' : 'SELECTED NAYANMAR'}</small>
-                  <h3>{selectedIsManikkavasakar ? 'Tirumurai 8 ↔ Talam Loci' : 'Saint ↔ Talam Connections'}</h3>
-                </div>
-                <button onClick={() => setGraphOpen(false)}>Close</button>
-              </div>
-              <Network
-                saint={saint}
-                centerLabel={selectedIsManikkavasakar ? 'M' : undefined}
-                sites={topLinkedSites.slice(0, 12)}
-              />
-              <p>
-                {selectedIsManikkavasakar
-                  ? 'Edges show the explicitly qualified Tiruvācakam section-to-locus mappings in this pinned product snapshot. They are not a biographical itinerary.'
-                  : 'Edges are Tēvāram author → patikam → talam relationships from the versioned Pramāṇa export. Layout position has no evidentiary meaning.'}
-              </p>
-            </div>
-          )}
         </section>
 
         <aside className="panel detail-card">
@@ -1082,6 +1061,23 @@ export default function App() {
           <Stat value={data.meta.counts.total_edges} label="Typed edges" />
         </div>
       </section>
+
+      {graphOpen && (
+        <ConnectionModal
+          saint={saint}
+          saintName={saintName}
+          selectedIsManikkavasakar={selectedIsManikkavasakar}
+          sites={topLinkedSites}
+          centerLabel={selectedIsManikkavasakar ? 'M' : undefined}
+          totalConnections={selectedIsManikkavasakar ? tirumurai8.loci.length : siteLinks.size}
+          onClose={() => setGraphOpen(false)}
+          onSelect={(site) => {
+            setSelectedSiteId(site.id);
+            setTab('visits');
+            setGraphOpen(false);
+          }}
+        />
+      )}
 
       <footer>
         <strong><GopuramIcon /> Nayanmar Trails</strong>
