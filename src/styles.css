@@ -1571,3 +1571,31 @@ footer svg{width:16px;height:16px;fill:#d9a84f}
   .graph-stage{min-height:330px}
   .graph-stage .network.expanded{height:310px}
 }
+
+.map-district-marker{
+  width:66px;
+  height:44px;
+  opacity:.76;
+}
+.district-marker-glow{
+  width:32px;
+  height:32px;
+}
+.district-marker-count{
+  left:50%;
+  top:15px;
+  transform:translate(-50%,-50%);
+  min-width:18px;
+  height:18px;
+  padding:0 4px;
+  border-color:rgba(238,196,116,.38);
+  background:rgba(7,31,38,.82);
+  color:#efc273;
+  font-size:6.8px;
+}
+.district-marker-label{
+  bottom:0;
+  max-width:72px;
+  color:rgba(213,202,179,.66);
+  font-size:6px;
+}
