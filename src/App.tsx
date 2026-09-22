@@ -1993,26 +1993,50 @@ function SthalamOverview({
   tirumuraiBreakdown: Array<[number, number]>;
   contextualHymn?: SaivaLiteraryLink | null;
 }) {
+  const locale = useLocale();
+  const siteName = localizedSiteName(site, locale);
+  const districtName = localizedAdministrativeName(site.district, locale);
+  const talukName = localizedAdministrativeName(site.taluk, locale);
+  const sacredRegion = localizedSacredRegion(site.traditional_location_class, locale);
+
   return (
     <div className="text sthalam-overview">
       <Badge kind="edition"><T>STHALAM OVERVIEW</T></Badge>
       <p className="detail-lead">
-        <b>{siteDisplayName(site)}</b><T>is associated with</T><b>{totalPathigams}</b> Tēvāram pathigam
-        {totalPathigams === 1 ? '' : 's'} across <b>{saintBreakdown.length}</b> saint
-        {saintBreakdown.length === 1 ? '' : 's'} in the current catalogue.
-        {selectedCount > 0 && <> <b>{saintName}</b><T>contributes</T><b>{selectedCount}</b>.</>}
+        {locale === 'ta' ? (
+          <>
+            இப்போது உள்ள தேவாரப் பட்டியலில் <b>{siteName}</b> தலத்திற்கு <b>{totalPathigams}</b> பதிகங்கள் உள்ளன;
+            அவை <b>{saintBreakdown.length}</b> நாயன்மார்களால் பாடப்பட்டவை.
+            {selectedCount > 0 && <> இதில் <b>{saintName}</b> பாடியவை <b>{selectedCount}</b>.</>}
+          </>
+        ) : (
+          <>
+            <b>{siteName}</b> is associated with <b>{totalPathigams}</b> Tēvāram pathigam
+            {totalPathigams === 1 ? '' : 's'} across <b>{saintBreakdown.length}</b> saint
+            {saintBreakdown.length === 1 ? '' : 's'} in the current catalogue.
+            {selectedCount > 0 && <> <b>{saintName}</b> contributes <b>{selectedCount}</b>.</>}
+          </>
+        )}
       </p>
 
       <div className="visitor-info-grid">
         <div>
           <small><T>MODERN LOCATION</T></small>
-          <b>{site.district || 'Location not supplied'}</b>
-          <span>{site.taluk ? `${site.taluk} taluk` : site.modern_name_nic || ''}</span>
+          <b>{districtName || (locale === 'ta' ? 'இடம் தரப்படவில்லை' : 'Location not supplied')}</b>
+          <span>
+            {site.taluk
+              ? locale === 'ta'
+                ? `${talukName || site.taluk} வட்டம்`
+                : `${site.taluk} taluk`
+              : locale === 'ta'
+                ? siteName
+                : site.modern_name_nic || ''}
+          </span>
         </div>
         <div>
           <small><T>SACRED REGION</T></small>
-          <b>{site.traditional_location_class?.replace(/^according to PK:\s*/i, '') || 'Not supplied'}</b>
-          <span>{cleanLabel(site.label)}</span>
+          <b>{sacredRegion || (locale === 'ta' ? 'தகவல் தரப்படவில்லை' : 'Not supplied')}</b>
+          <span>{locale === 'ta' ? siteName : cleanLabel(site.label)}</span>
         </div>
       </div>
 
@@ -2021,8 +2045,8 @@ function SthalamOverview({
         <div>
           {saintBreakdown.map(({ saintId, saint, count }) => (
             <span key={saintId}>
-              <b>{displaySaintName(saint).split(' · ')[0]}</b>
-              <em>{count} pathigam{count === 1 ? '' : 's'}</em>
+              <b>{localizedSaintName(saint, locale).split(' · ')[0]}</b>
+              <em>{locale === 'ta' ? `${count} பதிக${count === 1 ? 'ம்' : 'ங்கள்'}` : `${count} pathigam${count === 1 ? '' : 's'}`}</em>
             </span>
           ))}
         </div>
@@ -2032,7 +2056,7 @@ function SthalamOverview({
         <small><T>TIRUMURAI</T></small>
         <div>
           {tirumuraiBreakdown.map(([tirumurai, count]) => (
-            <span key={tirumurai}>T{tirumurai} <b>{count}</b></span>
+            <span key={tirumurai}>{locale === 'ta' ? `தி ${tirumurai}` : `T${tirumurai}`} <b>{count}</b></span>
           ))}
         </div>
       </section>
@@ -2042,23 +2066,37 @@ function SthalamOverview({
           <div className="detail-section-head">
             <div>
               <Badge kind="tradition"><T>TRADITIONAL CHRONOLOGY</T></Badge>
-              <h3>Kōḷaṟu Pathigam · 2.085</h3>
+              <h3>{locale === 'ta' ? 'கோளறு பதிகம் · 2.085' : 'Kōḷaṟu Pathigam · 2.085'}</h3>
             </div>
             <small>{contextualHymn.formal_tevaram_sthalam_classification}</small>
           </div>
-          <p>
-            A traditional Sambandar chronology places Kōḷaṟu Pathigam at <b>Tirumaraikadu</b>, modern Vedaranyam.
-            The formal Tēvāram edition separately classifies 2.085 as <b>POTU</b>, so it is intentionally not counted among this sthalam&apos;s {totalPathigams} formal pathigams.
-          </p>
-          <p className="reader-note">
-            This preserves both claims without collapsing traditional chronology into formal sthalam metadata.
-          </p>
+          {locale === 'ta' ? (
+            <>
+              <p>
+                சம்பந்தரின் மரபுக் காலவரிசையில் கோளறு பதிகம் 2.085 <b>திருமறைக்காடு</b>, இன்றைய வேதாரண்யம், உடன் இணைக்கப்படுகிறது.
+                ஆனால் தேவாரப் பதிப்பு இதைத் தனியாக <b>POTU</b> என்று வகைப்படுத்துகிறது. ஆகவே இத்தலத்தின் {totalPathigams} முறையான பதிகங்களில் 2.085 சேர்க்கப்படவில்லை.
+              </p>
+              <p className="reader-note">
+                மரபுக் காலவரிசையையும் பதிப்பின் தல வகைப்பாட்டையும் ஒன்றாகக் கலக்காமல், இரண்டையும் தனித்தனியாகக் காட்டுகிறோம்.
+              </p>
+            </>
+          ) : (
+            <>
+              <p>
+                A traditional Sambandar chronology places Kōḷaṟu Pathigam at <b>Tirumaraikadu</b>, modern Vedaranyam.
+                The formal Tēvāram edition separately classifies 2.085 as <b>POTU</b>, so it is intentionally not counted among this sthalam&apos;s {totalPathigams} formal pathigams.
+              </p>
+              <p className="reader-note">
+                This preserves both claims without collapsing traditional chronology into formal sthalam metadata.
+              </p>
+            </>
+          )}
         </section>
       )}
 
       {site.temple_identification_status && (
         <p className="reader-note">
-          <b><T>Place note:</T></b> {identificationLabel(site.temple_identification_status)}
+          <b><T>Place note:</T></b> {identificationLabel(site.temple_identification_status, locale)}
         </p>
       )}
     </div>
