@@ -1440,6 +1440,38 @@ function Fact({ label, value }: { label: string; value: string | number }) {
 }
 
 
+function LiterarySthalamHighlight({
+  place,
+  links,
+  onExplore,
+}: {
+  place: SaivaLiteraryPlace;
+  links: SaivaLiteraryLink[];
+  onExplore: () => void;
+}) {
+  const composition = links.filter(
+    (link) => link.predicate === 'SOURCE_HEADER_COMPOSITION_LOCUS',
+  );
+
+  return (
+    <button className="literary-place-highlight" onClick={onExplore}>
+      <span className="literary-place-icon"><GopuramIcon /></span>
+      <span>
+        <small>TIRUVĀCAKAM LITERARY STHALAM</small>
+        <b>{place.label}</b>
+        <em>{place.label_ta}</em>
+        <strong>
+          {links.length} sections · {composition.length === 1
+            ? 'section 6 source-heading locus'
+            : composition.length + ' source-heading loci'}
+        </strong>
+      </span>
+      <i>→</i>
+    </button>
+  );
+}
+
+
 function TraditionalPlaceDetail({
   saintName,
   stop,
@@ -1567,17 +1599,64 @@ function Tirumurai8LocusDetail({
   );
 }
 
-function Tirumurai8Chronology({ snapshot }: { snapshot: Tirumurai8Snapshot }) {
+function Tirumurai8Chronology({
+  snapshot,
+  place,
+  links,
+}: {
+  snapshot: Tirumurai8Snapshot;
+  place: SaivaLiteraryPlace | null;
+  links: SaivaLiteraryLink[];
+}) {
+  const compositionLinks = links.filter(
+    (link) => link.predicate === 'SOURCE_HEADER_COMPOSITION_LOCUS',
+  );
+  const textualLinks = links.filter(
+    (link) => link.predicate !== 'SOURCE_HEADER_COMPOSITION_LOCUS',
+  );
+
   return (
     <div className="text">
       <Badge kind="inference">JOURNEY NOTE</Badge>
       <p>
-        The Tiruvācakam/Tirukkōvaiyār corpus preserves section order, but section order is not treated as Manikkavasakar's historical itinerary.
+        The Tiruvācakam/Tirukkōvaiyār corpus preserves section order, but section order is not treated as Manikkavasakar&apos;s historical itinerary.
       </p>
       <div className="evidence-callout">
         <GopuramIcon />
         <p>{snapshot.meta.playback_policy}</p>
       </div>
+
+      {place && links.length > 0 && (
+        <section className="literary-place-detail">
+          <small>BEYOND THE PLOTTED LOCI</small>
+          <h3>{place.label}</h3>
+          <div className="tamil">{place.label_ta}</div>
+          <p>
+            Tiruvācakam connects this sthalam to <b>{links.length} sections</b>.
+            The pinned edition gives <b>{compositionLinks.length === 1 ? 'section 6' : compositionLinks.length + ' sections'}</b> a
+            source-heading composition locus; the other <b>{textualLinks.length}</b> are textual references.
+          </p>
+          <div className="literary-section-grid">
+            {links.map((link) => {
+              const section = Number(link.subject.match(/\.s(\d+)$/)?.[1] ?? 0);
+              return (
+                <span
+                  key={link.id}
+                  className={link.predicate === 'SOURCE_HEADER_COMPOSITION_LOCUS' ? 'composition' : ''}
+                >
+                  <b>{section}</b>
+                  {link.predicate === 'SOURCE_HEADER_COMPOSITION_LOCUS'
+                    ? 'source-heading locus'
+                    : 'textual reference'}
+                </span>
+              );
+            })}
+          </div>
+          <p className="reader-note">
+            Uttarakosamangai is not a member of the formal 276-site Tēvāram 1–7 catalogue, so this view does not invent a Tēvāram marker or travel segment for it.
+          </p>
+        </section>
+      )}
     </div>
   );
 }
@@ -1625,6 +1704,7 @@ function SthalamOverview({
   totalPathigams,
   saintBreakdown,
   tirumuraiBreakdown,
+  contextualHymn,
 }: {
   site: Site;
   saintName: string;
@@ -1632,6 +1712,7 @@ function SthalamOverview({
   totalPathigams: number;
   saintBreakdown: Array<{ saintId: string; saint: Saint | null; count: number }>;
   tirumuraiBreakdown: Array<[number, number]>;
+  contextualHymn?: SaivaLiteraryLink | null;
 }) {
   return (
     <div className="text sthalam-overview">
@@ -1676,6 +1757,25 @@ function SthalamOverview({
           ))}
         </div>
       </section>
+
+      {contextualHymn && (
+        <section className="contextual-hymn">
+          <div className="detail-section-head">
+            <div>
+              <Badge kind="tradition">TRADITIONAL CHRONOLOGY</Badge>
+              <h3>Kōḷaṟu Pathigam · 2.085</h3>
+            </div>
+            <small>{contextualHymn.formal_tevaram_sthalam_classification}</small>
+          </div>
+          <p>
+            A traditional Sambandar chronology places Kōḷaṟu Pathigam at <b>Tirumaraikadu</b>, modern Vedaranyam.
+            The formal Tēvāram edition separately classifies 2.085 as <b>POTU</b>, so it is intentionally not counted among this sthalam&apos;s {totalPathigams} formal pathigams.
+          </p>
+          <p className="reader-note">
+            This preserves both claims without collapsing traditional chronology into formal sthalam metadata.
+          </p>
+        </section>
+      )}
 
       {site.temple_identification_status && (
         <p className="reader-note">
