@@ -504,6 +504,7 @@ export default function App() {
             mode={mode}
             progress={progress}
             epigraphicSiteIds={epigraphicSiteIds}
+            travelerImage={saintMedia?.src}
             onSelect={(siteId) => {
               setSelectedSiteId(siteId);
               setTab('visits');
