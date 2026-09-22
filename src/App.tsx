@@ -784,9 +784,14 @@ export default function App() {
               : '63-Nayanmar traditional identity'}
           </div>
 
-          <blockquote className="saint-quote">
-            The devotional story remains vivid; the evidence layer remains explicit.
-          </blockquote>
+          <div className="saint-story-source">
+            <small>{selectedIsManikkavasakar ? 'DEVOTIONAL WORKS' : 'STORY TRADITION'}</small>
+            <b>
+              {selectedIsManikkavasakar
+                ? 'Tiruvācakam · Tirukkōvaiyār'
+                : periyaPuranamTitle || 'Periya Puranam tradition'}
+            </b>
+          </div>
 
           <div className="stat-grid">
             {selectedIsManikkavasakar ? (
@@ -798,10 +803,10 @@ export default function App() {
               </>
             ) : (
               <>
-                <Stat value={authoredPatikams.length} label="Tēvāram patikams" />
-                <Stat value={siteLinks.size} label="linked talams" />
-                <Stat value={episodeCount} label="Periya Puranam links" />
-                <Stat value={playbackStops.length} label="playback stops" />
+                <Stat value={authoredPatikams.length} label="Tēvāram pathigams" />
+                <Stat value={siteLinks.size} label="sung sthalams" />
+                <Stat value={episodeCount} label="Periya Puranam chapter" />
+                <Stat value={playbackStops.length} label="journey stops" />
               </>
             )}
           </div>
@@ -813,7 +818,7 @@ export default function App() {
                   ? 'Traditional place claims'
                   : selectedIsManikkavasakar
                     ? 'Tirumurai 8 textual loci'
-                    : 'Major linked talams'}
+                    : 'Major sthalams'}
               </h3>
               <span>
                 {showTraditionalDetail
@@ -874,10 +879,10 @@ export default function App() {
           </div>
 
           <div className="authority-box">
-            <b>{selectedIsManikkavasakar ? 'Tirumurai 8 authority boundary' : MODE_COPY[mode].short}</b>
+            <b>{selectedIsManikkavasakar ? 'How to read this journey' : MODE_COPY[mode].short}</b>
             <p>
               {selectedIsManikkavasakar
-                ? 'Pramāṇa preserves the Tiruvācakam/Tirukkōvaiyār edition loci; the two plotted modern centroids and the line between them are product presentation, not a historical journey claim.'
+                ? 'The plotted Tirumurai 8 locations are textual-locus waypoints. The line between them is a visual guide, not a claimed historical itinerary.'
                 : MODE_COPY[mode].body}
             </p>
           </div>
