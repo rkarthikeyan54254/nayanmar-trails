@@ -1,34 +1,42 @@
 import { useEffect, useMemo, useState } from 'react';
 import type { ReactNode } from 'react';
 import { GEO_SEEDS, TAMIL_NADU_SCHEMATIC } from './geometry';
+import { DISTRICT_CENTROIDS, normalizeDistrict } from './coverage';
+import { HERO_MEDIA, SAINT_MEDIA, TEMPLE_MEDIA } from './media';
+import GopuramIcon from './GopuramIcon';
+import SacredMap, { type CoveragePoint, type EvidenceMode, type MapStop } from './SacredMap';
 import type { PramanaExport, Saint, Site } from './types';
 
-type EvidenceMode = 'all' | 'edition' | 'tradition' | 'independent';
 type DetailTab = 'hymns' | 'chronology' | 'visits' | 'evidence';
 
 const MUVAR = ['nayanmar.20', 'nayanmar.27', 'nayanmar.63'];
+
 const SAINT_EN: Record<string, string> = {
   'nayanmar.20': 'Appar · Tirunavukkarasar',
   'nayanmar.27': 'Sambandar',
   'nayanmar.63': 'Sundarar · Arurar',
 };
 
-const MODE_COPY: Record<EvidenceMode, { title: string; body: string }> = {
+const MODE_COPY: Record<EvidenceMode, { label: string; short: string; body: string }> = {
   all: {
-    title: 'All layers',
-    body: 'Tradition, edition metadata, independent evidence and product inference are visible together, but never merged into one claim.',
+    label: 'All layers',
+    short: 'Layered view',
+    body: 'Tradition, edition metadata, independent evidence and product inference are visible together, but never collapsed into one claim.',
   },
   edition: {
-    title: 'Text / edition',
-    body: 'Tēvāram author ↔ patikam ↔ talam links are edition metadata. Luminous route geometry remains product inference.',
+    label: 'Text / edition',
+    short: 'Tēvāram evidence',
+    body: 'Author ↔ patikam ↔ talam links come from the edition-aligned Tēvāram graph. Route geometry remains product inference.',
   },
   tradition: {
-    title: 'Tradition',
-    body: 'Traditional saint/place claims are shown as tradition, not as independently verified historical geography.',
+    label: 'Tradition',
+    short: 'Traditional associations',
+    body: 'Traditional saint and place assertions remain visibly distinct from historical verification.',
   },
   independent: {
-    title: 'Independent evidence',
-    body: 'Inferred routes are hidden. Only mapped sites with explicit epigraphic evidence are emphasized.',
+    label: 'Independent',
+    short: 'Independent evidence',
+    body: 'Inferred routes are hidden. Only mapped sites with explicit epigraphic support are emphasized.',
   },
 };
 
@@ -42,6 +50,18 @@ function authorityLabel(scope: string) {
 
 function cleanLabel(label: string) {
   return label.replace(/\s*\([^)]*\)/g, '').trim();
+}
+
+function modernShort(value: string | null | undefined) {
+  if (!value) return '';
+  let current = value.trim().replace(/^\([^)]*\)\s*/, '');
+  if (current.includes('[[')) current = current.split('[[')[0].trim();
+  const beforeParen = current.split('(')[0].trim();
+  return beforeParen || current;
+}
+
+function siteDisplayName(site: Site) {
+  return modernShort(site.modern_name_nic) || cleanLabel(site.label);
 }
 
 export default function App() {
@@ -120,21 +140,67 @@ export default function App() {
     [data],
   );
 
-  const routeStops = useMemo(
+  const routeStops = useMemo<MapStop[]>(
     () =>
       GEO_SEEDS
         .map((seed) => ({
           ...seed,
-          entity: siteById.get(`tevaram_site.${seed.siteId}`),
           hymnIds: siteLinks.get(`tevaram_site.${seed.siteId}`) ?? [],
         }))
-        .filter((item) => item.entity && item.hymnIds.length)
+        .filter((item) => item.hymnIds.length)
         .sort((a, b) => a.playbackRank - b.playbackRank),
-    [siteById, siteLinks],
+    [siteLinks],
   );
+
+  const districtCoverage = useMemo<CoveragePoint[]>(() => {
+    if (!data) return [];
+    const counts = new Map<string, number>();
+    for (const site of data.sites) {
+      const key = normalizeDistrict(site.district);
+      if (key === 'unknown') continue;
+      counts.set(key, (counts.get(key) ?? 0) + 1);
+    }
+    return DISTRICT_CENTROIDS
+      .map((district) => ({
+        ...district,
+        count: counts.get(district.key) ?? 0,
+      }))
+      .filter((item) => item.count > 0)
+      .sort((a, b) => b.count - a.count);
+  }, [data]);
+
+  const saintDistrictCoverage = useMemo<CoveragePoint[]>(() => {
+    const counts = new Map<string, number>();
+    for (const siteId of siteLinks.keys()) {
+      const site = siteById.get(siteId);
+      if (!site) continue;
+      const key = normalizeDistrict(site.district);
+      if (key === 'unknown') continue;
+      counts.set(key, (counts.get(key) ?? 0) + 1);
+    }
+    return DISTRICT_CENTROIDS
+      .map((district) => ({
+        ...district,
+        count: counts.get(district.key) ?? 0,
+      }))
+      .filter((item) => item.count > 0)
+      .sort((a, b) => b.count - a.count);
+  }, [siteById, siteLinks]);
+
+  const topLinkedSites = useMemo(() => {
+    return [...siteLinks.entries()]
+      .map(([siteId, patikams]) => ({
+        site: siteById.get(siteId),
+        count: patikams.length,
+      }))
+      .filter((item): item is { site: Site; count: number } => Boolean(item.site))
+      .sort((a, b) => b.count - a.count || b.site.patikam_count - a.site.patikam_count)
+      .slice(0, 6);
+  }, [siteById, siteLinks]);
 
   const selectedSite = siteById.get(selectedSiteId) ?? null;
   const selectedPatikams = siteLinks.get(selectedSiteId) ?? [];
+
   const episodeCount =
     data?.edges.filter(
       (edge) =>
@@ -142,16 +208,30 @@ export default function App() {
         edge.object === selectedSaintId,
     ).length ?? 0;
 
+  const independentEdges =
+    data?.edges.filter((edge) => edge.authority_scope === 'epigraphic_primary').length ?? 0;
+
   const searchResults = useMemo(() => {
-    if (!data || !query.trim()) return [];
+    if (!data || !query.trim()) return { saints: [] as Saint[], sites: [] as Site[] };
     const needle = query.trim().toLowerCase();
-    return data.sites
-      .filter((site) =>
-        [site.label, site.label_ta, site.modern_name_nic, ...site.aliases]
+
+    const saints = data.saints
+      .filter((item) =>
+        [item.label, item.label_ta, ...(item.aliases ?? [])]
           .filter(Boolean)
           .some((value) => String(value).toLowerCase().includes(needle)),
       )
-      .slice(0, 6);
+      .slice(0, 3);
+
+    const sites = data.sites
+      .filter((item) =>
+        [item.label, item.label_ta, item.modern_name_nic, item.district, ...(item.aliases ?? [])]
+          .filter(Boolean)
+          .some((value) => String(value).toLowerCase().includes(needle)),
+      )
+      .slice(0, 5);
+
+    return { saints, sites };
   }, [data, query]);
 
   useEffect(() => {
@@ -169,7 +249,7 @@ export default function App() {
         }
         return value + 1;
       });
-    }, 1350);
+    }, 1500);
     return () => window.clearInterval(timer);
   }, [playing, routeStops.length]);
 
@@ -183,13 +263,14 @@ export default function App() {
   }
 
   const saintName = SAINT_EN[selectedSaintId] ?? saint?.label ?? 'Nayanmar';
-  const independentEdges = data.edges.filter(
-    (edge) => edge.authority_scope === 'epigraphic_primary',
-  ).length;
+  const activeStop = routeStops[Math.min(progress, Math.max(0, routeStops.length - 1))];
   const progressPct =
     routeStops.length <= 1 ? 0 : (progress / (routeStops.length - 1)) * 100;
-  const activeStop =
-    routeStops[Math.min(progress, Math.max(routeStops.length - 1, 0))];
+  const saintMedia = SAINT_MEDIA[selectedSaintId];
+  const templeMedia = selectedSite ? TEMPLE_MEDIA[selectedSite.id] : undefined;
+  const selectedGeoSeed = selectedSite
+    ? GEO_SEEDS.find((seed) => seed.siteId === selectedSite.site_id)
+    : undefined;
 
   return (
     <main className="app">
@@ -212,48 +293,78 @@ export default function App() {
         </nav>
 
         <div className="header-search">
-          <span>⌕</span>
+          <span className="search-glyph">⌕</span>
           <input
             value={query}
             onChange={(event) => setQuery(event.target.value)}
-            placeholder="Search temples, saints, or places…"
+            placeholder="Search saints, temples, or places…"
           />
           {query && (
             <div className="search-results">
-              {searchResults.length ? searchResults.map((site) => (
+              {searchResults.saints.map((item) => (
                 <button
-                  key={site.id}
+                  key={item.id}
                   onClick={() => {
-                    setSelectedSiteId(site.id);
+                    setSelectedSaintId(item.id);
                     setQuery('');
-                    setTab('visits');
                   }}
                 >
                   <GopuramIcon />
-                  <span>{cleanLabel(site.label)}<small>{site.modern_name_nic || site.district || site.site_id}</small></span>
+                  <span>
+                    {SAINT_EN[item.id] ?? item.label}
+                    <small>Nayanmar {item.ordinal}</small>
+                  </span>
                 </button>
-              )) : <em>No matching Pramāṇa talam</em>}
+              ))}
+              {searchResults.sites.map((item) => (
+                <button
+                  key={item.id}
+                  onClick={() => {
+                    setSelectedSiteId(item.id);
+                    setTab('visits');
+                    setQuery('');
+                  }}
+                >
+                  <GopuramIcon />
+                  <span>
+                    {siteDisplayName(item)}
+                    <small>{cleanLabel(item.label)} · {item.district || item.site_id}</small>
+                  </span>
+                </button>
+              ))}
+              {!searchResults.saints.length && !searchResults.sites.length && (
+                <em>No matching Pramāṇa entity</em>
+              )}
             </div>
           )}
         </div>
 
-        <div className="header-motto">Ancient Paths<br /><b>Living Today</b></div>
+        <div className="header-motto">
+          Ancient Paths<br /><b>Living Today</b>
+        </div>
       </header>
 
       <section className="hero">
-        <div className="hero-ornament left"><GopuramIcon /></div>
+        <img className="hero-photo" src={HERO_MEDIA.src} alt="" />
+        <div className="hero-photo-shade" />
+        <div className="hero-mountain hero-mountain-a" />
+        <div className="hero-mountain hero-mountain-b" />
+        <div className="hero-lamp">✦</div>
+        <div className="hero-tower left"><GopuramIcon /></div>
         <div className="hero-copy">
           <span>ANCIENT PATHS · LIVING EVIDENCE</span>
           <h1>Trace the living journeys of the Nayanmars</h1>
-          <p>Uncover chronology, temples, hymns and pilgrimage geography across a timeless Tamil land.</p>
+          <p>Temples, hymns, sacred geography and evidence — read together without blurring what each source can actually support.</p>
         </div>
-        <blockquote className="hero-quote">“Not just history,<br />but a living landscape of devotion.”</blockquote>
-        <div className="hero-ornament right"><GopuramIcon /></div>
+        <blockquote className="hero-quote">
+          “Not just history,<br />but a living landscape of devotion.”
+        </blockquote>
+        <div className="hero-tower right"><GopuramIcon /></div>
+        <small className="hero-credit">{HERO_MEDIA.source} · {HERO_MEDIA.license}</small>
       </section>
 
       <section className="filters">
-        <label>
-          <span>Saint</span>
+        <Filter label="Saint">
           <select value={selectedSaintId} onChange={(event) => setSelectedSaintId(event.target.value)}>
             {data.saints.map((item) => (
               <option key={item.id} value={item.id}>
@@ -261,47 +372,36 @@ export default function App() {
               </option>
             ))}
           </select>
-        </label>
+        </Filter>
 
-        <label className="secondary-filter">
-          <span>Century</span>
-          <select defaultValue="all"><option value="all">All centuries</option></select>
-        </label>
-        <label className="secondary-filter">
-          <span>Region</span>
-          <select defaultValue="tn"><option value="tn">Tamil Nadu</option></select>
-        </label>
-        <label className="secondary-filter">
-          <span>Shrine Type</span>
-          <select defaultValue="all"><option value="all">All temples</option></select>
-        </label>
+        <Filter label="Century">
+          <select defaultValue="unasserted">
+            <option value="unasserted">Not asserted in v1</option>
+          </select>
+        </Filter>
 
-        <div className="quick">
-          {MUVAR.map((id) => (
-            <button
-              key={id}
-              className={selectedSaintId === id ? 'active' : ''}
-              onClick={() => setSelectedSaintId(id)}
-            >
-              {SAINT_EN[id]?.split(' · ')[0]}
-            </button>
-          ))}
-        </div>
+        <Filter label="Region">
+          <select defaultValue="tn">
+            <option value="tn">Tamil Nadu</option>
+          </select>
+        </Filter>
 
-        <div className="mode">
-          {(['all', 'edition', 'tradition', 'independent'] as EvidenceMode[]).map((item) => (
+        <Filter label="Evidence lens">
+          <select value={mode} onChange={(event) => setMode(event.target.value as EvidenceMode)}>
+            {(Object.keys(MODE_COPY) as EvidenceMode[]).map((item) => (
+              <option key={item} value={item}>{MODE_COPY[item].label}</option>
+            ))}
+          </select>
+        </Filter>
+
+        <div className="mode-pills">
+          {(Object.keys(MODE_COPY) as EvidenceMode[]).map((item) => (
             <button
               key={item}
               className={mode === item ? 'active' : ''}
               onClick={() => setMode(item)}
             >
-              {item === 'all'
-                ? 'All layers'
-                : item === 'edition'
-                  ? 'Text / edition'
-                  : item === 'tradition'
-                    ? 'Tradition'
-                    : 'Independent'}
+              {MODE_COPY[item].label}
             </button>
           ))}
         </div>
@@ -310,66 +410,101 @@ export default function App() {
       <section className="workspace">
         <aside className="panel saint-card">
           <div className="saint-visual">
+            {saintMedia ? (
+              <img
+                src={saintMedia.src}
+                alt=""
+                onError={(event) => {
+                  event.currentTarget.style.display = 'none';
+                }}
+              />
+            ) : (
+              <div className="saint-fallback"><GopuramIcon /></div>
+            )}
+            <div className="saint-gradient" />
             <div className="saint-number">{saint?.ordinal}</div>
-            <SaintPortrait />
-            <div className="temple-silhouette"><GopuramIcon /></div>
+            <div className="saint-temple"><GopuramIcon /></div>
+            {saintMedia && (
+              <small className="media-credit">
+                {saintMedia.source} · {saintMedia.license}
+              </small>
+            )}
           </div>
 
-          <small className="eyebrow">NAYANMAR {saint?.ordinal}</small>
-          <h2>{saintName}</h2>
-          <div className="tamil">{saint?.label_ta}</div>
-          <div className="century-line"><span>◉</span> Traditional registry identity</div>
+          <div className="saint-heading">
+            <small>NAYANMAR {saint?.ordinal}</small>
+            <h2>{saintName}</h2>
+            <div className="tamil">{saint?.label_ta}</div>
+          </div>
+
+          <div className="identity-line"><GopuramIcon /> Traditional identity</div>
 
           <blockquote className="saint-quote">
-            “The map is devotional storytelling; the evidence labels say exactly what Pramāṇa can support.”
+            The devotional story remains vivid; the evidence layer remains explicit.
           </blockquote>
 
           <div className="stat-grid">
             <Stat value={authoredPatikams.length} label="Tēvāram patikams" />
-            <Stat value={siteLinks.size} label="edition-linked talams" />
+            <Stat value={siteLinks.size} label="linked talams" />
+            <Stat value={episodeCount} label="Periya Puranam links" />
+            <Stat value={routeStops.length} label="exact mapped exemplars" />
           </div>
 
           <div className="major-temples">
-            <h3>Mapped exemplars</h3>
-            {routeStops.slice(0, 5).map((stop) => (
+            <div className="section-title">
+              <h3>Major linked talams</h3>
+              <span>{siteLinks.size} total</span>
+            </div>
+            {topLinkedSites.map(({ site, count }) => (
               <button
-                key={stop.siteId}
+                key={site.id}
                 onClick={() => {
-                  setSelectedSiteId(`tevaram_site.${stop.siteId}`);
+                  setSelectedSiteId(site.id);
                   setTab('visits');
                 }}
               >
                 <GopuramIcon />
-                <span>{stop.name}</span>
-                <small>{stop.hymnIds.length}</small>
+                <span>{siteDisplayName(site)}</span>
+                <small>{count}</small>
               </button>
             ))}
           </div>
 
           <div className="journey-progress">
-            <div><b>Journey Progress</b><span>{routeStops.length ? progress + 1 : 0} / {routeStops.length}</span></div>
+            <div>
+              <b>Playback progress</b>
+              <span>{routeStops.length ? Math.min(progress + 1, routeStops.length) : 0} / {routeStops.length}</span>
+            </div>
             <div className="mini-track"><i style={{ width: `${progressPct}%` }} /></div>
           </div>
 
-          <div className="rule">
-            <h3>Authority boundary</h3>
+          <div className="authority-box">
+            <b>{MODE_COPY[mode].short}</b>
             <p>{MODE_COPY[mode].body}</p>
           </div>
         </aside>
 
         <section className="panel map-card">
           <div className="map-toolbar">
-            <span><GopuramIcon /> {MODE_COPY[mode].title}</span>
-            <b>{routeStops.length} mapped evidence-linked stops</b>
+            <div className="map-toolbar-left">
+              <GopuramIcon />
+              <span>{MODE_COPY[mode].short}</span>
+            </div>
+            <div className="map-toolbar-stats">
+              <span><b>{siteLinks.size}</b> linked talams</span>
+              <span><b>{saintDistrictCoverage.length}</b> linked districts</span>
+              <span><b>{routeStops.length}</b> exact exemplars</span>
+            </div>
           </div>
 
           <SacredMap
             routeStops={routeStops}
+            coverage={saintDistrictCoverage}
             selectedSiteId={selectedSiteId}
             mode={mode}
             progress={progress}
             epigraphicSiteIds={epigraphicSiteIds}
-            siteLinks={siteLinks}
+            travelerImage={saintMedia?.src}
             onSelect={(siteId) => {
               setSelectedSiteId(siteId);
               setTab('visits');
@@ -377,22 +512,34 @@ export default function App() {
           />
 
           <div className="map-legend">
-            <b>Legend</b>
-            <span><i className="legend-temple"><GopuramIcon /></i> Pramāṇa talam node</span>
-            <span><i className="legend-route" /> Product-inferred playback</span>
-            <span><i className="legend-epigraphy" /> Explicit epigraphic evidence</span>
-            <small>Terrain, route geometry and modern place centroids are presentation layers, never source evidence.</small>
+            <b>Evidence legend</b>
+            <span><i className="legend-tower"><GopuramIcon /></i> exact modern centroid for a mapped exemplar</span>
+            <span><i className="legend-route" /> route between known endpoints — product inference</span>
+            <span><i className="legend-coverage" /> selected-saint linked-talam density by normalized modern district</span>
+            <span><i className="legend-independent" /> explicit independent epigraphic support</span>
+          </div>
+
+          <div className="map-source-note">
+            OpenFreeMap / OpenStreetMap basemap · Pramāṇa data overlay
           </div>
 
           {graphOpen && (
             <div className="overlay">
-              <h3>Saint ↔ Talam Connections</h3>
-              <Network saint={saint} stops={routeStops.slice(0, 12)} />
+              <div className="overlay-head">
+                <div>
+                  <small>SELECTED SAINT</small>
+                  <h3>Saint ↔ Talam Connections</h3>
+                </div>
+                <button onClick={() => setGraphOpen(false)}>Close</button>
+              </div>
+              <Network
+                saint={saint}
+                sites={topLinkedSites.slice(0, 12)}
+              />
               <p>
-                Edges are selected saint → Tēvāram-linked talam relationships.
-                Graph layout has no evidentiary meaning.
+                Edges are Tēvāram author → patikam → talam relationships from the versioned Pramāṇa export.
+                Layout position has no evidentiary meaning.
               </p>
-              <button onClick={() => setGraphOpen(false)}>Close graph</button>
             </div>
           )}
         </section>
@@ -411,25 +558,39 @@ export default function App() {
           </div>
 
           <div className="detail">
-            <div className="temple-visual">
-              <div className="temple-art"><GopuramIcon /></div>
+            <div className={`temple-visual ${templeMedia ? 'has-photo' : ''}`}>
+              {templeMedia ? (
+                <img src={templeMedia.src} alt="" />
+              ) : (
+                <div className="temple-art"><GopuramIcon /></div>
+              )}
+              <div className="temple-shade" />
               <div className="temple-title">
                 <small>CURRENT TALAM</small>
-                <h2>{selectedSite ? cleanLabel(selectedSite.label) : 'Select a site'}</h2>
-                <p>{selectedSite?.label_ta || selectedSite?.modern_name_nic || ''}</p>
+                <h2>{selectedSite ? siteDisplayName(selectedSite) : 'Select a talam'}</h2>
+                <p>{selectedSite ? `${cleanLabel(selectedSite.label)}${selectedSite.label_ta ? ` · ${selectedSite.label_ta}` : ''}` : ''}</p>
               </div>
+              {templeMedia && (
+                <span className="temple-credit">{templeMedia.source} · {templeMedia.license}</span>
+              )}
             </div>
 
             {selectedSite && (
               <>
                 <div className="chips">
                   <span>{selectedSite.site_id}</span>
-                  <span>{selectedSite.patikam_count} total patikams</span>
+                  <span>{selectedSite.patikam_count} site patikams</span>
                   <span>{selectedPatikams.length} by {saintName.split(' · ')[0]}</span>
                 </div>
 
                 {tab === 'visits' && (
-                  <Visits site={selectedSite} saintName={saintName} count={selectedPatikams.length} />
+                  <Visits
+                    site={selectedSite}
+                    saintName={saintName}
+                    count={selectedPatikams.length}
+                    patikamIds={selectedPatikams}
+                    patikamById={patikamById}
+                  />
                 )}
                 {tab === 'hymns' && (
                   <Hymns ids={selectedPatikams} patikamById={patikamById} />
@@ -438,10 +599,10 @@ export default function App() {
                 {tab === 'evidence' && <Evidence site={selectedSite} data={data} />}
 
                 <div className="temple-facts">
-                  <div><GopuramIcon /><span><small>Traditional class</small>{selectedSite.traditional_location_class || 'Not supplied'}</span></div>
-                  <div><GopuramIcon /><span><small>Modern catalog</small>{selectedSite.modern_name_nic || selectedSite.district || 'Not supplied'}</span></div>
-                  <div><GopuramIcon /><span><small>Patikams</small>{selectedSite.patikam_count}</span></div>
-                  <div><GopuramIcon /><span><small>Evidence class</small>{authorityLabel(selectedSite.authority_scope)}</span></div>
+                  <Fact label="Traditional class" value={selectedSite.traditional_location_class || 'Not supplied'} />
+                  <Fact label="Modern catalog" value={selectedSite.modern_name_nic || selectedSite.district || 'Not supplied'} />
+                  <Fact label="Map geometry" value={selectedGeoSeed ? 'Exact modern centroid exemplar' : 'District-level corpus context only'} />
+                  <Fact label="Evidence class" value={authorityLabel(selectedSite.authority_scope)} />
                 </div>
 
                 <button
@@ -453,7 +614,7 @@ export default function App() {
                     })
                   }
                 >
-                  View on Map →
+                  <GopuramIcon /> View on map →
                 </button>
               </>
             )}
@@ -465,8 +626,8 @@ export default function App() {
         <div className="panel timeline">
           <div className="section-head">
             <div>
-              <h3>Timeline of the 63 Nayanmars</h3>
-              <p>Playback below is a <b>presentation sequence, not asserted chronology.</b></p>
+              <h3>Journey Playback</h3>
+              <p>Geographic presentation sequence — <b>not a historical chronology.</b></p>
             </div>
             <Badge kind="inference">INFERENCE</Badge>
           </div>
@@ -509,349 +670,77 @@ export default function App() {
                 </>
               ) : (
                 <>
-                  <b>No mapped playback</b>
-                  <small>No current seed stops for this saint.</small>
+                  <b>No exact mapped playback</b>
+                  <small>This saint has no current exact seed stops.</small>
                 </>
               )}
+            </div>
+          </div>
+
+          <div className="timeline-labels">
+            {routeStops.slice(0, 6).map((stop) => <span key={stop.siteId}>{stop.name}</span>)}
+          </div>
+
+          <div className="saint-registry">
+            <div className="registry-copy">
+              <b>63-saint traditional registry</b>
+              <small>ordinal sequence · not historical dating</small>
+            </div>
+            <div className="registry-dots">
+              {data.saints
+                .slice()
+                .sort((a, b) => a.ordinal - b.ordinal)
+                .map((item) => (
+                  <button
+                    key={item.id}
+                    title={SAINT_EN[item.id] ?? item.label}
+                    className={item.id === selectedSaintId ? 'selected' : ''}
+                    onClick={() => setSelectedSaintId(item.id)}
+                  />
+                ))}
             </div>
           </div>
         </div>
 
         <div className="panel graph-mini">
-          <h3>Saint – Temple Connections</h3>
-          <Network saint={saint} stops={routeStops.slice(0, 8)} />
+          <div className="section-title">
+            <h3>Saint – Talam Graph</h3>
+            <span>{siteLinks.size} linked talams</span>
+          </div>
+          <Network saint={saint} sites={topLinkedSites.slice(0, 8)} />
         </div>
 
         <div className="panel density-card">
-          <h3>Temple Visit Density</h3>
-          <MiniDensity stops={routeStops} />
+          <div className="section-title">
+            <h3>Corpus Density</h3>
+            <span>by catalog district</span>
+          </div>
+          <DensityPanel points={districtCoverage.slice(0, 6)} />
         </div>
 
         <div className="panel totals">
-          <Stat value={data.meta.counts.tevaram_sites} label="Total Temples" />
-          <Stat value={data.meta.counts.tevaram_patikams} label="Total Patikams" />
           <Stat value={data.meta.counts.saints} label="Nayanmars" />
-          <Stat value={independentEdges} label="Independent edges" />
+          <Stat value={data.meta.counts.tevaram_sites} label="Tēvāram talams" />
+          <Stat value={data.meta.counts.tevaram_patikams} label="Patikams" />
+          <Stat value={data.meta.counts.total_edges} label="Typed edges" />
         </div>
       </section>
 
       <footer>
         <strong><GopuramIcon /> Nayanmar Trails</strong>
-        <span>A digital humanities initiative for a more connected sacred history.</span>
-        <span>Pramāṇa source {data.meta.source_commit.slice(0, 10)}</span>
+        <span>Versioned read-only Pramāṇa export · source commit {data.meta.source_commit.slice(0, 10)}</span>
+        <span>Map © OpenFreeMap / OpenMapTiles / OpenStreetMap</span>
       </footer>
     </main>
   );
 }
 
-
-function SaintPortrait() {
+function Filter({ label, children }: { label: string; children: ReactNode }) {
   return (
-    <svg className="saint-portrait" viewBox="0 0 220 230" aria-hidden="true">
-      <defs>
-        <linearGradient id="skin" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stopColor="#d6a06d" />
-          <stop offset=".55" stopColor="#a9653f" />
-          <stop offset="1" stopColor="#6e3f2f" />
-        </linearGradient>
-        <linearGradient id="cloth" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stopColor="#d99542" />
-          <stop offset="1" stopColor="#8d4e2a" />
-        </linearGradient>
-        <filter id="portraitGlow" x="-50%" y="-50%" width="200%" height="200%">
-          <feGaussianBlur stdDeviation="7" result="blur" />
-          <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
-        </filter>
-      </defs>
-      <circle cx="108" cy="101" r="78" fill="#183d3d" opacity=".78" />
-      <path d="M58 196 C66 154 77 145 90 139 C97 136 103 132 105 127 C86 117 77 97 79 73 C81 49 96 34 115 32 C138 29 156 44 160 68 C164 90 156 113 139 126 C141 133 148 138 157 142 C172 150 184 166 191 199 Z" fill="url(#skin)" />
-      <path d="M75 60 C80 31 103 17 128 22 C151 27 161 46 158 69 C148 57 137 51 123 50 C104 49 91 55 75 60 Z" fill="#191b18" />
-      <path d="M112 20 C110 6 117 0 127 2 C140 4 145 13 140 28" fill="#151714" />
-      <path d="M145 72 C157 83 158 104 149 119 C142 132 131 138 119 139 C137 127 144 110 143 94 Z" fill="#2a211b" />
-      <path d="M89 86 Q105 75 121 84" stroke="#402a21" strokeWidth="4" fill="none" strokeLinecap="round" />
-      <path d="M126 84 Q141 76 151 86" stroke="#402a21" strokeWidth="4" fill="none" strokeLinecap="round" />
-      <circle cx="104" cy="88" r="3.5" fill="#17120f" />
-      <circle cx="138" cy="88" r="3.5" fill="#17120f" />
-      <path d="M122 88 C120 101 117 109 119 113" stroke="#7c4934" strokeWidth="3" fill="none" />
-      <path d="M105 119 Q122 128 138 118" stroke="#563126" strokeWidth="4" fill="none" strokeLinecap="round" />
-      <path d="M83 69 H151" stroke="#f2e4cf" strokeWidth="5" opacity=".95" />
-      <path d="M87 76 H148" stroke="#f2e4cf" strokeWidth="4" opacity=".93" />
-      <path d="M91 83 H145" stroke="#f2e4cf" strokeWidth="3" opacity=".9" />
-      <circle cx="119" cy="77" r="4" fill="#b53a2b" />
-      <path d="M63 195 C75 161 86 150 99 145 L120 173 L143 145 C160 153 174 168 185 196 Z" fill="url(#cloth)" />
-      <path d="M95 142 C101 159 109 174 120 184 C130 174 139 159 146 143" fill="none" stroke="#e8c78a" strokeWidth="4" />
-      <g fill="#3b2117">
-        <circle cx="101" cy="151" r="3" /><circle cx="108" cy="157" r="3" /><circle cx="115" cy="163" r="3" />
-        <circle cx="122" cy="164" r="3" /><circle cx="129" cy="159" r="3" /><circle cx="136" cy="152" r="3" />
-      </g>
-      <circle cx="110" cy="107" r="91" fill="none" stroke="#d8a651" strokeWidth="2" opacity=".55" filter="url(#portraitGlow)" />
-    </svg>
-  );
-}
-
-function GopuramIcon({ className = '' }: { className?: string }) {
-  return (
-    <svg className={`gopuram-icon ${className}`} viewBox="0 0 64 64" aria-hidden="true">
-      <path d="M28 4h8l2 6H26l2-6Z" />
-      <path d="M23 12h18l3 7H20l3-7Z" />
-      <path d="M18 21h28l3 8H15l3-8Z" />
-      <path d="M13 31h38l3 10H10l3-10Z" />
-      <path d="M8 43h48v9H8z" />
-      <path d="M5 54h54v6H5z" />
-      <path d="M25 39h14v21H25z" className="door" />
-      <circle cx="25" cy="16" r="1.5" />
-      <circle cx="32" cy="16" r="1.5" />
-      <circle cx="39" cy="16" r="1.5" />
-      <circle cx="21" cy="26" r="1.5" />
-      <circle cx="28" cy="26" r="1.5" />
-      <circle cx="36" cy="26" r="1.5" />
-      <circle cx="43" cy="26" r="1.5" />
-    </svg>
-  );
-}
-
-function MapGopuram({ x, y, scale = 1 }: { x: number; y: number; scale?: number }) {
-  return (
-    <g transform={`translate(${x - 7 * scale} ${y - 12 * scale}) scale(${0.22 * scale})`}>
-      <path d="M28 4h8l2 6H26l2-6Z" />
-      <path d="M23 12h18l3 7H20l3-7Z" />
-      <path d="M18 21h28l3 8H15l3-8Z" />
-      <path d="M13 31h38l3 10H10l3-10Z" />
-      <path d="M8 43h48v9H8z" />
-      <path d="M5 54h54v6H5z" />
-      <path className="map-door" d="M25 39h14v21H25z" />
-    </g>
-  );
-}
-
-type SacredStop = {
-  siteId: string;
-  name: string;
-  nameTa: string;
-  lng: number;
-  lat: number;
-  playbackRank: number;
-  geometryStatus: 'modern_place_centroid_product_metadata';
-  entity?: Site;
-  hymnIds: string[];
-};
-
-function SacredMap({
-  routeStops,
-  selectedSiteId,
-  mode,
-  progress,
-  epigraphicSiteIds,
-  siteLinks,
-  onSelect,
-}: {
-  routeStops: SacredStop[];
-  selectedSiteId: string;
-  mode: EvidenceMode;
-  progress: number;
-  epigraphicSiteIds: Set<string>;
-  siteLinks: Map<string, string[]>;
-  onSelect: (siteId: string) => void;
-}) {
-  const width = 920;
-  const height = 570;
-  const bounds = { minLng: 76.75, maxLng: 80.55, minLat: 7.85, maxLat: 13.65 };
-
-  const project = (lng: number, lat: number) => {
-    const x = 55 + ((lng - bounds.minLng) / (bounds.maxLng - bounds.minLng)) * (width - 110);
-    const y = 36 + ((bounds.maxLat - lat) / (bounds.maxLat - bounds.minLat)) * (height - 72);
-    return [x, y] as const;
-  };
-
-  const landPoints = TAMIL_NADU_SCHEMATIC
-    .map(([lng, lat]) => project(lng, lat).join(','))
-    .join(' ');
-
-  const fullRoute = routeStops.map((stop) => project(stop.lng, stop.lat));
-  const activeRoute = routeStops
-    .slice(0, Math.min(progress + 1, routeStops.length))
-    .map((stop) => project(stop.lng, stop.lat));
-
-  const pathFor = (points: readonly (readonly [number, number])[]) =>
-    points.length < 2
-      ? ''
-      : points
-          .map(([x, y], index) => `${index ? 'L' : 'M'} ${x.toFixed(1)} ${y.toFixed(1)}`)
-          .join(' ');
-
-  const isEditionVisible = mode === 'all' || mode === 'edition';
-  const isSiteVisible = mode !== 'tradition';
-  const currentPoint = activeRoute[activeRoute.length - 1];
-
-  return (
-    <div className="map sacred-map" aria-label="Evidence-aware Tamil Nadu sacred geography">
-      <svg viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="xMidYMid meet" role="img">
-        <defs>
-          <linearGradient id="landGradient" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0" stopColor="#55745b" />
-            <stop offset=".24" stopColor="#355d4e" />
-            <stop offset=".58" stopColor="#1e4b43" />
-            <stop offset="1" stopColor="#0c2d34" />
-          </linearGradient>
-          <radialGradient id="mapGlow" cx="52%" cy="43%" r="66%">
-            <stop offset="0" stopColor="#47735e" stopOpacity=".42" />
-            <stop offset=".55" stopColor="#123d42" stopOpacity=".18" />
-            <stop offset="1" stopColor="#051923" stopOpacity="0" />
-          </radialGradient>
-          <radialGradient id="cityGlow">
-            <stop offset="0" stopColor="#ffe19a" stopOpacity=".95" />
-            <stop offset=".22" stopColor="#f5b74e" stopOpacity=".55" />
-            <stop offset="1" stopColor="#f5b74e" stopOpacity="0" />
-          </radialGradient>
-          <pattern id="contours" width="48" height="32" patternUnits="userSpaceOnUse">
-            <path
-              d="M-8 22 C7 4 22 36 52 11"
-              fill="none"
-              stroke="#a8c68f"
-              strokeOpacity=".08"
-              strokeWidth="1"
-            />
-          </pattern>
-          <filter id="routeGlow" x="-50%" y="-50%" width="200%" height="200%">
-            <feGaussianBlur stdDeviation="4" result="blur" />
-            <feMerge>
-              <feMergeNode in="blur" />
-              <feMergeNode in="SourceGraphic" />
-            </feMerge>
-          </filter>
-          <filter id="templeGlow" x="-90%" y="-90%" width="280%" height="280%">
-            <feGaussianBlur stdDeviation="3" result="blur" />
-            <feMerge>
-              <feMergeNode in="blur" />
-              <feMergeNode in="SourceGraphic" />
-            </feMerge>
-          </filter>
-          <clipPath id="landClip">
-            <polygon points={landPoints} />
-          </clipPath>
-        </defs>
-
-        <rect width={width} height={height} fill="#061a24" />
-        <rect width={width} height={height} fill="url(#mapGlow)" />
-
-        <g className="sea-texture" opacity=".32">
-          <path d="M665 30 C743 84 796 170 804 257 C813 357 775 432 700 535" />
-          <path d="M725 23 C802 95 843 180 848 273 C852 367 820 449 758 538" />
-          <path d="M54 151 C103 178 121 221 106 276 C91 331 90 401 129 470" />
-        </g>
-
-        <polygon
-          points={landPoints}
-          fill="url(#landGradient)"
-          stroke="#e1bd6f"
-          strokeOpacity=".72"
-          strokeWidth="2"
-        />
-        <polygon points={landPoints} fill="url(#contours)" />
-
-        <g clipPath="url(#landClip)" className="relief">
-          <ellipse cx="208" cy="183" rx="130" ry="70" />
-          <ellipse cx="246" cy="290" rx="118" ry="116" />
-          <ellipse cx="342" cy="430" rx="110" ry="80" />
-          <ellipse cx="515" cy="225" rx="115" ry="70" />
-          <ellipse cx="590" cy="350" rx="132" ry="92" />
-        </g>
-
-        <g className="mountains">
-          <path d="M153 147 L182 104 L204 144 L230 115 L259 163 L286 129 L319 178" />
-          <path d="M203 225 L238 176 L261 214 L296 164 L334 230" />
-          <path d="M252 354 L292 300 L325 344 L358 293 L399 364" />
-        </g>
-
-        <g className="rivers">
-          <path d="M245 315 C326 294 386 320 461 347 C533 373 598 365 704 337" />
-          <path d="M408 219 C466 237 522 254 596 245" />
-          <path d="M353 437 C427 405 490 424 562 458" />
-        </g>
-
-        <g className="region-boundaries">
-          <path d="M215 173 C307 194 341 266 320 340" />
-          <path d="M410 133 C437 220 446 321 421 430" />
-          <path d="M559 155 C544 230 567 303 639 365" />
-        </g>
-
-        {isEditionVisible && fullRoute.length > 1 && (
-          <>
-            <path className="route route-ghost" d={pathFor(fullRoute)} />
-            <path className="route route-dots" d={pathFor(fullRoute)} />
-            {activeRoute.length > 1 && (
-              <path
-                className="route route-live"
-                d={pathFor(activeRoute)}
-                filter="url(#routeGlow)"
-              />
-            )}
-          </>
-        )}
-
-        {isSiteVisible &&
-          GEO_SEEDS.map((seed) => {
-            const [x, y] = project(seed.lng, seed.lat);
-            const siteId = `tevaram_site.${seed.siteId}`;
-            const linked = siteLinks.get(siteId)?.length ?? 0;
-            const independent = epigraphicSiteIds.has(seed.siteId);
-            if (mode === 'independent' && !independent) return null;
-            const selected = selectedSiteId === siteId;
-            const active = linked > 0;
-
-            return (
-              <g
-                key={seed.siteId}
-                className={`temple-marker ${active ? 'linked' : ''} ${independent ? 'independent' : ''} ${selected ? 'selected' : ''}`}
-                transform={`translate(${x} ${y})`}
-                onClick={() => onSelect(siteId)}
-                onKeyDown={(event) => {
-                  if (event.key === 'Enter' || event.key === ' ') onSelect(siteId);
-                }}
-                role="button"
-                tabIndex={0}
-                aria-label={`${seed.name}, ${linked} linked patikams`}
-              >
-                <circle className="marker-glow" r={selected ? 25 : active ? 18 : 12} />
-                <circle className="marker-ring" r={selected ? 12 : active ? 10 : 8} />
-                <MapGopuram x={0} y={0} scale={selected ? 1.1 : active ? 1 : .82} />
-                {(active || selected) && (
-                  <text y={selected ? 30 : 26} textAnchor="middle">{seed.name}</text>
-                )}
-                {independent && (
-                  <path className="epigraphic-diamond" d="M0 -20 L5 -15 L0 -10 L-5 -15 Z" />
-                )}
-              </g>
-            );
-          })}
-
-        {currentPoint && isEditionVisible && (
-          <g className="traveler" transform={`translate(${currentPoint[0]} ${currentPoint[1]})`}>
-            <circle r="22" fill="url(#cityGlow)" />
-            <circle r="5" />
-          </g>
-        )}
-
-        <text className="region-label" x="455" y="303">TAMIL NADU</text>
-        <text className="sea-label" x="794" y="276">BAY OF BENGAL</text>
-        <text className="sea-label" x="636" y="531">INDIAN OCEAN</text>
-        <text className="neighbor-label" x="183" y="92">KARNATAKA</text>
-        <text className="neighbor-label" x="119" y="334">KERALA</text>
-
-        <g className="north" transform="translate(846 65)">
-          <text textAnchor="middle" y="-14">N</text>
-          <path d="M0 -3 L6 12 L0 8 L-6 12 Z" />
-          <path d="M0 28 L-5 16 L0 20 L5 16 Z" opacity=".5" />
-        </g>
-      </svg>
-
-      {mode === 'tradition' && (
-        <div className="map-message">
-          <Badge kind="tradition">TRADITION LAYER</Badge>
-          <p>Traditional place assertions are kept separate. This v1 map does not yet geocode the full traditional-place registry.</p>
-        </div>
-      )}
-    </div>
+    <label className="filter">
+      <span>{label}</span>
+      {children}
+    </label>
   );
 }
 
@@ -868,8 +757,20 @@ function Badge({
 function Stat({ value, label }: { value: number; label: string }) {
   return (
     <div className="stat">
-      <b>{value}</b>
+      <b>{value.toLocaleString()}</b>
       <small>{label}</small>
+    </div>
+  );
+}
+
+function Fact({ label, value }: { label: string; value: string | number }) {
+  return (
+    <div className="fact">
+      <GopuramIcon />
+      <span>
+        <small>{label}</small>
+        {value}
+      </span>
     </div>
   );
 }
@@ -878,19 +779,49 @@ function Visits({
   site,
   saintName,
   count,
+  patikamIds,
+  patikamById,
 }: {
   site: Site;
   saintName: string;
   count: number;
+  patikamIds: string[];
+  patikamById: Map<string, { tirumurai: number; patikam: number }>;
 }) {
   return (
     <div className="text">
       <Badge kind="edition">EDITION METADATA</Badge>
       <p>
-        <b>{saintName}</b> is linked to {count} Tēvāram patikam
+        <b>{saintName}</b> is linked to <b>{count}</b> Tēvāram patikam
         {count === 1 ? '' : 's'} associated with this traditional talam in the current Pramāṇa graph.
       </p>
-      <p className="quote-box">This is a Tēvāram association, not by itself proof of the exact modern temple or road travelled.</p>
+
+      {patikamIds.length > 0 && (
+        <div className="locus-strip">
+          <small>TĒVĀRAM LOCI</small>
+          <div>
+            {patikamIds.slice(0, 3).map((id) => {
+              const item = patikamById.get(id);
+              return (
+                <span key={id}>
+                  <GopuramIcon />
+                  {item ? `T${item.tirumurai} · P${item.patikam}` : id.replace('tevaram.ifp.', '')}
+                </span>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      <div className="evidence-callout">
+        <GopuramIcon />
+        <p>
+          This establishes a text/edition association. It does not by itself prove the precise modern temple identity or historical road travelled.
+        </p>
+      </div>
+      {site.temple_identification_status && (
+        <p className="microcopy">Temple identification status: {site.temple_identification_status}</p>
+      )}
     </div>
   );
 }
@@ -911,7 +842,7 @@ function Hymns({
             const item = patikamById.get(id);
             return (
               <li key={id}>
-                <span><GopuramIcon /></span>
+                <GopuramIcon />
                 <div>
                   <b>{id.replace('tevaram.ifp.', 'Tēvāram ')}</b>
                   <small>
@@ -925,7 +856,7 @@ function Hymns({
           })}
         </ul>
       ) : (
-        <p>No patikam by the selected saint is linked to this mapped talam.</p>
+        <p>No patikam by the selected saint is linked to this talam.</p>
       )}
     </div>
   );
@@ -936,11 +867,14 @@ function Chronology() {
     <div className="text">
       <Badge kind="inference">FAIL-CLOSED CHRONOLOGY</Badge>
       <p>
-        The current Pramāṇa Nayanmar graph does <b>not</b> assert a complete historical visit sequence or precise saint chronology.
+        The current Pramāṇa Nayanmar graph does <b>not</b> assert a complete visit sequence or a precise historical chronology.
       </p>
-      <p className="quote-box">
-        Nayanmar Trails therefore keeps playback as presentation inference until a versioned chronology export exists.
-      </p>
+      <div className="evidence-callout">
+        <GopuramIcon />
+        <p>
+          Playback therefore remains explicitly labeled product inference until a versioned chronology export exists.
+        </p>
+      </div>
     </div>
   );
 }
@@ -965,9 +899,12 @@ function Evidence({ site, data }: { site: Site; data: PramanaExport }) {
           </div>
         ))
       ) : (
-        <p className="caution">
-          No explicit epigraphic edge is attached to this mapped talam in the current export. That is not evidence of historical absence.
-        </p>
+        <div className="evidence-callout muted">
+          <GopuramIcon />
+          <p>
+            No explicit epigraphic edge is attached to this mapped talam in the current export. That is not evidence of historical absence.
+          </p>
+        </div>
       )}
     </div>
   );
@@ -975,33 +912,33 @@ function Evidence({ site, data }: { site: Site; data: PramanaExport }) {
 
 function Network({
   saint,
-  stops,
+  sites,
 }: {
   saint: Saint | null;
-  stops: Array<{ siteId: string; name: string; hymnIds: string[] }>;
+  sites: Array<{ site: Site; count: number }>;
 }) {
-  const width = 320;
-  const height = 130;
-  const cx = 160;
-  const cy = 64;
-  const rx = 118;
-  const ry = 44;
+  const width = 360;
+  const height = 148;
+  const cx = 180;
+  const cy = 73;
+  const rx = 137;
+  const ry = 52;
 
   return (
     <svg className="network" viewBox={`0 0 ${width} ${height}`} role="img" aria-label="Saint to talam graph">
-      {stops.map((stop, index) => {
-        const angle = (index / Math.max(stops.length, 1)) * Math.PI * 2 - Math.PI / 2;
+      {sites.map(({ site, count }, index) => {
+        const angle = (index / Math.max(sites.length, 1)) * Math.PI * 2 - Math.PI / 2;
         const x = cx + Math.cos(angle) * rx;
         const y = cy + Math.sin(angle) * ry;
         return (
-          <g key={stop.siteId}>
+          <g key={site.id}>
             <line x1={cx} y1={cy} x2={x} y2={y} />
-            <circle cx={x} cy={y} r={4 + Math.min(stop.hymnIds.length / 3, 4)} />
-            <text x={x} y={y + 14} textAnchor="middle">{stop.name.slice(0, 11)}</text>
+            <circle cx={x} cy={y} r={4 + Math.min(count, 7) * .8} />
+            <text x={x} y={y + 16} textAnchor="middle">{cleanLabel(site.label).slice(0, 13)}</text>
           </g>
         );
       })}
-      <circle className="center" cx={cx} cy={cy} r="14" />
+      <circle className="center" cx={cx} cy={cy} r="16" />
       <text className="center-text" x={cx} y={cy + 3} textAnchor="middle">
         {saint?.ordinal ?? '—'}
       </text>
@@ -1009,22 +946,46 @@ function Network({
   );
 }
 
-function MiniDensity({ stops }: { stops: SacredStop[] }) {
-  const spots = stops.slice(0, 10);
+function DensityPanel({ points }: { points: CoveragePoint[] }) {
+  const width = 180;
+  const height = 118;
+  const bounds = { minLng: 76.7, maxLng: 80.55, minLat: 7.85, maxLat: 13.65 };
+  const project = (lng: number, lat: number) => {
+    const x = 22 + ((lng - bounds.minLng) / (bounds.maxLng - bounds.minLng)) * 122;
+    const y = 8 + ((bounds.maxLat - lat) / (bounds.maxLat - bounds.minLat)) * 101;
+    return [x, y] as const;
+  };
+  const polygon = TAMIL_NADU_SCHEMATIC
+    .map(([lng, lat]) => project(lng, lat).join(','))
+    .join(' ');
+  const max = Math.max(...points.map((item) => item.count), 1);
+
   return (
     <div className="density-map">
-      <svg viewBox="0 0 180 110" role="img" aria-label="Temple density preview">
-        <path
-          d="M112 7 L136 19 L146 41 L145 63 L133 87 L115 103 L94 99 L82 82 L67 69 L58 47 L65 28 L84 15 Z"
-          className="density-land"
-        />
-        {spots.map((stop, index) => {
-          const x = 78 + ((stop.lng - 77.2) / 3.2) * 60;
-          const y = 20 + ((13.3 - stop.lat) / 4.3) * 70;
-          return <circle key={stop.siteId} cx={x} cy={y} r={5 + Math.min(stop.hymnIds.length, 5)} className={`heat heat-${index % 3}`} />;
+      <svg viewBox={`0 0 ${width} ${height}`} role="img" aria-label="Pramāṇa talam density by modern catalog district">
+        <defs>
+          <filter id="densityGlow" x="-80%" y="-80%" width="260%" height="260%">
+            <feGaussianBlur stdDeviation="4" />
+          </filter>
+        </defs>
+        <polygon points={polygon} className="density-land" />
+        {points.map((point) => {
+          const [x, y] = project(point.lng, point.lat);
+          const radius = 4 + (point.count / max) * 10;
+          return (
+            <g key={point.key}>
+              <circle cx={x} cy={y} r={radius * 1.55} className="density-glow" filter="url(#densityGlow)" />
+              <circle cx={x} cy={y} r={radius} className="density-hotspot" />
+              <text x={x} y={y + 2} textAnchor="middle">{point.count}</text>
+            </g>
+          );
         })}
       </svg>
-      <div className="density-scale"><span>Low</span><i /><span>High</span></div>
+      <div className="density-caption">
+        <span>district aggregate</span>
+        <i />
+        <span>higher corpus density</span>
+      </div>
     </div>
   );
 }
