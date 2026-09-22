@@ -313,14 +313,13 @@ export default function SacredMap({
     if (mode === 'tradition') return;
 
     if (mode === 'all' || mode === 'edition') {
-      for (const point of coverage.slice(0, 16)) {
-        if (point.count < 2) continue;
+      for (const point of coverage.slice(0, 10)) {
+        if (point.count < 3) continue;
         const node = document.createElement('div');
         node.className = 'map-district-marker';
         node.style.position = 'absolute';
         node.innerHTML = `
           <span class="district-marker-glow"></span>
-          <span class="district-marker-tower">${gopuramMarkup}</span>
           <span class="district-marker-count">${point.count}</span>
           <span class="district-marker-label">${point.label}</span>
         `;
