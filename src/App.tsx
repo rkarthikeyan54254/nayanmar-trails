@@ -99,13 +99,18 @@ function authorityLabel(scope: string) {
 }
 
 function cleanLabel(label: string) {
-  return label.replace(/\s*\([^)]*\)/g, '').trim();
+  return label
+    .replace(/\s*\([^)]*\)/g, '')
+    .replace(/\s*\[[^\]]*\]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
 }
 
 function modernShort(value: string | null | undefined) {
   if (!value) return '';
   let current = value.trim().replace(/^\([^)]*\)\s*/, '');
   if (current.includes('[[')) current = current.split('[[')[0].trim();
+  current = current.replace(/\s*\[[^\]]*\]\s*$/, '').trim();
   const beforeParen = current.split('(')[0].trim();
   return beforeParen || current;
 }
