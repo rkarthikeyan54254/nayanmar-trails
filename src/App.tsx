@@ -1491,7 +1491,7 @@ function Tirumurai8LocusDetail({
 function Tirumurai8Chronology({ snapshot }: { snapshot: Tirumurai8Snapshot }) {
   return (
     <div className="text">
-      <Badge kind="inference">FAIL-CLOSED BIOGRAPHICAL CHRONOLOGY</Badge>
+      <Badge kind="inference">JOURNEY NOTE</Badge>
       <p>
         The Tiruvācakam/Tirukkōvaiyār corpus preserves section order, but section order is not treated as Manikkavasakar's historical itinerary.
       </p>
@@ -1971,7 +1971,7 @@ function ConnectionModal({
 
         <div className="graph-modal-note">
           <Badge kind={selectedIsManikkavasakar ? 'edition' : 'edition'}>
-            {selectedIsManikkavasakar ? 'TEXTUAL LOCI' : 'EDITION METADATA'}
+            {selectedIsManikkavasakar ? 'TEXTUAL LOCI' : 'TĒVĀRAM LINKS'}
           </Badge>
           <p>
             {selectedIsManikkavasakar
@@ -2095,7 +2095,7 @@ function DensityPanel({ points }: { points: CoveragePoint[] }) {
       <div className="density-caption">
         <span>district aggregate</span>
         <i />
-        <span>higher corpus density</span>
+        <span>more sthalams</span>
       </div>
     </div>
   );
