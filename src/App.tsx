@@ -2175,17 +2175,24 @@ function JourneyContext({
   activeIndex: number;
   geographic: boolean;
 }) {
+  const locale = useLocale();
   const active = stops[Math.min(activeIndex, Math.max(0, stops.length - 1))];
   return (
     <div className="text journey-context">
       <Badge kind={geographic ? 'inference' : 'tradition'}>
-        {geographic ? 'JOURNEY VIEW' : 'TRADITIONAL PLACES'}
+        {locale === 'ta'
+          ? geographic ? 'பயணக் காட்சி' : 'மரபில் வரும் தலங்கள்'
+          : geographic ? 'JOURNEY VIEW' : 'TRADITIONAL PLACES'}
       </Badge>
       <h3>{saintName}</h3>
       <p>
-        {geographic
-          ? `Explore ${stops.length} mapped Tēvāram-linked sthalams for this saint.`
-          : `Explore ${stops.length} traditional place references connected with this saint.`}
+        {locale === 'ta'
+          ? geographic
+            ? <>இந்த நாயன்மாருடன் தேவாரச் சான்றால் தொடர்புடைய <b>{stops.length}</b> திருத்தலங்களை வரைபடத்தில் ஒன்றன்பின் ஒன்றாகப் பாருங்கள்.</>
+            : <><b>{stops.length}</b> தலங்கள் இந்த நாயன்மாருடன் மரபில் தொடர்புடையதாகச் சொல்லப்படுகின்றன. அவற்றை ஒன்றன்பின் ஒன்றாகப் பாருங்கள்.</>
+          : geographic
+            ? `Explore ${stops.length} mapped Tēvāram-linked sthalams for this saint.`
+            : `Explore ${stops.length} traditional place references connected with this saint.`}
       </p>
 
       {active && (
@@ -2206,9 +2213,13 @@ function JourneyContext({
       </div>
 
       <p className="reader-note">
-        {geographic
-          ? 'The sequence is an exploratory presentation of known endpoints, not a dated historical itinerary.'
-          : 'Traditional place claims are shown without inventing precise coordinates or a historical route.'}
+        {locale === 'ta'
+          ? geographic
+            ? 'இது கிடைத்துள்ள தலங்களைப் புரிந்துகொள்ள உதவும் காட்சி வரிசை மட்டுமே; தேதி நிர்ணயிக்கப்பட்ட வரலாற்றுப் பயணப் பாதை அல்ல.'
+            : 'மரபில் வரும் தலங்களை மட்டும் காட்டுகிறோம்; தெரியாத இடத்தையும் வரலாற்றுப் பாதையையும் ஊகித்து சேர்ப்பதில்லை.'
+          : geographic
+            ? 'The sequence is an exploratory presentation of known endpoints, not a dated historical itinerary.'
+            : 'Traditional place claims are shown without inventing precise coordinates or a historical route.'}
       </p>
     </div>
   );
