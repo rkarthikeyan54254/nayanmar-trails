@@ -1224,10 +1224,16 @@ export default function App() {
           </div>
 
           <div className="authority-box">
-            <b>{selectedIsManikkavasakar ? 'How to read this journey' : tr(locale, MODE_COPY[mode].short)}</b>
+            <b>
+              {selectedIsManikkavasakar
+                ? locale === 'ta' ? 'இந்தத் தல வரிசையை எப்படி வாசிப்பது?' : 'How to read this journey'
+                : tr(locale, MODE_COPY[mode].short)}
+            </b>
             <p>
               {selectedIsManikkavasakar
-                ? 'The plotted Tirumurai 8 locations are textual-locus waypoints. The line between them is a visual guide, not a claimed historical itinerary.'
+                ? locale === 'ta'
+                  ? 'வரைபடத்தில் காட்டப்படும் திருமுறை 8 தலங்கள் பாடல் உரையில் வரும் இடங்கள். அவற்றை இணைக்கும் கோடு வாசிப்புக்கு உதவும் காட்சி மட்டுமே; மாணிக்கவாசகரின் வரலாற்றுப் பயணப் பாதை என்று கொள்ளக்கூடாது.'
+                  : 'The plotted Tirumurai 8 locations are textual-locus waypoints. The line between them is a visual guide, not a claimed historical itinerary.'
                 : tr(locale, MODE_COPY[mode].body)}
             </p>
           </div>
@@ -1277,7 +1283,9 @@ export default function App() {
           </div>
 
           <div className="map-source-note">
-            OpenFreeMap / OpenStreetMap basemap · curated heritage data
+            {locale === 'ta'
+              ? 'OpenFreeMap / OpenStreetMap வரைபடம் · தொகுக்கப்பட்ட பாரம்பரியத் தரவுகள்'
+              : 'OpenFreeMap / OpenStreetMap basemap · curated heritage data'}
           </div>
 
           {!playbackIsGeographic && traditionalPlaybackStops.length > 0 && (
@@ -1364,15 +1372,25 @@ export default function App() {
                   <>
                     <div className="chips">
                       <span>{selectedSite.site_id}</span>
-                      <span>{selectedSite.patikam_count} Tēvāram pathigams</span>
+                      <span>
+                        {locale === 'ta'
+                          ? `${selectedSite.patikam_count} தேவாரப் பதிகங்கள்`
+                          : `${selectedSite.patikam_count} Tēvāram pathigams`}
+                      </span>
                       {selectedIsManikkavasakar ? (
                         <span>
                           {selectedTirumurai8Locus
-                            ? `${selectedTirumurai8Locus.section_numbers.length} Tiruvācakam section ${selectedTirumurai8Locus.section_numbers.length === 1 ? 'locus' : 'loci'}`
-                            : 'no mapped Tirumurai 8 locus'}
+                            ? locale === 'ta'
+                              ? `${selectedTirumurai8Locus.section_numbers.length} திருவாசகப் பகுதிகள்`
+                              : `${selectedTirumurai8Locus.section_numbers.length} Tiruvācakam section ${selectedTirumurai8Locus.section_numbers.length === 1 ? 'locus' : 'loci'}`
+                            : locale === 'ta' ? 'திருமுறை 8 பாடல் குறிப்பு இல்லை' : 'no mapped Tirumurai 8 locus'}
                         </span>
                       ) : (
-                        <span>{selectedPatikams.length} by {saintName.split(' · ')[0]}</span>
+                        <span>
+                          {locale === 'ta'
+                            ? `${saintName.split(' · ')[0]} பாடியவை ${selectedPatikams.length}`
+                            : `${selectedPatikams.length} by ${saintName.split(' · ')[0]}`}
+                        </span>
                       )}
                     </div>
 
@@ -1432,17 +1450,32 @@ export default function App() {
                     )}
 
                     <div className="temple-facts">
-                      <Fact label="Sacred region" value={selectedSite.traditional_location_class || 'Not supplied'} />
-                      <Fact label="Modern location" value={selectedSite.modern_name_nic || selectedSite.district || 'Not supplied'} />
-                      <Fact label="Map location" value={selectedGeoSeed ? 'Mapped modern centroid' : 'District-level context'} />
                       <Fact
-                        label="Source layer"
+                        label={locale === 'ta' ? 'திருத்தலப் பகுதி' : 'Sacred region'}
+                        value={locale === 'ta'
+                          ? localizedSacredRegion(selectedSite.traditional_location_class, locale) || 'தகவல் தரப்படவில்லை'
+                          : selectedSite.traditional_location_class || 'Not supplied'}
+                      />
+                      <Fact
+                        label={locale === 'ta' ? 'இன்றைய இருப்பிடம்' : 'Modern location'}
+                        value={locale === 'ta'
+                          ? localizedAdministrativeName(selectedSite.district, locale) || localizedSiteName(selectedSite, locale)
+                          : selectedSite.modern_name_nic || selectedSite.district || 'Not supplied'}
+                      />
+                      <Fact
+                        label={locale === 'ta' ? 'வரைபட நிலை' : 'Map location'}
+                        value={locale === 'ta'
+                          ? selectedGeoSeed ? 'இன்றைய ஊர் மையம் வரைபடத்தில் குறிக்கப்பட்டுள்ளது' : 'மாவட்ட அளவிலான தகவல் மட்டும்'
+                          : selectedGeoSeed ? 'Mapped modern centroid' : 'District-level context'}
+                      />
+                      <Fact
+                        label={locale === 'ta' ? 'ஆதார வகை' : 'Source layer'}
                         value={
                           selectedIsManikkavasakar
                             ? selectedTirumurai8Locus
-                              ? 'Tirumurai 8 textual locus'
-                              : 'No mapped Tirumurai 8 locus'
-                            : authorityLabel(selectedSite.authority_scope)
+                              ? locale === 'ta' ? 'திருமுறை 8 பாடல் குறிப்பு' : 'Tirumurai 8 textual locus'
+                              : locale === 'ta' ? 'திருமுறை 8 பாடல் குறிப்பு இல்லை' : 'No mapped Tirumurai 8 locus'
+                            : authorityLabel(selectedSite.authority_scope, locale)
                         }
                       />
                     </div>
@@ -1456,7 +1489,7 @@ export default function App() {
                         })
                       }
                     >
-                      <GopuramIcon /> Locate on map →
+                      <GopuramIcon /> {locale === 'ta' ? 'வரைபடத்தில் காண்க' : 'Locate on map'} →
                     </button>
                   </>
                 )}
@@ -1478,7 +1511,9 @@ export default function App() {
               </p>
             </div>
             <Badge kind={playbackIsGeographic ? 'inference' : 'tradition'}>
-              {playbackIsGeographic ? 'PRESENTATION' : 'TRADITION'}
+              {locale === 'ta'
+                ? playbackIsGeographic ? 'வழிகாட்டுக் காட்சி' : 'மரபு'
+                : playbackIsGeographic ? 'PRESENTATION' : 'TRADITION'}
             </Badge>
           </div>
 
@@ -1552,8 +1587,8 @@ export default function App() {
                     onClick={() => setSelectedSaintId(id)}
                   >
                     {id === MANIKKAVASAKAR_ID
-                      ? 'Manikkavasakar'
-                      : SAINT_EN[id]?.split(' · ')[0]}
+                      ? locale === 'ta' ? tirumurai8.author.label_ta : 'Manikkavasakar'
+                      : localizedSaintName(saintById.get(id) ?? null, locale).split(' · ')[0]}
                   </button>
                 ))}
               </div>
@@ -1564,7 +1599,7 @@ export default function App() {
                   .map((item) => (
                     <button
                       key={item.id}
-                      title={SAINT_EN[item.id] ?? item.label}
+                      title={localizedSaintName(item, locale)}
                       className={item.id === selectedSaintId ? 'selected' : ''}
                       onClick={() => setSelectedSaintId(item.id)}
                     />
@@ -1579,7 +1614,11 @@ export default function App() {
             <div className="section-title">
               <div>
                 <h3><T>Traditional Place Claims</T></h3>
-                <span>{traditionalPlaybackStops.length} traditional references</span>
+                <span>
+                  {locale === 'ta'
+                    ? `${traditionalPlaybackStops.length} மரபுத் தலங்கள்`
+                    : `${traditionalPlaybackStops.length} traditional references`}
+                </span>
               </div>
               <Badge kind="tradition"><T>TRADITION</T></Badge>
             </div>
@@ -1607,16 +1646,28 @@ export default function App() {
           <div className="panel graph-mini">
             <div className="section-title">
               <div>
-                <h3>{selectedIsManikkavasakar ? 'Tirumurai 8 – Sthalam Connections' : 'Saint – Sthalam Connections'}</h3>
+                <h3>
+                  {locale === 'ta'
+                    ? selectedIsManikkavasakar ? 'திருமுறை 8 · தலத் தொடர்புகள்' : 'நாயன்மார் · திருத்தலத் தொடர்புகள்'
+                    : selectedIsManikkavasakar ? 'Tirumurai 8 – Sthalam Connections' : 'Saint – Sthalam Connections'}
+                </h3>
                 <span>
-                  {selectedIsManikkavasakar
-                    ? `${tirumurai8.loci.length} textual loci`
-                    : `${siteLinks.size} linked sthalams`}
+                  {locale === 'ta'
+                    ? selectedIsManikkavasakar
+                      ? `${tirumurai8.loci.length} பாடல் தலங்கள்`
+                      : `${siteLinks.size} தொடர்புள்ள திருத்தலங்கள்`
+                    : selectedIsManikkavasakar
+                      ? `${tirumurai8.loci.length} textual loci`
+                      : `${siteLinks.size} linked sthalams`}
                 </span>
               </div>
               <button className="graph-expand" onClick={() => setGraphOpen(true)}><T>Expand ↗</T></button>
             </div>
-            <button className="graph-preview-button" onClick={() => setGraphOpen(true)} aria-label="Open expanded connection graph">
+            <button
+              className="graph-preview-button"
+              onClick={() => setGraphOpen(true)}
+              aria-label={locale === 'ta' ? 'தலத் தொடர்பு வரைபடத்தை விரிவாகத் திற' : 'Open expanded connection graph'}
+            >
               <Network
                 saint={saint}
                 centerLabel={selectedIsManikkavasakar ? 'M' : undefined}
@@ -1635,10 +1686,10 @@ export default function App() {
         </div>
 
         <div className="panel totals">
-          <Stat value={data.meta.counts.saints} label="Nayanmars" />
-          <Stat value={4} label="Naalvar" />
-          <Stat value={data.meta.counts.tevaram_patikams} label="Tēvāram pathigams" />
-          <Stat value={data.meta.counts.tevaram_sites} label="Sthalams" />
+          <Stat value={data.meta.counts.saints} label={locale === 'ta' ? 'நாயன்மார்கள்' : 'Nayanmars'} />
+          <Stat value={4} label={locale === 'ta' ? 'நால்வர்' : 'Naalvar'} />
+          <Stat value={data.meta.counts.tevaram_patikams} label={tr(locale, 'Tēvāram pathigams')} />
+          <Stat value={data.meta.counts.tevaram_sites} label={locale === 'ta' ? 'திருத்தலங்கள்' : 'Sthalams'} />
         </div>
       </section>
 
