@@ -4,11 +4,13 @@ const exportPath = new URL('../public/data/pramana-export-v1.json', import.meta.
 const tirumurai8Path = new URL('../public/data/pramana-tirumurai8-v1.json', import.meta.url);
 const geometryPath = new URL('../src/geometry.ts', import.meta.url);
 const mapPath = new URL('../src/SacredMap.tsx', import.meta.url);
+const appPath = new URL('../src/App.tsx', import.meta.url);
 
 const doc = JSON.parse(await readFile(exportPath, 'utf8'));
 const tirumurai8 = JSON.parse(await readFile(tirumurai8Path, 'utf8'));
 const geometryText = await readFile(geometryPath, 'utf8');
 const mapText = await readFile(mapPath, 'utf8');
+const appText = await readFile(appPath, 'utf8');
 
 const required = [
   'traditional_reference',
@@ -98,15 +100,27 @@ const traditionPredicates = new Set([
   'MUKTI_PLACE_TRADITION',
   'RELATED_PLACE_TRADITION',
 ]);
-const saintsWithTraditionPlayback = new Set(
-  doc.edges
-    .filter((edge) => traditionPredicates.has(edge.predicate))
-    .map((edge) => edge.subject),
-);
+const traditionEdges = doc.edges.filter((edge) => traditionPredicates.has(edge.predicate));
+const saintsWithTraditionPlayback = new Set(traditionEdges.map((edge) => edge.subject));
 if (saintsWithTraditionPlayback.size !== 63) {
   throw new Error(
     `Expected tradition-playback coverage for all 63 Nayanmars, got ${saintsWithTraditionPlayback.size}`,
   );
+}
+
+const traditionCounts = new Map();
+for (const edge of traditionEdges) {
+  traditionCounts.set(edge.subject, (traditionCounts.get(edge.subject) ?? 0) + 1);
+}
+const multiStopSaints = doc.saints.filter((saint) => (traditionCounts.get(saint.id) ?? 0) >= 2);
+const singleStopSaints = doc.saints.filter((saint) => (traditionCounts.get(saint.id) ?? 0) === 1);
+if (multiStopSaints.length !== 62 || singleStopSaints.length !== 1) {
+  throw new Error(
+    `Expected 62 Nayanmars with 2+ tradition claims and one single-stop saint; got ${multiStopSaints.length} and ${singleStopSaints.length}`,
+  );
+}
+if (appText.includes('const seen = new Set<string>();')) {
+  throw new Error('Playback must not collapse distinct birth/mukti claims merely because they name the same traditional place');
 }
 
 console.log(
@@ -114,6 +128,6 @@ console.log(
   `${doc.saints.length} Nayanmars, ${doc.sites.length} sites, ` +
   `${doc.patikams.length} Tēvāram patikams, ${doc.edges.length} edges; ` +
   `${geometryIds.length} deliberately exact product map seeds; ` +
-  `tradition playback covers ${saintsWithTraditionPlayback.size}/63; ` +
+  `tradition playback covers ${saintsWithTraditionPlayback.size}/63 (62 multi-step, 1 single-stop); ` +
   `Manikkavasakar remains a separate Naalvar/Tirumurai 8 companion.`,
 );
