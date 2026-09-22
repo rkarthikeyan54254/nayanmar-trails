@@ -377,7 +377,7 @@ export default function App() {
       }))
       .filter((item): item is { site: Site; count: number } => Boolean(item.site))
       .sort((a, b) => b.count - a.count || b.site.patikam_count - a.site.patikam_count)
-      .slice(0, 6);
+      .slice(0, 12);
   }, [selectedIsManikkavasakar, siteById, siteLinks, tirumurai8]);
 
   const selectedSite = siteById.get(selectedSiteId) ?? null;
@@ -702,19 +702,26 @@ export default function App() {
               <h3>{selectedIsManikkavasakar ? 'Tirumurai 8 textual loci' : 'Major linked talams'}</h3>
               <span>{selectedIsManikkavasakar ? tirumurai8.loci.length : siteLinks.size} total</span>
             </div>
-            {topLinkedSites.map(({ site, count }) => (
-              <button
-                key={site.id}
-                onClick={() => {
-                  setSelectedSiteId(site.id);
-                  setTab('visits');
-                }}
-              >
-                <GopuramIcon />
-                <span>{siteDisplayName(site)}</span>
-                <small>{count}</small>
-              </button>
-            ))}
+            {topLinkedSites.slice(0, 6).map(({ site, count }) => {
+              const modern = modernShort(site.modern_name_nic);
+              const canonical = cleanLabel(site.label);
+              return (
+                <button
+                  key={site.id}
+                  onClick={() => {
+                    setSelectedSiteId(site.id);
+                    setTab('visits');
+                  }}
+                >
+                  <GopuramIcon />
+                  <span className="major-talam-copy">
+                    <b>{canonical}</b>
+                    {modern && modern.toLowerCase() !== canonical.toLowerCase() && <em>{modern}</em>}
+                  </span>
+                  <small>{count}</small>
+                </button>
+              );
+            })}
           </div>
 
           <div className="journey-progress">
