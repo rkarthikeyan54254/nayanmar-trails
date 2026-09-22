@@ -38,7 +38,7 @@ jobs:
             echo "No headless browser available"
             exit 1
           fi
-          "$BROWSER"             --headless             --no-sandbox             --disable-gpu             --disable-dev-shm-usage             --hide-scrollbars             --run-all-compositor-stages-before-draw             --virtual-time-budget=8000             --window-size=1600,1050             --screenshot=artifacts/nayanmar-home.png             http://127.0.0.1:4173/
+          "$BROWSER"             --headless             --no-sandbox             --disable-gpu             --disable-dev-shm-usage             --hide-scrollbars             --run-all-compositor-stages-before-draw             --virtual-time-budget=16000             --window-size=1600,1050             --screenshot=artifacts/nayanmar-home.png             http://127.0.0.1:4173/
           test -s artifacts/nayanmar-home.png
 
       - name: Upload visual QA artifact
