@@ -1570,11 +1570,11 @@ function SthalamOverview({
         <div>
           <small>MODERN LOCATION</small>
           <b>{site.district || 'Location not supplied'}</b>
-          <span>{site.taluk ? \`\${site.taluk} taluk\` : site.modern_name_nic || ''}</span>
+          <span>{site.taluk ? `${site.taluk} taluk` : site.modern_name_nic || ''}</span>
         </div>
         <div>
           <small>SACRED REGION</small>
-          <b>{site.traditional_location_class?.replace(/^according to PK:\\s*/i, '') || 'Not supplied'}</b>
+          <b>{site.traditional_location_class?.replace(/^according to PK:\s*/i, '') || 'Not supplied'}</b>
           <span>{cleanLabel(site.label)}</span>
         </div>
       </div>
@@ -1676,8 +1676,8 @@ function JourneyContext({
       <h3>{saintName}</h3>
       <p>
         {geographic
-          ? \`Explore \${stops.length} mapped Tēvāram-linked sthalams for this saint.\`
-          : \`Explore \${stops.length} traditional place references connected with this saint.\`}
+          ? `Explore ${stops.length} mapped Tēvāram-linked sthalams for this saint.`
+          : `Explore ${stops.length} traditional place references connected with this saint.`}
       </p>
 
       {active && (
