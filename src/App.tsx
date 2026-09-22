@@ -1718,6 +1718,7 @@ function Fact({ label, value }: { label: string; value: string | number }) {
 }
 
 
+
 function LiterarySthalamHighlight({
   place,
   links,
@@ -1727,6 +1728,7 @@ function LiterarySthalamHighlight({
   links: SaivaLiteraryLink[];
   onExplore: () => void;
 }) {
+  const locale = useLocale();
   const composition = links.filter(
     (link) => link.predicate === 'SOURCE_HEADER_COMPOSITION_LOCUS',
   );
@@ -1736,19 +1738,18 @@ function LiterarySthalamHighlight({
       <span className="literary-place-icon"><GopuramIcon /></span>
       <span>
         <small><T>TIRUVĀCAKAM LITERARY STHALAM</T></small>
-        <b>{place.label}</b>
-        <em>{place.label_ta}</em>
+        <b>{locale === 'ta' ? (place.label_ta || place.label) : place.label}</b>
+        {locale === 'en' && place.label_ta && <em>{place.label_ta}</em>}
         <strong>
-          {links.length} sections · {composition.length === 1
-            ? 'section 6 source-heading locus'
-            : composition.length + ' source-heading loci'}
+          {locale === 'ta'
+            ? `${links.length} திருவாசகப் பகுதிகள் · ${composition.length === 1 ? 'பகுதி 6-ன் மூலத் தலைப்பில் தலக் குறிப்பு' : `${composition.length} பகுதிகளின் மூலத் தலைப்புகளில் தலக் குறிப்பு`}`
+            : `${links.length} sections · ${composition.length === 1 ? 'section 6 source-heading locus' : composition.length + ' source-heading loci'}`}
         </strong>
       </span>
       <i>→</i>
     </button>
   );
 }
-
 
 function TraditionalPlaceDetail({
   saintName,
@@ -1818,6 +1819,7 @@ function TraditionalPlaceDetail({
   );
 }
 
+
 function Tirumurai8LocusDetail({
   locus,
   view,
@@ -1825,12 +1827,16 @@ function Tirumurai8LocusDetail({
   locus: Tirumurai8Locus | null;
   view: 'visits' | 'hymns';
 }) {
+  const locale = useLocale();
+
   if (!locus) {
     return (
       <div className="text">
         <Badge kind="edition"><T>NO MAPPED TIRUMURAI 8 LOCUS</T></Badge>
         <p>
-          This sthalam is part of the broader Tēvāram catalogue, but the pinned Tirumurai 8 product snapshot does not map a Manikkavasakar textual locus here.
+          {locale === 'ta'
+            ? 'இந்தத் தலம் பரந்த தேவாரப் பட்டியலில் இடம்பெறுகிறது. ஆனால் இப்போது பயன்படுத்தும் திருமுறை 8 பதிப்பில், மாணிக்கவாசகரின் பாடலுடன் இந்தத் தலத்தை இணைக்கும் உரைக் குறிப்பு இல்லை.'
+            : 'This sthalam is part of the broader Tēvāram catalogue, but the pinned Tirumurai 8 product snapshot does not map a Manikkavasakar textual locus here.'}
         </p>
       </div>
     );
@@ -1841,11 +1847,15 @@ function Tirumurai8LocusDetail({
       <Badge kind="edition"><T>TIRUVĀCAKAM STHALAM</T></Badge>
       {view === 'visits' ? (
         <p>
-          This view is a <b><T>textual-locus mapping</T></b>, not a claim of a historically verified temple visit or a travel sequence for Manikkavasakar.
+          {locale === 'ta'
+            ? 'இது திருவாசகத்தில் இந்தத் தலம் எங்கு குறிப்பிடப்படுகிறது என்பதை காட்டும் காட்சி. மாணிக்கவாசகர் இத்தலத்திற்கு வந்தார் என்ற வரலாற்றுச் சான்றோ, அவர் சென்ற பயண வரிசையோ இதனால் நிரூபிக்கப்படுவதில்லை.'
+            : <>This view is a <b>textual-locus mapping</b>, not a claim of a historically verified temple visit or a travel sequence for Manikkavasakar.</>}
         </p>
       ) : (
         <p>
-          The pinned Tiruvācakam edition metadata associates this product locus with the following section title{locus.section_numbers.length === 1 ? '' : 's'}.
+          {locale === 'ta'
+            ? 'இப்போது பயன்படுத்தும் திருவாசகப் பதிப்பு, இந்தத் தலத்துடன் கீழே உள்ள பாடல் பகுதிகளை இணைக்கிறது.'
+            : `The pinned Tiruvācakam edition metadata associates this product locus with the following section title${locus.section_numbers.length === 1 ? '' : 's'}.`}
         </p>
       )}
 
@@ -1855,7 +1865,7 @@ function Tirumurai8LocusDetail({
           {locus.section_numbers.map((section, index) => (
             <span key={section} title={locus.section_titles_ta[index]}>
               <GopuramIcon />
-              Section {section}
+              {locale === 'ta' ? `பகுதி ${section}` : `Section ${section}`}
             </span>
           ))}
         </div>
@@ -1872,11 +1882,16 @@ function Tirumurai8LocusDetail({
 
       <div className="evidence-callout">
         <GopuramIcon />
-        <p>{locus.locus_basis}</p>
+        <p>
+          {locale === 'ta'
+            ? 'இந்த இணைப்பு திருமுறை 8 பதிப்பின் உரைத் தகவலை மட்டுமே காட்டுகிறது; தனித்த வரலாற்றுப் பயணச் சான்றாக எடுத்துக்கொள்ளப்படவில்லை.'
+            : locus.locus_basis}
+        </p>
       </div>
     </div>
   );
 }
+
 
 function Tirumurai8Chronology({
   snapshot,
@@ -1887,6 +1902,7 @@ function Tirumurai8Chronology({
   place: SaivaLiteraryPlace | null;
   links: SaivaLiteraryLink[];
 }) {
+  const locale = useLocale();
   const compositionLinks = links.filter(
     (link) => link.predicate === 'SOURCE_HEADER_COMPOSITION_LOCUS',
   );
@@ -1898,22 +1914,37 @@ function Tirumurai8Chronology({
     <div className="text">
       <Badge kind="inference"><T>JOURNEY NOTE</T></Badge>
       <p>
-        The Tiruvācakam/Tirukkōvaiyār corpus preserves section order, but section order is not treated as Manikkavasakar&apos;s historical itinerary.
+        {locale === 'ta'
+          ? 'திருவாசகமும் திருக்கோவையாரும் பாடல் பகுதிகளின் வரிசையைப் பாதுகாக்கின்றன. அந்த வரிசையை மாணிக்கவாசகரின் வரலாற்றுப் பயண வரிசையாக நாங்கள் எடுத்துக்கொள்வதில்லை.'
+          : 'The Tiruvācakam/Tirukkōvaiyār corpus preserves section order, but section order is not treated as Manikkavasakar\'s historical itinerary.'}
       </p>
       <div className="evidence-callout">
         <GopuramIcon />
-        <p>{snapshot.meta.playback_policy}</p>
+        <p>
+          {locale === 'ta'
+            ? 'வரைபடத்தில் தெரியும் வரிசை வாசிப்புக்கு உதவும் காட்சி மட்டுமே; ஆதாரம் இல்லாத பயணப் பாதை எதையும் இதில் உருவாக்கவில்லை.'
+            : snapshot.meta.playback_policy}
+        </p>
       </div>
 
       {place && links.length > 0 && (
         <section className="literary-place-detail">
           <small><T>BEYOND THE PLOTTED LOCI</T></small>
-          <h3>{place.label}</h3>
-          <div className="tamil">{place.label_ta}</div>
+          <h3>{locale === 'ta' ? (place.label_ta || place.label) : place.label}</h3>
+          {locale === 'en' && place.label_ta && <div className="tamil">{place.label_ta}</div>}
           <p>
-            Tiruvācakam connects this sthalam to <b>{links.length} sections</b>.
-            The pinned edition gives <b>{compositionLinks.length === 1 ? 'section 6' : compositionLinks.length + ' sections'}</b> a
-            source-heading composition locus; the other <b>{textualLinks.length}</b> are textual references.
+            {locale === 'ta' ? (
+              <>
+                திருவாசகத்தில் இந்தத் தலம் <b>{links.length} பகுதிகளில்</b> வருகிறது.
+                இப்போது பயன்படுத்தும் பதிப்பில் <b>{compositionLinks.length === 1 ? '6-ஆம் பகுதி மட்டும்' : `${compositionLinks.length} பகுதிகள்`}</b> மூலத் தலைப்பிலேயே இத்தலத்தைச் சுட்டுகிறது;
+                மற்ற <b>{textualLinks.length}</b> இடங்கள் பாடல் உரையிலுள்ள குறிப்புகள்.
+              </>
+            ) : (
+              <>
+                Tiruvācakam connects this sthalam to <b>{links.length} sections</b>.
+                The pinned edition gives <b>{compositionLinks.length === 1 ? 'section 6' : compositionLinks.length + ' sections'}</b> a source-heading composition locus; the other <b>{textualLinks.length}</b> are textual references.
+              </>
+            )}
           </p>
           <div className="literary-section-grid">
             {links.map((link) => {
@@ -1924,21 +1955,28 @@ function Tirumurai8Chronology({
                   className={link.predicate === 'SOURCE_HEADER_COMPOSITION_LOCUS' ? 'composition' : ''}
                 >
                   <b>{section}</b>
-                  {link.predicate === 'SOURCE_HEADER_COMPOSITION_LOCUS'
-                    ? 'source-heading locus'
-                    : 'textual reference'}
+                  {locale === 'ta'
+                    ? link.predicate === 'SOURCE_HEADER_COMPOSITION_LOCUS'
+                      ? 'மூலத் தலைப்பில் தலக் குறிப்பு'
+                      : 'பாடல் உரையில் தலக் குறிப்பு'
+                    : link.predicate === 'SOURCE_HEADER_COMPOSITION_LOCUS'
+                      ? 'source-heading locus'
+                      : 'textual reference'}
                 </span>
               );
             })}
           </div>
           <p className="reader-note">
-            Uttarakosamangai is not a member of the formal 276-site Tēvāram 1–7 catalogue, so this view does not invent a Tēvāram marker or travel segment for it.
+            {locale === 'ta'
+              ? 'திருஉத்தரகோசமங்கை, தேவாரம் 1–7-ன் 276 தலப் பட்டியலில் இடம்பெறும் தலம் அல்ல. ஆகவே இதற்காக தேவாரத் தலக் குறியீடோ கற்பனையான பயணக் கோடோ சேர்க்கப்படவில்லை.'
+              : 'Uttarakosamangai is not a member of the formal 276-site Tēvāram 1–7 catalogue, so this view does not invent a Tēvāram marker or travel segment for it.'}
           </p>
         </section>
       )}
     </div>
   );
 }
+
 
 function Tirumurai8Evidence({
   locus,
@@ -1949,22 +1987,35 @@ function Tirumurai8Evidence({
   site: Site;
   snapshot: Tirumurai8Snapshot;
 }) {
+  const locale = useLocale();
+  const siteName = localizedSiteName(site, locale);
+
   return (
     <div className="text">
-      <Badge kind="edition">{snapshot.authority.text.replace(/_/g, ' ')}</Badge>
+      <Badge kind="edition">{locale === 'ta' ? 'திருமுறை 8 பதிப்புச் சான்று' : snapshot.authority.text.replace(/_/g, ' ')}</Badge>
       <p>
-        This Tirumurai 8 view uses the pinned release <b>{snapshot.meta.release_id}</b>. The historical status of each location remains separate from the text itself.
+        {locale === 'ta'
+          ? <>இந்தக் காட்சி நிலைப்படுத்தப்பட்ட <b>{snapshot.meta.release_id}</b> பதிப்பைப் பயன்படுத்துகிறது. ஒரு தலம் பாடலில் வருவது மற்றும் அந்தத் தலத்துக்கான தனித்த வரலாற்றுச் சான்று இருப்பது—இரண்டையும் தனித்தனியாக வைத்திருக்கிறோம்.</>
+          : <>This Tirumurai 8 view uses the pinned release <b>{snapshot.meta.release_id}</b>. The historical status of each location remains separate from the text itself.</>}
       </p>
       {locus ? (
         <div className="inscription">
           <Badge kind="edition"><T>TEXTUAL LOCUS</T></Badge>
-          <b>{locus.display_name}</b>
-          <p>{locus.locus_basis}</p>
+          <b>{locale === 'ta' ? (locus.label_ta || locus.display_name) : locus.display_name}</b>
+          <p>
+            {locale === 'ta'
+              ? 'இந்தத் தலத் தொடர்பு திருமுறை 8 பதிப்பின் பாடல்/உரைத் தகவலிலிருந்து வருகிறது.'
+              : locus.locus_basis}
+          </p>
         </div>
       ) : (
         <div className="evidence-callout muted">
           <GopuramIcon />
-          <p>No Tirumurai 8 textual-locus mapping is attached to {siteDisplayName(site)} in this product snapshot.</p>
+          <p>
+            {locale === 'ta'
+              ? `இப்போது பயன்படுத்தும் திருமுறை 8 தரவுகளில் ${siteName} தலத்துடன் இணைக்கப்பட்ட பாடல் குறிப்பு இல்லை.`
+              : `No Tirumurai 8 textual-locus mapping is attached to ${siteDisplayName(site)} in this product snapshot.`}
+          </p>
         </div>
       )}
     </div>
