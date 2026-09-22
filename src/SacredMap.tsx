@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef } from 'react';
 import maplibregl, { Map as MapLibreMap, Marker } from 'maplibre-gl';
 import type { FeatureCollection, LineString, Point } from 'geojson';
 import { GEO_SEEDS } from './geometry';
+import { useLocale } from './i18n';
 
 export type EvidenceMode = 'all' | 'edition' | 'tradition' | 'independent';
 
@@ -135,6 +136,7 @@ export default function SacredMap({
   travelerImage?: string;
   showUnlinkedExemplars?: boolean;
 }) {
+  const locale = useLocale();
   const mapNode = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<MapLibreMap | null>(null);
   const markerRefs = useRef<Marker[]>([]);
@@ -327,7 +329,9 @@ export default function SacredMap({
           <span class="district-marker-glow"></span>
           <span class="district-marker-count">${point.count}</span>
         `;
-        node.title = `${point.label}: ${point.count} Tēvāram sthalam entries in the normalized modern district aggregate`;
+        node.title = locale === 'ta'
+          ? `${point.label}: இன்றைய மாவட்ட அடிப்படையில் ${point.count} தேவாரத் தலப் பதிவுகள்`
+          : `${point.label}: ${point.count} Tēvāram sthalam entries in the normalized modern district aggregate`;
         node.setAttribute('aria-label', node.title);
 
         const marker = new maplibregl.Marker({
@@ -359,12 +363,16 @@ export default function SacredMap({
         selected ? 'selected' : '',
         featuredSiteIds.has(seed.siteId) ? 'featured' : '',
       ].filter(Boolean).join(' ');
+      const routeStop = routeStops.find((stop) => stop.siteId === seed.siteId);
+      const seedLabel = locale === 'ta' ? (routeStop?.nameTa || routeStop?.name || seed.name) : seed.name;
       node.innerHTML = `
         <span class="marker-glow"></span>
         <span class="marker-tower">${gopuramMarkup}</span>
-        <span class="marker-label">${seed.name}</span>
+        <span class="marker-label">${seedLabel}</span>
       `;
-      node.title = `${seed.name}${linked ? ' · evidence-linked to selected saint' : ''}`;
+      node.title = locale === 'ta'
+        ? `${seedLabel}${linked ? ' · தேர்ந்த நாயன்மாருடன் ஆதாரத் தொடர்புள்ளது' : ''}`
+        : `${seed.name}${linked ? ' · evidence-linked to selected saint' : ''}`;
       node.setAttribute('aria-label', node.title);
       node.addEventListener('click', () => selectedCallback.current(entityId));
 
@@ -391,7 +399,7 @@ export default function SacredMap({
         .addTo(map);
       markerRefs.current.push(marker);
     }
-  }, [coverage, epigraphicSiteIds, featuredSiteIds, linkedSet, mode, progress, routeStops, selectedSiteId, showUnlinkedExemplars, travelerImage]);
+  }, [coverage, epigraphicSiteIds, featuredSiteIds, linkedSet, locale, mode, progress, routeStops, selectedSiteId, showUnlinkedExemplars, travelerImage]);
 
 
 
@@ -399,18 +407,20 @@ export default function SacredMap({
     <div className="sacred-map-shell">
       <div ref={mapNode} className="sacred-map-canvas" />
       <div className="map-vignette" />
-      <div className="map-compass"><b>N</b><span>✦</span></div>
-      <div className="map-neighbor-label karnataka">KARNATAKA</div>
-      <div className="map-neighbor-label kerala">KERALA</div>
-      <div className="map-neighbor-label andhra">ANDHRA PRADESH</div>
-      <div className="map-region-title">TAMIL NADU</div>
-      <div className="map-sea-label east">BAY OF BENGAL</div>
-      <div className="map-sea-label south">INDIAN OCEAN</div>
+      <div className="map-compass"><b>{locale === 'ta' ? 'வ' : 'N'}</b><span>✦</span></div>
+      <div className="map-neighbor-label karnataka">{locale === 'ta' ? 'கர்நாடகம்' : 'KARNATAKA'}</div>
+      <div className="map-neighbor-label kerala">{locale === 'ta' ? 'கேரளம்' : 'KERALA'}</div>
+      <div className="map-neighbor-label andhra">{locale === 'ta' ? 'ஆந்திரப் பிரதேசம்' : 'ANDHRA PRADESH'}</div>
+      <div className="map-region-title">{locale === 'ta' ? 'தமிழ்நாடு' : 'TAMIL NADU'}</div>
+      <div className="map-sea-label east">{locale === 'ta' ? 'வங்காள விரிகுடா' : 'BAY OF BENGAL'}</div>
+      <div className="map-sea-label south">{locale === 'ta' ? 'இந்தியப் பெருங்கடல்' : 'INDIAN OCEAN'}</div>
       {mode === 'tradition' && (
         <div className="map-layer-message">
-          <strong>Tradition layer</strong>
+          <strong>{locale === 'ta' ? 'மரபில் வரும் தலங்கள்' : 'Tradition layer'}</strong>
           <p>
-            Traditional place associations are shown without fabricating precise coordinates for them.
+            {locale === 'ta'
+              ? 'மரபில் தொடர்புடையதாகச் சொல்லப்படும் தலங்களை மட்டும் காட்டுகிறோம்; தெரியாத இடங்களை ஊகித்து வரைபடத்தில் புள்ளியாகச் சேர்ப்பதில்லை.'
+              : 'Traditional place associations are shown without fabricating precise coordinates for them.'}
           </p>
         </div>
       )}

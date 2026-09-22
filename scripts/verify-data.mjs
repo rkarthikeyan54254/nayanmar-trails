@@ -8,6 +8,7 @@ const geometryPath = new URL('../src/geometry.ts', import.meta.url);
 const mapPath = new URL('../src/SacredMap.tsx', import.meta.url);
 const appPath = new URL('../src/App.tsx', import.meta.url);
 const stylesPath = new URL('../src/styles.css', import.meta.url);
+const i18nPath = new URL('../src/i18n.tsx', import.meta.url);
 
 const doc = JSON.parse(await readFile(exportPath, 'utf8'));
 const tirumurai8 = JSON.parse(await readFile(tirumurai8Path, 'utf8'));
@@ -17,6 +18,7 @@ const geometryText = await readFile(geometryPath, 'utf8');
 const mapText = await readFile(mapPath, 'utf8');
 const appText = await readFile(appPath, 'utf8');
 const stylesText = await readFile(stylesPath, 'utf8');
+const i18nText = await readFile(i18nPath, 'utf8');
 
 const required = [
   'traditional_reference',
@@ -50,6 +52,9 @@ if (curiosities.meta?.source_repo !== 'rkarthikeyan54254/pramana' ||
     curiosities.meta?.authority_scope !== 'traditional_reference') {
   throw new Error('Saint curiosity layer must remain pinned to Pramana and explicitly traditional');
 }
+if (!curiosities.meta?.language_policy?.includes('Tamil copy is independently authored')) {
+  throw new Error('Tamil curiosity copy must retain the native-authoring editorial policy');
+}
 if (!Array.isArray(curiosities.stories) || curiosities.stories.length !== 63) {
   throw new Error(`Expected one curiosity hook for each of 63 Nayanmars, got ${curiosities.stories?.length}`);
 }
@@ -70,6 +75,24 @@ if (!appText.includes("LocaleContext.Provider") ||
     !appText.includes("setLocale('en')") ||
     !appText.includes("setLocale('ta')")) {
   throw new Error('English/Tamil reader-mode separation is missing from App');
+}
+const tamilProductCopy = `${i18nText}\n${appText}\n${mapText}`;
+const literalTamilCalques = [
+  'புனிதப் புவியியல்',
+  'பக்தி நிலப்பரப்பு',
+  'பயணத் தங்கல்கள்',
+  'உரைத் தலங்கள்',
+  'கற்பனை இடமுறைகள்',
+  'ஆதாரத் தடம்',
+];
+for (const phrase of literalTamilCalques) {
+  if (tamilProductCopy.includes(phrase)) {
+    throw new Error(`Mechanical Tamil product-copy phrase reintroduced: ${phrase}`);
+  }
+}
+if (!mapText.includes("locale === 'ta' ? 'தமிழ்நாடு'") ||
+    !mapText.includes("locale === 'ta' ? 'வங்காள விரிகுடா'")) {
+  throw new Error('Tamil map labels must stay localized in Tamil reader mode');
 }
 
 if (tirumurai8.author?.id !== 'tirumurai8.manikkavacakar') {
