@@ -69,24 +69,24 @@ const SAINT_EN: Record<string, string> = {
 
 const MODE_COPY: Record<EvidenceMode, { label: string; short: string; body: string }> = {
   all: {
-    label: 'All layers',
-    short: 'Layered view',
-    body: 'Tradition, edition metadata, independent evidence and product inference are visible together, but never collapsed into one claim.',
+    label: 'Everything',
+    short: 'Sacred geography',
+    body: 'See text-linked sthalams, traditional associations and independently attested places together. Journey lines are visual reconstructions, not claimed historical roads.',
   },
   edition: {
-    label: 'Text / edition',
-    short: 'Tēvāram evidence',
-    body: 'Author ↔ patikam ↔ talam links come from the edition-aligned Tēvāram graph. Route geometry remains product inference.',
+    label: 'Tēvāram',
+    short: 'Tēvāram-linked',
+    body: 'Show sthalams linked through the Tēvāram editions and the selected saint’s pathigams.',
   },
   tradition: {
     label: 'Tradition',
-    short: 'Traditional associations',
-    body: 'Traditional saint and place assertions remain visibly distinct from historical verification.',
+    short: 'Traditional places',
+    body: 'Show birthplace, related-place and mukti-place traditions without converting them into precise historical claims.',
   },
   independent: {
-    label: 'Independent',
-    short: 'Independent evidence',
-    body: 'Inferred routes are hidden. Only mapped sites with explicit epigraphic support are emphasized.',
+    label: 'Historical',
+    short: 'Historically attested',
+    body: 'Show mapped places with independent inscriptional support and hide reconstructed routes.',
   },
 };
 
@@ -100,7 +100,7 @@ function authorityLabel(scope: string) {
 
 function identificationLabel(status: string) {
   if (status === 'traditional_talam_not_assumed_single_modern_temple') {
-    return 'Traditional talam; no single modern temple identity is asserted.';
+    return 'Traditional sthalam; no single modern temple identity is asserted.';
   }
   return status
     .replace(/_/g, ' ')
