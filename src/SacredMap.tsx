@@ -46,12 +46,15 @@ function recolorBase(map: MapLibreMap) {
         if (/water|ocean|lake|river/.test(id)) {
           map.setPaintProperty(layer.id, 'fill-color', '#062c3b');
           map.setPaintProperty(layer.id, 'fill-opacity', 0.98);
+          map.setPaintProperty(layer.id, 'fill-outline-color', '#062c3b');
         } else if (/park|wood|forest|landcover|landuse|natural/.test(id)) {
-          map.setPaintProperty(layer.id, 'fill-color', '#2f5a45');
-          map.setPaintProperty(layer.id, 'fill-opacity', 0.55);
+          map.setPaintProperty(layer.id, 'fill-color', '#315f49');
+          map.setPaintProperty(layer.id, 'fill-opacity', 0.62);
+          map.setPaintProperty(layer.id, 'fill-outline-color', 'rgba(49,95,73,0.16)');
         } else if (/building/.test(id)) {
           map.setPaintProperty(layer.id, 'fill-color', '#263a34');
-          map.setPaintProperty(layer.id, 'fill-opacity', 0.14);
+          map.setPaintProperty(layer.id, 'fill-opacity', 0.12);
+          map.setPaintProperty(layer.id, 'fill-outline-color', 'rgba(38,58,52,0.08)');
         }
       } else if (layer.type === 'line') {
         if (/road|highway|street|motorway|trunk|primary|secondary/.test(id)) {
@@ -119,6 +122,7 @@ export default function SacredMap({
   progress,
   epigraphicSiteIds,
   onSelect,
+  travelerImage,
 }: {
   routeStops: MapStop[];
   coverage: CoveragePoint[];
@@ -127,6 +131,7 @@ export default function SacredMap({
   progress: number;
   epigraphicSiteIds: Set<string>;
   onSelect: (siteId: string) => void;
+  travelerImage?: string;
 }) {
   const mapNode = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<MapLibreMap | null>(null);
@@ -208,8 +213,8 @@ export default function SacredMap({
         layout: { 'line-cap': 'round', 'line-join': 'round' },
         paint: {
           'line-color': '#f0aa42',
-          'line-width': 9,
-          'line-opacity': 0.12,
+          'line-width': 12,
+          'line-opacity': 0.16,
           'line-blur': 5,
         },
       });
@@ -220,7 +225,7 @@ export default function SacredMap({
         layout: { 'line-cap': 'round', 'line-join': 'round' },
         paint: {
           'line-color': '#eab052',
-          'line-width': 2.7,
+          'line-width': 3.15,
           'line-opacity': 0.72,
           'line-dasharray': [1.3, 2],
         },
@@ -367,14 +372,16 @@ export default function SacredMap({
     const active = routeStops[Math.min(progress, Math.max(0, routeStops.length - 1))];
     if (active && (mode === 'all' || mode === 'edition')) {
       const traveler = document.createElement('div');
-      traveler.className = 'map-traveler';
-      traveler.innerHTML = '<span></span>';
+      traveler.className = travelerImage ? 'map-traveler has-image' : 'map-traveler';
+      traveler.innerHTML = travelerImage
+        ? `<img src="${travelerImage}" alt="" /><span></span>`
+        : '<span></span>';
       const marker = new maplibregl.Marker({ element: traveler, anchor: 'center' })
         .setLngLat([active.lng, active.lat])
         .addTo(map);
       markerRefs.current.push(marker);
     }
-  }, [coverage, epigraphicSiteIds, linkedSet, mode, progress, routeStops, selectedSiteId]);
+  }, [coverage, epigraphicSiteIds, linkedSet, mode, progress, routeStops, selectedSiteId, travelerImage]);
 
   useEffect(() => {
     const map = mapRef.current;
