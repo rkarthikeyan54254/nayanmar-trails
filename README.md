@@ -47,9 +47,12 @@ Nayanmar Trails uses explicit reader modes rather than mixing Tamil and English 
 
 - `EN` keeps navigation, explanations and curated story summaries in English.
 - `தமிழ்` keeps the reader-facing experience in Tamil where reviewed Tamil copy exists.
+- Tamil is **authored as Tamil**, not translated sentence-by-sentence from English. The target register is clear, idiomatic devotional-magazine Tamil: direct like mainstream Tamil publishing, warm enough for a general reader, and precise enough to preserve Pramāṇa evidence boundaries.
+- Avoid English-shaped compounds and academic calques such as “புனிதப் புவியியல்”, “பக்தி நிலப்பரப்பு”, “பயணத் தங்கல்கள்” or “ஆதாரத் தடம்”. Prefer phrases a Tamil editor would naturally write: “திருத்தலங்கள்”, “இன்றும் வாழும் பக்தியின் பாதை”, “பயணத் தலங்கள்”, “ஆதாரங்களைப் பார்க்க”.
+- Story hooks may be rewritten structurally in Tamil—sentence order, emphasis and rhythm do not have to mirror English—as long as the underlying traditional claim and authority scope stay unchanged.
 - Canonical source text may remain in its original language inside evidence/source views; this is source fidelity, not UI mixing.
 - A language is not exposed until its product copy is complete enough to avoid a half-translated experience.
 
 ## Saint curiosity layer
 
-`public/data/pramana-saint-curiosities-v1.json` contains one bilingual curiosity hook for each of the 63 Nayanmars. These are concise reader-facing retellings of the Periya Puranam traditional narrative layer. They are explicitly scoped as `traditional_reference` and are not presented as independently verified historical biography. Product verification requires exactly 63 records, English + Tamil copy for each record, and an exact match to the Pramāṇa 63-saint registry.
+`public/data/pramana-saint-curiosities-v1.json` contains one bilingual curiosity hook for each of the 63 Nayanmars. These are concise reader-facing retellings of the Periya Puranam traditional narrative layer. The Tamil hooks are independently edited as native Tamil prose rather than mechanically aligned translations of the English hooks. They are explicitly scoped as `traditional_reference` and are not presented as independently verified historical biography. Product verification requires exactly 63 records, English + Tamil copy for each record, and an exact match to the Pramāṇa 63-saint registry.
