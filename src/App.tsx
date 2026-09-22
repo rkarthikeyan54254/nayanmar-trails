@@ -795,7 +795,9 @@ export default function App() {
                 className={tab === item ? 'active' : ''}
                 onClick={() => setTab(item)}
               >
-                {item === 'visits' ? 'Temple Visits' : item[0].toUpperCase() + item.slice(1)}
+                {item === 'visits'
+                  ? selectedIsManikkavasakar ? 'Textual Loci' : 'Temple Visits'
+                  : item[0].toUpperCase() + item.slice(1)}
               </button>
             ))}
           </div>
@@ -823,29 +825,69 @@ export default function App() {
                 <div className="chips">
                   <span>{selectedSite.site_id}</span>
                   <span>{selectedSite.patikam_count} site patikams</span>
-                  <span>{selectedPatikams.length} by {saintName.split(' · ')[0]}</span>
+                  {selectedIsManikkavasakar ? (
+                    <span>
+                      {selectedTirumurai8Locus
+                        ? `${selectedTirumurai8Locus.section_numbers.length} Tiruvācakam section locus${selectedTirumurai8Locus.section_numbers.length === 1 ? '' : 'i'}`
+                        : 'no mapped Tirumurai 8 locus'}
+                    </span>
+                  ) : (
+                    <span>{selectedPatikams.length} by {saintName.split(' · ')[0]}</span>
+                  )}
                 </div>
 
-                {tab === 'visits' && (
-                  <Visits
-                    site={selectedSite}
-                    saintName={saintName}
-                    count={selectedPatikams.length}
-                    patikamIds={selectedPatikams}
-                    patikamById={patikamById}
-                  />
+                {selectedIsManikkavasakar ? (
+                  <>
+                    {(tab === 'visits' || tab === 'hymns') && (
+                      <Tirumurai8LocusDetail
+                        locus={selectedTirumurai8Locus}
+                        view={tab}
+                      />
+                    )}
+                    {tab === 'chronology' && (
+                      <Tirumurai8Chronology snapshot={tirumurai8} />
+                    )}
+                    {tab === 'evidence' && (
+                      <Tirumurai8Evidence
+                        locus={selectedTirumurai8Locus}
+                        site={selectedSite}
+                        snapshot={tirumurai8}
+                      />
+                    )}
+                  </>
+                ) : (
+                  <>
+                    {tab === 'visits' && (
+                      <Visits
+                        site={selectedSite}
+                        saintName={saintName}
+                        count={selectedPatikams.length}
+                        patikamIds={selectedPatikams}
+                        patikamById={patikamById}
+                      />
+                    )}
+                    {tab === 'hymns' && (
+                      <Hymns ids={selectedPatikams} patikamById={patikamById} />
+                    )}
+                    {tab === 'chronology' && <Chronology />}
+                    {tab === 'evidence' && <Evidence site={selectedSite} data={data} />}
+                  </>
                 )}
-                {tab === 'hymns' && (
-                  <Hymns ids={selectedPatikams} patikamById={patikamById} />
-                )}
-                {tab === 'chronology' && <Chronology />}
-                {tab === 'evidence' && <Evidence site={selectedSite} data={data} />}
 
                 <div className="temple-facts">
                   <Fact label="Traditional class" value={selectedSite.traditional_location_class || 'Not supplied'} />
                   <Fact label="Modern catalog" value={selectedSite.modern_name_nic || selectedSite.district || 'Not supplied'} />
                   <Fact label="Map geometry" value={selectedGeoSeed ? 'Exact modern centroid exemplar' : 'District-level corpus context only'} />
-                  <Fact label="Evidence class" value={authorityLabel(selectedSite.authority_scope)} />
+                  <Fact
+                    label="Selected-saint evidence"
+                    value={
+                      selectedIsManikkavasakar
+                        ? selectedTirumurai8Locus
+                          ? 'Tirumurai 8 textual locus'
+                          : 'No mapped Tirumurai 8 locus'
+                        : authorityLabel(selectedSite.authority_scope)
+                    }
+                  />
                 </div>
 
                 <button
@@ -857,7 +899,7 @@ export default function App() {
                     })
                   }
                 >
-                  <GopuramIcon /> View on map →
+                  <GopuramIcon /> View on static map →
                 </button>
               </>
             )}
