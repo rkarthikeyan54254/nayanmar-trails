@@ -434,10 +434,20 @@ export default function App() {
     );
   }
 
-  const saintName = SAINT_EN[selectedSaintId] ?? saint?.label ?? 'Nayanmar';
-  const activeStop = routeStops[Math.min(progress, Math.max(0, routeStops.length - 1))];
+  const saintName = selectedIsManikkavasakar
+    ? tirumurai8.author.display_label
+    : SAINT_EN[selectedSaintId] ?? saint?.label ?? 'Nayanmar';
+  const saintTamil = selectedIsManikkavasakar
+    ? tirumurai8.author.label_ta
+    : saint?.label_ta ?? '';
+  const saintRegistryLabel = selectedIsManikkavasakar
+    ? 'NAALVAR · TIRUMURAI 8'
+    : `NAYANMAR ${saint?.ordinal ?? ''}`;
+  const saintNumberLabel = selectedIsManikkavasakar ? 'N4' : saint?.ordinal;
+  const activePlaybackStop =
+    playbackStops[Math.min(progress, Math.max(0, playbackStops.length - 1))];
   const progressPct =
-    routeStops.length <= 1 ? 0 : (progress / (routeStops.length - 1)) * 100;
+    playbackStops.length <= 1 ? 0 : (progress / (playbackStops.length - 1)) * 100;
   const saintMedia = SAINT_MEDIA[selectedSaintId];
   const templeMedia = selectedSite ? TEMPLE_MEDIA[selectedSite.id] : undefined;
   const selectedGeoSeed = selectedSite
