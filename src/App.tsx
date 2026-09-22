@@ -61,8 +61,6 @@ type PlaybackStop = {
   siteId?: string;
 };
 
-const MUVAR = ['nayanmar.20', 'nayanmar.27', 'nayanmar.63'];
-
 const SAINT_EN: Record<string, string> = {
   'nayanmar.20': 'Appar · Tirunavukkarasar',
   'nayanmar.27': 'Sambandar',
@@ -118,6 +116,7 @@ function siteDisplayName(site: Site) {
 
 export default function App() {
   const [data, setData] = useState<PramanaExport | null>(null);
+  const [tirumurai8, setTirumurai8] = useState<Tirumurai8Snapshot | null>(null);
   const [selectedSaintId, setSelectedSaintId] = useState('nayanmar.20');
   const [selectedSiteId, setSelectedSiteId] = useState('tevaram_site.KV01');
   const [mode, setMode] = useState<EvidenceMode>('all');
@@ -128,13 +127,21 @@ export default function App() {
   const [query, setQuery] = useState('');
 
   useEffect(() => {
-    fetch('/data/pramana-export-v1.json')
-      .then((response) => {
-        if (!response.ok) throw new Error(`HTTP ${response.status}`);
-        return response.json();
+    Promise.all([
+      fetch('/data/pramana-export-v1.json').then((response) => {
+        if (!response.ok) throw new Error(`Nayanmar export HTTP ${response.status}`);
+        return response.json() as Promise<PramanaExport>;
+      }),
+      fetch('/data/pramana-tirumurai8-v1.json').then((response) => {
+        if (!response.ok) throw new Error(`Tirumurai 8 export HTTP ${response.status}`);
+        return response.json() as Promise<Tirumurai8Snapshot>;
+      }),
+    ])
+      .then(([graph, t8]) => {
+        setData(graph);
+        setTirumurai8(t8);
       })
-      .then(setData)
-      .catch((error) => console.error('Unable to load Pramāṇa export', error));
+      .catch((error) => console.error('Unable to load Pramāṇa product exports', error));
   }, []);
 
   const saint = useMemo(
