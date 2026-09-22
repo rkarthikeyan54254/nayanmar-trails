@@ -1716,3 +1716,50 @@ button,select,input,.text,.chips,.fact,.search-results{
 @keyframes travelerImagePulse{
   50%{transform:scale(1.06);filter:sepia(.2) saturate(.9) contrast(1.08) brightness(1)}
 }
+
+
+/* ---------- readability pass ---------- */
+.filter{font-size:8px}
+.filter select{font-size:9px}
+.mode-pills button{font-size:8px}
+.naalvar-switcher button{font-size:7.6px}
+
+.identity-line{font-size:8px}
+.stat small{font-size:7.4px}
+.section-title h3,.major-temples h3,.bottom h3{font-size:14px}
+.section-title>span{font-size:7.2px}
+.major-talam-copy b{font-size:8.4px}
+.major-talam-copy em{font-size:6.8px}
+.major-temples small{font-size:6.8px}
+.journey-progress{font-size:7px}
+.journey-progress b{font-size:9.7px}
+.authority-box b{font-size:9.8px}
+.authority-box p{font-size:7.4px}
+
+.map-toolbar{font-size:7.6px}
+.map-legend{font-size:7.5px}
+
+.tabs button{font-size:8.5px}
+.chips span{font-size:7.2px}
+.detail-card .text{font-size:9.2px}
+.badge{font-size:6.8px}
+.microcopy{font-size:7.1px!important}
+.fact{font-size:7.8px}
+.fact small{font-size:6.3px}
+.focus{font-size:8.2px}
+
+.section-head p{font-size:7.2px}
+.now small{font-size:7px}
+.timeline-labels{font-size:6px}
+.registry-copy b{font-size:8.6px}
+.registry-copy small{font-size:5.9px}
+.naalvar-mini button{font-size:6.1px}
+
+.saint-card,.detail-card{
+  scrollbar-width:thin;
+  scrollbar-color:#35565b transparent;
+}
+.saint-card::-webkit-scrollbar,.detail-card::-webkit-scrollbar{width:4px}
+.saint-card::-webkit-scrollbar-thumb,.detail-card::-webkit-scrollbar-thumb{
+  background:#35565b;border-radius:5px
+}
