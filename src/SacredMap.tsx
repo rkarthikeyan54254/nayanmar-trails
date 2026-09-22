@@ -157,10 +157,10 @@ export default function SacredMap({
       pitch: 4,
       bearing: 0,
       attributionControl: false,
+      interactive: false,
       antialias: true,
     });
 
-    map.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'bottom-right');
     map.addControl(new maplibregl.AttributionControl({ compact: true }), 'bottom-left');
 
     map.on('load', () => {
@@ -383,17 +383,7 @@ export default function SacredMap({
     }
   }, [coverage, epigraphicSiteIds, linkedSet, mode, progress, routeStops, selectedSiteId, travelerImage]);
 
-  useEffect(() => {
-    const map = mapRef.current;
-    const active = routeStops[Math.min(progress, Math.max(0, routeStops.length - 1))];
-    if (!map || !active || progress === 0) return;
-    map.easeTo({
-      center: [active.lng, active.lat],
-      zoom: 7,
-      pitch: 12,
-      duration: 900,
-    });
-  }, [progress, routeStops]);
+
 
   return (
     <div className="sacred-map-shell">
