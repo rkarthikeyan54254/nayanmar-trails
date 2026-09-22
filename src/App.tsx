@@ -1670,7 +1670,7 @@ export default function App() {
             >
               <Network
                 saint={saint}
-                centerLabel={selectedIsManikkavasakar ? 'M' : undefined}
+                centerLabel={selectedIsManikkavasakar ? (locale === 'ta' ? 'மா' : 'M') : undefined}
                 sites={topLinkedSites.slice(0, 8)}
               />
             </button>
@@ -1699,7 +1699,7 @@ export default function App() {
           saintName={saintName}
           selectedIsManikkavasakar={selectedIsManikkavasakar}
           sites={topLinkedSites}
-          centerLabel={selectedIsManikkavasakar ? 'M' : undefined}
+          centerLabel={selectedIsManikkavasakar ? (locale === 'ta' ? 'மா' : 'M') : undefined}
           totalConnections={selectedIsManikkavasakar ? tirumurai8.loci.length : siteLinks.size}
           onClose={() => setGraphOpen(false)}
           onSelect={(site) => {
@@ -2545,6 +2545,7 @@ function SourcesModal({
   );
 }
 
+
 function ConnectionModal({
   saint,
   saintName,
@@ -2564,6 +2565,8 @@ function ConnectionModal({
   onClose: () => void;
   onSelect: (site: Site) => void;
 }) {
+  const locale = useLocale();
+
   return (
     <div
       className="graph-backdrop"
@@ -2576,20 +2579,34 @@ function ConnectionModal({
         className="graph-modal"
         role="dialog"
         aria-modal="true"
-        aria-label={selectedIsManikkavasakar ? 'Tirumurai 8 sthalam connections' : 'Saint sthalam connections'}
+        aria-label={locale === 'ta'
+          ? selectedIsManikkavasakar ? 'திருமுறை 8 தலத் தொடர்புகள்' : 'நாயன்மார் திருத்தலத் தொடர்புகள்'
+          : selectedIsManikkavasakar ? 'Tirumurai 8 sthalam connections' : 'Saint sthalam connections'}
         onMouseDown={(event) => event.stopPropagation()}
       >
         <header className="graph-modal-head">
           <div>
-            <small>{selectedIsManikkavasakar ? 'NAALVAR · TIRUMURAI 8' : 'SELECTED NAYANMAR'}</small>
+            <small>
+              {locale === 'ta'
+                ? selectedIsManikkavasakar ? 'நால்வர் · திருமுறை 8' : 'தேர்ந்த நாயன்மார்'
+                : selectedIsManikkavasakar ? 'NAALVAR · TIRUMURAI 8' : 'SELECTED NAYANMAR'}
+            </small>
             <h2>{saintName}</h2>
             <p>
-              {selectedIsManikkavasakar
-                ? 'Qualified Tiruvācakam textual loci from the pinned Tirumurai 8 release.'
-                : `${totalConnections} Tēvāram-linked sthalams for this saint.`}
+              {locale === 'ta'
+                ? selectedIsManikkavasakar
+                  ? 'நிலைப்படுத்தப்பட்ட திருமுறை 8 பதிப்பில் திருவாசகத்துடன் தெளிவாக இணைக்கப்பட்ட தலங்கள்.'
+                  : `இந்த நாயன்மாருடன் தேவாரப் பதிகங்கள் வழியாக ${totalConnections} திருத்தலங்கள் இணைகின்றன.`
+                : selectedIsManikkavasakar
+                  ? 'Qualified Tiruvācakam textual loci from the pinned Tirumurai 8 release.'
+                  : `${totalConnections} Tēvāram-linked sthalams for this saint.`}
             </p>
           </div>
-          <button className="modal-close" onClick={onClose} aria-label="Close connection graph">×</button>
+          <button
+            className="modal-close"
+            onClick={onClose}
+            aria-label={locale === 'ta' ? 'தலத் தொடர்பு காட்சியை மூடு' : 'Close connection graph'}
+          >×</button>
         </header>
 
         <div className="graph-modal-grid">
@@ -2602,25 +2619,31 @@ function ConnectionModal({
               onSelect={onSelect}
             />
             <div className="graph-stage-caption">
-              Node size reflects linked pathigam or section count. Layout is a reading aid, not geography or chronology.
+              {locale === 'ta'
+                ? 'வட்டத்தின் அளவு இணைக்கப்பட்ட பதிகம் அல்லது பாடல் பகுதிகளின் எண்ணிக்கையை காட்டுகிறது. இந்த அமைப்பு வாசிப்புக்கு உதவும் காட்சி மட்டுமே; புவியியல் வரைபடமோ காலவரிசையோ அல்ல.'
+                : 'Node size reflects linked pathigam or section count. Layout is a reading aid, not geography or chronology.'}
             </div>
           </div>
 
           <aside className="graph-ranking">
             <div className="graph-ranking-head">
               <small><T>TOP CONNECTIONS</T></small>
-              <b>{sites.length ? 'Select a sthalam to inspect it' : 'No mapped sthalam connections'}</b>
+              <b>
+                {locale === 'ta'
+                  ? sites.length ? 'ஒரு திருத்தலத்தைத் தேர்ந்தெடுத்து பார்க்கவும்' : 'வரைபடத்தில் இணைக்கப்பட்ட திருத்தலங்கள் இல்லை'
+                  : sites.length ? 'Select a sthalam to inspect it' : 'No mapped sthalam connections'}
+              </b>
             </div>
             <div className="graph-ranking-list">
               {sites.slice(0, 12).map(({ site, count }, index) => {
-                const primary = siteDisplayName(site);
+                const primary = localizedSiteName(site, locale);
                 const canonical = cleanLabel(site.label);
                 return (
                   <button key={site.id} onClick={() => onSelect(site)}>
                     <span className="graph-rank">{String(index + 1).padStart(2, '0')}</span>
                     <span className="graph-rank-copy">
                       <b>{primary}</b>
-                      {canonical.toLowerCase() !== primary.toLowerCase() && <small>{canonical}</small>}
+                      {locale === 'en' && canonical.toLowerCase() !== primary.toLowerCase() && <small>{canonical}</small>}
                     </span>
                     <strong>{count}</strong>
                   </button>
@@ -2631,19 +2654,26 @@ function ConnectionModal({
         </div>
 
         <div className="graph-modal-note">
-          <Badge kind={selectedIsManikkavasakar ? 'edition' : 'edition'}>
-            {selectedIsManikkavasakar ? 'TEXTUAL LOCI' : 'TĒVĀRAM LINKS'}
+          <Badge kind="edition">
+            {locale === 'ta'
+              ? selectedIsManikkavasakar ? 'பாடலில் வரும் தலங்கள்' : 'தேவாரத் தொடர்புகள்'
+              : selectedIsManikkavasakar ? 'TEXTUAL LOCI' : 'TĒVĀRAM LINKS'}
           </Badge>
           <p>
-            {selectedIsManikkavasakar
-              ? 'These connections do not establish Manikkavasakar’s historical itinerary.'
-              : 'These edges express author → pathigam → sthalam relationships; they do not establish a historical travel route.'}
+            {locale === 'ta'
+              ? selectedIsManikkavasakar
+                ? 'இந்தத் தொடர்புகள் மாணிக்கவாசகரின் வரலாற்றுப் பயண வரிசையை நிரூபிப்பதில்லை.'
+                : 'இவை நாயன்மார் → பதிகம் → திருத்தலம் என்ற தேவாரத் தொடர்புகளை மட்டுமே காட்டுகின்றன; வரலாற்றுப் பயணப் பாதையை நிரூபிப்பதில்லை.'
+              : selectedIsManikkavasakar
+                ? 'These connections do not establish Manikkavasakar’s historical itinerary.'
+                : 'These edges express author → pathigam → sthalam relationships; they do not establish a historical travel route.'}
           </p>
         </div>
       </section>
     </div>
   );
 }
+
 
 function Network({
   saint,
@@ -2658,6 +2688,7 @@ function Network({
   expanded?: boolean;
   onSelect?: (site: Site) => void;
 }) {
+  const locale = useLocale();
   const width = expanded ? 720 : 360;
   const height = expanded ? 360 : 148;
   const cx = width / 2;
@@ -2670,13 +2701,13 @@ function Network({
       className={`network ${expanded ? 'expanded' : ''}`}
       viewBox={`0 0 ${width} ${height}`}
       role="img"
-      aria-label="Saint to sthalam graph"
+      aria-label={locale === 'ta' ? 'நாயன்மார் மற்றும் திருத்தலத் தொடர்புகள்' : 'Saint to sthalam graph'}
     >
       {sites.map(({ site, count }, index) => {
         const angle = (index / Math.max(sites.length, 1)) * Math.PI * 2 - Math.PI / 2;
         const x = cx + Math.cos(angle) * rx;
         const y = cy + Math.sin(angle) * ry;
-        const label = siteDisplayName(site);
+        const label = localizedSiteName(site, locale);
         const radius = (expanded ? 8 : 4) + Math.min(count, 9) * (expanded ? .72 : .8);
 
         return (
@@ -2693,7 +2724,9 @@ function Network({
             }}
             role={onSelect ? 'button' : undefined}
             tabIndex={onSelect ? 0 : undefined}
-            aria-label={onSelect ? `${label}, ${count} linked items` : undefined}
+            aria-label={onSelect
+              ? locale === 'ta' ? `${label}, ${count} தொடர்புகள்` : `${label}, ${count} linked items`
+              : undefined}
           >
             <line x1={cx} y1={cy} x2={x} y2={y} />
             <circle cx={x} cy={y} r={radius} />
