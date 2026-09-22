@@ -151,6 +151,9 @@ export default function App() {
   );
   const [query, setQuery] = useState('');
   const didInitSaintSelection = useRef(false);
+  const preserveInitialSiteDeepLink = useRef(
+    Boolean(new URLSearchParams(window.location.search).get('site')),
+  );
 
   useEffect(() => {
     if (!graphOpen) return;
@@ -461,6 +464,10 @@ export default function App() {
 
   useEffect(() => {
     if (!playbackIsGeographic || !routeStops.length) return;
+    if (preserveInitialSiteDeepLink.current) {
+      preserveInitialSiteDeepLink.current = false;
+      return;
+    }
     const active = routeStops[Math.min(progress, routeStops.length - 1)];
     if (!active) return;
     setSelectedSiteId(`tevaram_site.${active.siteId}`);
