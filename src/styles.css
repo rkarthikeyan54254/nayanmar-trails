@@ -1814,3 +1814,10 @@ button,select,input,.text,.chips,.fact,.search-results{
   color:#657d77;
   font-size:6.2px;
 }
+
+
+.map-fallback-note>b,
+.now b,
+.network text{
+  font-family:"Cormorant Garamond","Noto Serif Tamil",serif;
+}
