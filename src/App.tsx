@@ -2112,14 +2112,22 @@ function ThevaramDetails({
   saintById: Map<string, Saint>;
   selectedSaintId: string;
 }) {
+  const locale = useLocale();
+
   return (
     <div className="text">
       <div className="detail-section-head">
         <div>
-          <Badge kind="edition">TĒVĀRAM</Badge>
-          <h3>{items.length} pathigam{items.length === 1 ? '' : 's'} at this sthalam</h3>
+          <Badge kind="edition">{locale === 'ta' ? 'தேவாரம்' : 'TĒVĀRAM'}</Badge>
+          <h3>
+            {locale === 'ta'
+              ? items.length === 1
+                ? 'இந்தத் தலத்தில் 1 தேவாரப் பதிகம்'
+                : `இந்தத் தலத்தில் ${items.length} தேவாரப் பதிகங்கள்`
+              : `${items.length} pathigam${items.length === 1 ? '' : 's'} at this sthalam`}
+          </h3>
         </div>
-        <small>Tirumurai 1–7</small>
+        <small>{locale === 'ta' ? 'திருமுறை 1–7' : 'Tirumurai 1–7'}</small>
       </div>
 
       {items.length ? (
@@ -2131,8 +2139,12 @@ function ThevaramDetails({
               <li key={item.id} className={selected ? 'selected-author' : ''}>
                 <GopuramIcon />
                 <div>
-                  <b>Tirumurai {item.tirumurai} · Pathigam {item.patikam}</b>
-                  <small>{displaySaintName(author)}</small>
+                  <b>
+                    {locale === 'ta'
+                      ? `திருமுறை ${item.tirumurai} · பதிகம் ${item.patikam}`
+                      : `Tirumurai ${item.tirumurai} · Pathigam ${item.patikam}`}
+                  </b>
+                  <small>{localizedSaintName(author ?? null, locale)}</small>
                 </div>
                 {selected && <span className="you-are-here"><T>selected saint</T></span>}
               </li>
@@ -2144,7 +2156,9 @@ function ThevaramDetails({
       )}
 
       <p className="reader-note">
-        Pathigam numbering follows the edition catalogue used by this site. Source and edition details are available under <b><T>Sources</T></b>.
+        {locale === 'ta'
+          ? <>பதிக எண்கள் இந்தத் தளம் பயன்படுத்தும் தேவாரப் பதிப்புப் பட்டியலைப் பின்பற்றுகின்றன. மூலமும் பதிப்பும் பற்றிய விவரம் <b>ஆதாரங்கள்</b> பகுதியில் உள்ளது.</>
+          : <>Pathigam numbering follows the edition catalogue used by this site. Source and edition details are available under <b>Sources</b>.</>}
       </p>
     </div>
   );
