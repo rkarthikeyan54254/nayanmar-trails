@@ -98,6 +98,15 @@ function authorityLabel(scope: string) {
   return scope.replace(/_/g, ' ');
 }
 
+function identificationLabel(status: string) {
+  if (status === 'traditional_talam_not_assumed_single_modern_temple') {
+    return 'Traditional talam; no single modern temple identity is asserted.';
+  }
+  return status
+    .replace(/_/g, ' ')
+    .replace(/^./, (letter) => letter.toUpperCase());
+}
+
 function cleanLabel(label: string) {
   return label
     .replace(/\s*\([^)]*\)/g, '')
@@ -1423,7 +1432,9 @@ function Visits({
         </p>
       </div>
       {site.temple_identification_status && (
-        <p className="microcopy">Temple identification status: {site.temple_identification_status}</p>
+        <p className="microcopy">
+          <b>Identification:</b> {identificationLabel(site.temple_identification_status)}
+        </p>
       )}
     </div>
   );
