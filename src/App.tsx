@@ -6,7 +6,7 @@ import { HERO_MEDIA, SAINT_MEDIA, TEMPLE_MEDIA } from './media';
 import GopuramIcon from './GopuramIcon';
 import SacredMap, { type CoveragePoint, type EvidenceMode, type MapStop } from './SacredMap';
 import type { Patikam, PramanaExport, Saint, Site } from './types';
-import { LocaleContext, T, tr, type Locale } from './i18n';
+import { LocaleContext, T, tr, useLocale, type Locale } from './i18n';
 
 type DetailTab = 'hymns' | 'chronology' | 'visits' | 'evidence';
 
@@ -127,8 +127,68 @@ type PlaybackStop = {
 };
 
 const SAINT_EN: Record<string, string> = {
+  'nayanmar.01': 'Thirunilakanda Nayanar',
+  'nayanmar.02': 'Iyarpakai Nayanar',
+  'nayanmar.03': 'Ilaiyankudi Mara Nayanar',
+  'nayanmar.04': 'Meypporul Nayanar',
+  'nayanmar.05': 'Viranminda Nayanar',
+  'nayanmar.06': 'Amarnidhi Nayanar',
+  'nayanmar.07': 'Eripaththa Nayanar',
+  'nayanmar.08': 'Enathi Natha Nayanar',
+  'nayanmar.09': 'Kannappa Nayanar',
+  'nayanmar.10': 'Kunkiliyak Kalaya Nayanar',
+  'nayanmar.11': 'Manak Kanchara Nayanar',
+  'nayanmar.12': 'Arivattaya Nayanar',
+  'nayanmar.13': 'Anaya Nayanar',
+  'nayanmar.14': 'Murthi Nayanar',
+  'nayanmar.15': 'Muruga Nayanar',
+  'nayanmar.16': 'Rudra Pasupathi Nayanar',
+  'nayanmar.17': 'Thirunalaip Povar · Nandanar',
+  'nayanmar.18': 'Thirukkurippu Thondar',
+  'nayanmar.19': 'Chandesha Nayanar',
   'nayanmar.20': 'Appar · Tirunavukkarasar',
+  'nayanmar.21': 'Kulachirai Nayanar',
+  'nayanmar.22': 'Perumizhalai Kurumba Nayanar',
+  'nayanmar.23': 'Karaikkal Ammaiyar',
+  'nayanmar.24': 'Appudhi Adigal',
+  'nayanmar.25': 'Thiru Nilanakka Nayanar',
+  'nayanmar.26': 'Naminandi Adigal',
   'nayanmar.27': 'Sambandar',
+  'nayanmar.28': 'Eyarkon Kalikkamar',
+  'nayanmar.29': 'Thirumular',
+  'nayanmar.30': 'Dandi Adigal',
+  'nayanmar.31': 'Murkha Nayanar',
+  'nayanmar.32': 'Somasi Mara Nayanar',
+  'nayanmar.33': 'Sakkiya Nayanar',
+  'nayanmar.34': 'Sirappuli Nayanar',
+  'nayanmar.35': 'Siruthonda Nayanar',
+  'nayanmar.36': 'Cheraman Perumal Nayanar',
+  'nayanmar.37': 'Gana Natha Nayanar',
+  'nayanmar.38': 'Kootruva Nayanar',
+  'nayanmar.39': 'Pugazh Chola Nayanar',
+  'nayanmar.40': 'Narasinga Munaiyaraiyar',
+  'nayanmar.41': 'Adipaththa Nayanar',
+  'nayanmar.42': 'Kalikkamba Nayanar',
+  'nayanmar.43': 'Kaliya Nayanar',
+  'nayanmar.44': 'Satti Nayanar',
+  'nayanmar.45': 'Aiyadigal Kadavar Kon Nayanar',
+  'nayanmar.46': 'Kanampulla Nayanar',
+  'nayanmar.47': 'Kari Nayanar',
+  'nayanmar.48': 'Ninra Sir Nedumara Nayanar',
+  'nayanmar.49': 'Vayilar Nayanar',
+  'nayanmar.50': 'Munaiyaduvar Nayanar',
+  'nayanmar.51': 'Kazharsinga Nayanar',
+  'nayanmar.52': 'Idangazhi Nayanar',
+  'nayanmar.53': 'Seruthunai Nayanar',
+  'nayanmar.54': 'Pugazhthunai Nayanar',
+  'nayanmar.55': 'Kotpuli Nayanar',
+  'nayanmar.56': 'Pusalar Nayanar',
+  'nayanmar.57': 'Mangayarkkarasiyar',
+  'nayanmar.58': 'Nesa Nayanar',
+  'nayanmar.59': 'Kochengat Chola Nayanar',
+  'nayanmar.60': 'Thirunilakanda Yazhpanar',
+  'nayanmar.61': 'Sadaiya Nayanar',
+  'nayanmar.62': 'Isaignaniyar',
   'nayanmar.63': 'Sundarar · Arurar',
 };
 
@@ -466,10 +526,10 @@ export default function App() {
         if (!place) return [];
         const detail =
           edge.predicate === 'BIRTHPLACE_TRADITION'
-            ? 'Birthplace tradition'
+            ? tr(locale, 'Birthplace tradition')
             : edge.predicate === 'MUKTI_PLACE_TRADITION'
-              ? 'Mukti-place tradition'
-              : 'Related-place tradition';
+              ? tr(locale, 'Mukti-place tradition')
+              : tr(locale, 'Related-place tradition');
         return [{
           id: `${edge.predicate}:${place.id}`,
           name: locale === 'ta' ? (place.label_ta || place.label) : place.label,
@@ -733,9 +793,9 @@ export default function App() {
                 setGraphOpen(true);
               }
             }}
-            title={showTraditionalDetail ? 'Explore the traditional-place sequence below' : 'Open sthalam connections'}
+            title={tr(locale, showTraditionalDetail ? 'Explore the traditional-place sequence below' : 'Open sthalam connections')}
           >
-            Connections
+            <T>Connections</T>
           </button>
           <button onClick={() => setSourcesOpen(true)}><T>Sources</T></button>
         </nav>
@@ -1116,9 +1176,15 @@ export default function App() {
           {!playbackIsGeographic && traditionalPlaybackStops.length > 0 && (
             <div className="map-fallback-note">
               <Badge kind="tradition"><T>TRADITION PLAYBACK</T></Badge>
-              <b>{traditionalPlaybackStops.length} traditional places are associated with {saintName}</b>
+              <b>
+                {locale === 'ta'
+                  ? `${traditionalPlaybackStops.length} மரபுத் தலங்கள் ${saintName} உடன் தொடர்புபடுத்தப்படுகின்றன`
+                  : `${traditionalPlaybackStops.length} traditional places are associated with ${saintName}`}
+              </b>
               <p>
-                Use the journey strip below to explore them. A geographic route is not drawn until reviewed locations are available.
+                {locale === 'ta'
+                  ? 'அவற்றை ஆராய கீழே உள்ள பயணப் பட்டையைப் பயன்படுத்துங்கள். ஆய்வு செய்யப்பட்ட இடங்கள் கிடைக்கும் வரை புவியியல் பாதை வரையப்படாது.'
+                  : 'Use the journey strip below to explore them. A geographic route is not drawn until reviewed locations are available.'}
               </p>
             </div>
           )}
@@ -1588,14 +1654,15 @@ function TraditionalPlaceDetail({
   total: number;
   tab: DetailTab;
 }) {
+  const locale = useLocale();
   return (
     <div className="traditional-detail">
       <div className="traditional-visual">
         <div className="traditional-symbol"><GopuramIcon /></div>
         <div>
           <small><T>TRADITIONAL PLACE REFERENCE</T></small>
-          <h2>{stop?.name || 'No place selected'}</h2>
-          <p>{stop?.detail || 'No current traditional-place claim.'}</p>
+          <h2>{stop?.name || (locale === 'ta' ? 'தலம் தேர்ந்தெடுக்கப்படவில்லை' : 'No place selected')}</h2>
+          <p>{stop?.detail || (locale === 'ta' ? 'தற்போதைய மரபுத் தலக் குறிப்பு இல்லை.' : 'No current traditional-place claim.')}</p>
         </div>
       </div>
 
@@ -1603,14 +1670,16 @@ function TraditionalPlaceDetail({
         <div className="text">
           <Badge kind="tradition"><T>TRADITION</T></Badge>
           <p>
-            This site records <b>{total}</b> traditional place claim{total === 1 ? '' : 's'} for <b>{saintName}</b>.
-            This playback keeps those claims visible without inventing modern coordinates or a travel route.
+            {locale === 'ta'
+              ? <>இந்தத் தளம் <b>{saintName}</b> குறித்து <b>{total}</b> மரபுத் தலக் குறிப்புகளைப் பதிவு செய்கிறது. நவீன இடமுறைகள் அல்லது பயணப் பாதையை கற்பனை செய்யாமல் அவை இங்கே காட்டப்படுகின்றன.</>
+              : <>This site records <b>{total}</b> traditional place claim{total === 1 ? '' : 's'} for <b>{saintName}</b>. This playback keeps those claims visible without inventing modern coordinates or a travel route.</>}
           </p>
           <div className="evidence-callout muted">
             <GopuramIcon />
             <p>
-              The selected item is a traditional association. It is not automatically a modern temple identification,
-              exact geographic point, or independently verified historical event.
+              {locale === 'ta'
+                ? 'தேர்ந்தெடுக்கப்பட்ட பதிவு ஒரு மரபுத் தொடர்பு. அது தானாகவே நவீன கோயில் அடையாளம், துல்லிய புவியியல் புள்ளி அல்லது தனித்த வரலாற்றுச் சான்றாக மாறாது.'
+                : 'The selected item is a traditional association. It is not automatically a modern temple identification, exact geographic point, or independently verified historical event.'}
             </p>
           </div>
         </div>
@@ -1619,26 +1688,24 @@ function TraditionalPlaceDetail({
       {tab === 'chronology' && (
         <div className="text">
           <Badge kind="inference"><T>NO ASSERTED JOURNEY CHRONOLOGY</T></Badge>
-          <p>
-            Birthplace, related-place and mukti-place traditions are ordered only as a reading sequence.
-            Nayanmar Trails does not infer the historical path between them.
-          </p>
+          <p>{locale === 'ta'
+            ? 'பிறப்பிடம், தொடர்புத் தலம், முக்தித் தலம் ஆகிய மரபுகள் வாசிப்பு வரிசைக்காக மட்டுமே ஒழுங்குபடுத்தப்பட்டுள்ளன. அவற்றுக்கிடையிலான வரலாற்றுப் பாதையை நாயன்மார் பாதைகள் ஊகிக்காது.'
+            : 'Birthplace, related-place and mukti-place traditions are ordered only as a reading sequence. Nayanmar Trails does not infer the historical path between them.'}</p>
         </div>
       )}
 
       {tab === 'evidence' && (
         <div className="text">
           <Badge kind="tradition"><T>TRADITIONAL SOURCE</T></Badge>
-          <p>
-            No map marker is shown until a reviewed location is attached
-            or another explicitly qualified location mapping.
-          </p>
+          <p>{locale === 'ta'
+            ? 'ஆய்வு செய்யப்பட்ட இடம் அல்லது வெளிப்படையாகத் தகுதிப்படுத்தப்பட்ட இட வரைபடம் இணைக்கப்படும் வரை வரைபடக் குறியீடு காட்டப்படாது.'
+            : 'No map marker is shown until a reviewed location is attached or another explicitly qualified location mapping.'}</p>
         </div>
       )}
 
       <div className="traditional-detail-footer">
-        <span>{total} tradition claim{total === 1 ? '' : 's'}</span>
-        <span>0 invented coordinates</span>
+        <span>{locale === 'ta' ? `${total} மரபுக் குறிப்புகள்` : `${total} tradition claim${total === 1 ? '' : 's'}`}</span>
+        <span>{locale === 'ta' ? '0 கற்பனை இடமுறைகள்' : '0 invented coordinates'}</span>
       </div>
     </div>
   );
