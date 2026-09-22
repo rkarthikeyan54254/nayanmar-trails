@@ -197,26 +197,6 @@ export default function SacredMap({
           'circle-stroke-width': 0,
         },
       });
-      map.addLayer({
-        id: 'district-coverage-label',
-        type: 'symbol',
-        source: 'district-coverage',
-        filter: ['>=', ['get', 'count'], 10],
-        layout: {
-          'text-field': ['concat', ['get', 'label'], '  ·  ', ['to-string', ['get', 'count']]],
-          'text-size': 9,
-          'text-offset': [0, 2.2],
-          'text-anchor': 'top',
-          'text-allow-overlap': false,
-        },
-        paint: {
-          'text-color': '#d6bf8d',
-          'text-halo-color': '#061923',
-          'text-halo-width': 1.2,
-          'text-opacity': 0.72,
-        },
-      });
-
       map.addSource('route-ghost', {
         type: 'geojson',
         data: routeCollection([]),
@@ -301,7 +281,7 @@ export default function SacredMap({
       if (map.getLayer('route-live-line')) {
         map.setLayoutProperty('route-live-line', 'visibility', routeVisible ? 'visible' : 'none');
       }
-      for (const layerId of ['district-coverage-halo', 'district-coverage-label']) {
+      for (const layerId of ['district-coverage-halo']) {
         if (map.getLayer(layerId)) {
           map.setLayoutProperty(
             layerId,
