@@ -65,7 +65,9 @@ jobs:
           capture "appar-mapped-playback" "http://127.0.0.1:4173/?saint=nayanmar.20"
           capture "appar-kanchipuram-position" "http://127.0.0.1:4173/?saint=nayanmar.20&site=TO01"
           capture "appar-connections-modal" "http://127.0.0.1:4173/?saint=nayanmar.20&graph=1"
-          capture "appar-hymns-panel" "http://127.0.0.1:4173/?saint=nayanmar.20&tab=hymns"
+          capture "appar-sthalam-overview" "http://127.0.0.1:4173/?saint=nayanmar.20&site=TO20"
+          capture "appar-thevaram-panel" "http://127.0.0.1:4173/?saint=nayanmar.20&site=TO20&tab=hymns"
+          capture "sources-methodology" "http://127.0.0.1:4173/?sources=1"
           capture "nayanmar-tradition-fallback" "http://127.0.0.1:4173/?saint=nayanmar.01"
           capture "manikkavasakar-naalvar" "http://127.0.0.1:4173/?saint=tirumurai8.manikkavacakar"
 
