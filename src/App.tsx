@@ -246,7 +246,6 @@ export default function App() {
       RELATED_PLACE_TRADITION: 1,
       MUKTI_PLACE_TRADITION: 2,
     };
-    const seen = new Set<string>();
     return data.edges
       .filter(
         (edge) =>
@@ -255,10 +254,8 @@ export default function App() {
       )
       .sort((a, b) => (rank[a.predicate] ?? 9) - (rank[b.predicate] ?? 9))
       .flatMap((edge) => {
-        if (seen.has(edge.object)) return [];
         const place = traditionalPlaceById.get(edge.object);
         if (!place) return [];
-        seen.add(edge.object);
         const detail =
           edge.predicate === 'BIRTHPLACE_TRADITION'
             ? 'Birthplace tradition'
@@ -830,7 +827,7 @@ export default function App() {
                   {selectedIsManikkavasakar ? (
                     <span>
                       {selectedTirumurai8Locus
-                        ? `${selectedTirumurai8Locus.section_numbers.length} Tiruvācakam section locus${selectedTirumurai8Locus.section_numbers.length === 1 ? '' : 'i'}`
+                        ? `${selectedTirumurai8Locus.section_numbers.length} Tiruvācakam section ${selectedTirumurai8Locus.section_numbers.length === 1 ? 'locus' : 'loci'}`
                         : 'no mapped Tirumurai 8 locus'}
                     </span>
                   ) : (
@@ -928,8 +925,13 @@ export default function App() {
           <div className="play-row">
             <button
               className="play"
-              disabled={playbackStops.length < 2}
+              disabled={playbackStops.length < 1}
               onClick={() => {
+                if (playbackStops.length === 1) {
+                  setProgress(0);
+                  setPlaying(false);
+                  return;
+                }
                 if (progress >= playbackStops.length - 1) setProgress(0);
                 setPlaying((value) => !value);
               }}
