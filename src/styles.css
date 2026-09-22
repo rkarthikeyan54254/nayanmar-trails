@@ -1680,3 +1680,21 @@ button,select,input,.text,.chips,.fact,.search-results{
   color:#6f8780;
   font-size:6.3px;
 }
+
+.tradition-place-dot{
+  width:9px;
+  height:9px;
+  justify-self:center;
+  border-radius:50%;
+  border:1px solid #d2a052;
+  background:rgba(210,160,82,.18);
+  box-shadow:0 0 7px rgba(210,160,82,.2);
+}
+.major-temples button.active-tradition-place{
+  background:rgba(205,154,69,.09);
+}
+.major-temples button.active-tradition-place .tradition-place-dot{
+  background:#d5a04e;
+  border-color:#f1c87a;
+  box-shadow:0 0 8px rgba(218,163,74,.5);
+}
