@@ -44,6 +44,17 @@ export interface Edge {
   confidence_basis: string | null;
 }
 
+export interface TraditionalPlace {
+  id: string;
+  label: string;
+  label_ta: string | null;
+  authority_scope: AuthorityScope;
+  attributes?: {
+    normalization_key?: string;
+    historical_identification_status?: string;
+  };
+}
+
 export interface Inscription {
   id: string;
   label: string;
@@ -68,6 +79,7 @@ export interface PramanaExport {
     route_policy: string;
   };
   saints: Saint[];
+  traditional_places?: TraditionalPlace[];
   sites: Site[];
   patikams: Patikam[];
   inscriptions: Inscription[];
