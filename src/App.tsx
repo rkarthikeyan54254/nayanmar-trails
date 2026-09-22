@@ -144,6 +144,8 @@ export default function App() {
       .catch((error) => console.error('Unable to load Pramāṇa product exports', error));
   }, []);
 
+  const selectedIsManikkavasakar = selectedSaintId === MANIKKAVASAKAR_ID;
+
   const saint = useMemo(
     () => data?.saints.find((item) => item.id === selectedSaintId) ?? null,
     [data, selectedSaintId],
@@ -154,13 +156,18 @@ export default function App() {
     [data],
   );
 
+  const traditionalPlaceById = useMemo(
+    () => new Map((data?.traditional_places ?? []).map((item) => [item.id, item])),
+    [data],
+  );
+
   const patikamById = useMemo(
     () => new Map((data?.patikams ?? []).map((item) => [item.id, item])),
     [data],
   );
 
   const authoredPatikams = useMemo(() => {
-    if (!data) return [];
+    if (!data || selectedIsManikkavasakar) return [];
     const ids = new Set(
       data.edges
         .filter(
@@ -171,11 +178,11 @@ export default function App() {
         .map((edge) => edge.object),
     );
     return data.patikams.filter((item) => ids.has(item.id));
-  }, [data, selectedSaintId]);
+  }, [data, selectedIsManikkavasakar, selectedSaintId]);
 
   const siteLinks = useMemo(() => {
     const result = new Map<string, string[]>();
-    if (!data) return result;
+    if (!data || selectedIsManikkavasakar) return result;
     const authored = new Set(authoredPatikams.map((item) => item.id));
     for (const edge of data.edges) {
       if (
@@ -187,7 +194,13 @@ export default function App() {
       result.set(edge.object, [...(result.get(edge.object) ?? []), edge.subject]);
     }
     return result;
-  }, [data, authoredPatikams]);
+  }, [data, authoredPatikams, selectedIsManikkavasakar]);
+
+  const tirumurai8LociBySite = useMemo(() => {
+    const result = new Map<string, Tirumurai8Locus>();
+    for (const locus of tirumurai8?.loci ?? []) result.set(locus.site_entity_id, locus);
+    return result;
+  }, [tirumurai8]);
 
   const epigraphicSiteIds = useMemo(
     () =>
@@ -199,17 +212,87 @@ export default function App() {
     [data],
   );
 
-  const routeStops = useMemo<MapStop[]>(
-    () =>
-      GEO_SEEDS
-        .map((seed) => ({
-          ...seed,
-          hymnIds: siteLinks.get(`tevaram_site.${seed.siteId}`) ?? [],
-        }))
-        .filter((item) => item.hymnIds.length)
-        .sort((a, b) => a.playbackRank - b.playbackRank),
-    [siteLinks],
-  );
+  const routeStops = useMemo<MapStop[]>(() => {
+    if (selectedIsManikkavasakar) {
+      return (tirumurai8?.loci ?? [])
+        .map((locus) => {
+          const seed = GEO_SEEDS.find((item) => item.siteId === locus.site_id);
+          if (!seed) return null;
+          return {
+            ...seed,
+            playbackRank: locus.playback_rank,
+            hymnIds: locus.section_numbers.map((section) => `tirumurai8.section.${section}`),
+          };
+        })
+        .filter((item): item is MapStop => Boolean(item))
+        .sort((a, b) => a.playbackRank - b.playbackRank);
+    }
+
+    return GEO_SEEDS
+      .map((seed) => ({
+        ...seed,
+        hymnIds: siteLinks.get(`tevaram_site.${seed.siteId}`) ?? [],
+      }))
+      .filter((item) => item.hymnIds.length)
+      .sort((a, b) => a.playbackRank - b.playbackRank);
+  }, [selectedIsManikkavasakar, siteLinks, tirumurai8]);
+
+  const traditionalPlaybackStops = useMemo<PlaybackStop[]>(() => {
+    if (!data || selectedIsManikkavasakar) return [];
+    const rank: Record<string, number> = {
+      BIRTHPLACE_TRADITION: 0,
+      RELATED_PLACE_TRADITION: 1,
+      MUKTI_PLACE_TRADITION: 2,
+    };
+    const seen = new Set<string>();
+    return data.edges
+      .filter(
+        (edge) =>
+          edge.subject === selectedSaintId &&
+          edge.predicate in rank,
+      )
+      .sort((a, b) => (rank[a.predicate] ?? 9) - (rank[b.predicate] ?? 9))
+      .flatMap((edge) => {
+        if (seen.has(edge.object)) return [];
+        const place = traditionalPlaceById.get(edge.object);
+        if (!place) return [];
+        seen.add(edge.object);
+        const detail =
+          edge.predicate === 'BIRTHPLACE_TRADITION'
+            ? 'Birthplace tradition'
+            : edge.predicate === 'MUKTI_PLACE_TRADITION'
+              ? 'Mukti-place tradition'
+              : 'Related-place tradition';
+        return [{
+          id: `${edge.predicate}:${place.id}`,
+          name: place.label_ta || place.label,
+          detail,
+          kind: 'traditional_place' as const,
+        }];
+      });
+  }, [data, selectedIsManikkavasakar, selectedSaintId, traditionalPlaceById]);
+
+  const playbackStops = useMemo<PlaybackStop[]>(() => {
+    if (routeStops.length >= 2) {
+      return routeStops.map((stop) => ({
+        id: `mapped:${stop.siteId}`,
+        name: stop.name,
+        detail: selectedIsManikkavasakar
+          ? `${stop.hymnIds.length} Tiruvācakam section locus${stop.hymnIds.length === 1 ? '' : 'i'}`
+          : `${stop.hymnIds.length} linked Tēvāram patikam${stop.hymnIds.length === 1 ? '' : 's'}`,
+        kind: 'exact_text_locus' as const,
+        siteId: stop.siteId,
+      }));
+    }
+    return traditionalPlaybackStops;
+  }, [routeStops, selectedIsManikkavasakar, traditionalPlaybackStops]);
+
+  const playbackIsGeographic = routeStops.length >= 2;
+  const playbackKind = selectedIsManikkavasakar
+    ? 'Tirumurai 8 textual loci'
+    : playbackIsGeographic
+      ? 'Mapped Tēvāram loci'
+      : 'Traditional place sequence';
 
   const districtCoverage = useMemo<CoveragePoint[]>(() => {
     if (!data) return [];
@@ -230,13 +313,25 @@ export default function App() {
 
   const saintDistrictCoverage = useMemo<CoveragePoint[]>(() => {
     const counts = new Map<string, number>();
-    for (const siteId of siteLinks.keys()) {
-      const site = siteById.get(siteId);
-      if (!site) continue;
-      const key = normalizeDistrict(site.district);
-      if (key === 'unknown') continue;
-      counts.set(key, (counts.get(key) ?? 0) + 1);
+
+    if (selectedIsManikkavasakar) {
+      for (const stop of routeStops) {
+        const site = siteById.get(`tevaram_site.${stop.siteId}`);
+        if (!site) continue;
+        const key = normalizeDistrict(site.district);
+        if (key === 'unknown') continue;
+        counts.set(key, (counts.get(key) ?? 0) + 1);
+      }
+    } else {
+      for (const siteId of siteLinks.keys()) {
+        const site = siteById.get(siteId);
+        if (!site) continue;
+        const key = normalizeDistrict(site.district);
+        if (key === 'unknown') continue;
+        counts.set(key, (counts.get(key) ?? 0) + 1);
+      }
     }
+
     return DISTRICT_CENTROIDS
       .map((district) => ({
         ...district,
@@ -244,9 +339,19 @@ export default function App() {
       }))
       .filter((item) => item.count > 0)
       .sort((a, b) => b.count - a.count);
-  }, [siteById, siteLinks]);
+  }, [routeStops, selectedIsManikkavasakar, siteById, siteLinks]);
 
   const topLinkedSites = useMemo(() => {
+    if (selectedIsManikkavasakar) {
+      return (tirumurai8?.loci ?? [])
+        .map((locus) => ({
+          site: siteById.get(locus.site_entity_id),
+          count: locus.section_numbers.length,
+        }))
+        .filter((item): item is { site: Site; count: number } => Boolean(item.site))
+        .sort((a, b) => b.count - a.count);
+    }
+
     return [...siteLinks.entries()]
       .map(([siteId, patikams]) => ({
         site: siteById.get(siteId),
@@ -255,23 +360,28 @@ export default function App() {
       .filter((item): item is { site: Site; count: number } => Boolean(item.site))
       .sort((a, b) => b.count - a.count || b.site.patikam_count - a.site.patikam_count)
       .slice(0, 6);
-  }, [siteById, siteLinks]);
+  }, [selectedIsManikkavasakar, siteById, siteLinks, tirumurai8]);
 
   const selectedSite = siteById.get(selectedSiteId) ?? null;
   const selectedPatikams = siteLinks.get(selectedSiteId) ?? [];
+  const selectedTirumurai8Locus = tirumurai8LociBySite.get(selectedSiteId) ?? null;
 
   const episodeCount =
-    data?.edges.filter(
-      (edge) =>
-        edge.predicate === 'EPISODE_ABOUT_SAINT' &&
-        edge.object === selectedSaintId,
-    ).length ?? 0;
+    selectedIsManikkavasakar
+      ? 0
+      : data?.edges.filter(
+          (edge) =>
+            edge.predicate === 'EPISODE_ABOUT_SAINT' &&
+            edge.object === selectedSaintId,
+        ).length ?? 0;
 
   const independentEdges =
     data?.edges.filter((edge) => edge.authority_scope === 'epigraphic_primary').length ?? 0;
 
   const searchResults = useMemo(() => {
-    if (!data || !query.trim()) return { saints: [] as Saint[], sites: [] as Site[] };
+    if (!data || !query.trim()) {
+      return { saints: [] as Saint[], sites: [] as Site[], manikkavasakar: false };
+    }
     const needle = query.trim().toLowerCase();
 
     const saints = data.saints
@@ -290,7 +400,10 @@ export default function App() {
       )
       .slice(0, 5);
 
-    return { saints, sites };
+    const manikkavasakar = ['manikkavasakar', 'manikkavacakar', 'மாணிக்கவாசகர்']
+      .some((value) => value.toLowerCase().includes(needle) || needle.includes(value.toLowerCase()));
+
+    return { saints, sites, manikkavasakar };
   }, [data, query]);
 
   useEffect(() => {
@@ -299,10 +412,10 @@ export default function App() {
   }, [selectedSaintId]);
 
   useEffect(() => {
-    if (!playing || routeStops.length < 2) return;
+    if (!playing || playbackStops.length < 2) return;
     const timer = window.setInterval(() => {
       setProgress((value) => {
-        if (value >= routeStops.length - 1) {
+        if (value >= playbackStops.length - 1) {
           setPlaying(false);
           return value;
         }
@@ -310,9 +423,9 @@ export default function App() {
       });
     }, 1500);
     return () => window.clearInterval(timer);
-  }, [playing, routeStops.length]);
+  }, [playing, playbackStops.length]);
 
-  if (!data) {
+  if (!data || !tirumurai8) {
     return (
       <div className="loading">
         <div className="loading-mark"><GopuramIcon /></div>
