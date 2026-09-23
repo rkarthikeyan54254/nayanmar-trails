@@ -2546,6 +2546,32 @@ button,select,input,.text,.chips,.fact,.search-results{
 .app[data-locale="ta"] .brand strong{
   font-family:"Cormorant Garamond",Georgia,serif!important;
 }
+/* Map overlays use explicit Latin display fonts in the base theme.
+   Force a Tamil-capable face so localized map labels never render as tofu. */
+.app[data-locale="ta"] :is(
+  .map-compass,
+  .map-region-title,
+  .map-sea-label,
+  .map-neighbor-label,
+  .map-legend,
+  .map-legend>b,
+  .map-layer-message,
+  .map-layer-message strong,
+  .map-fallback-note,
+  .map-fallback-note>b,
+  .district-marker-label
+){
+  font-family:"Noto Sans Tamil",system-ui,sans-serif!important;
+}
+.app[data-locale="ta"] :is(.map-region-title,.map-sea-label,.map-neighbor-label){
+  letter-spacing:.04em;
+}
+.app[data-locale="ta"] .map-region-title{
+  font-weight:700;
+}
+.app[data-locale="ta"] .map-sea-label{
+  font-style:normal;
+}
 .app[data-locale="ta"] .brand{
   overflow:hidden;
 }
