@@ -1,5 +1,5 @@
 import { readFile, stat, readdir } from 'node:fs/promises';
-import { join } from 'node:path';
+import { gzipSync } from 'node:zlib';
 
 const dist = new URL('../dist/', import.meta.url);
 const publicData = new URL('../public/data/', import.meta.url);
@@ -46,14 +46,24 @@ const assetDir = new URL('assets/', dist);
 const files = await readdir(assetDir);
 let jsBytes = 0;
 let cssBytes = 0;
+let jsGzipBytes = 0;
+let cssGzipBytes = 0;
 for (const file of files) {
-  const info = await stat(new URL(file, assetDir));
-  if (file.endsWith('.js')) jsBytes += info.size;
-  if (file.endsWith('.css')) cssBytes += info.size;
+  if (!file.endsWith('.js') && !file.endsWith('.css')) continue;
+  const body = await readFile(new URL(file, assetDir));
+  const gzipped = gzipSync(body, { level: 9 }).length;
+  if (file.endsWith('.js')) {
+    jsBytes += body.length;
+    jsGzipBytes += gzipped;
+  }
+  if (file.endsWith('.css')) {
+    cssBytes += body.length;
+    cssGzipBytes += gzipped;
+  }
 }
-const JS_BUDGET = 850 * 1024;
-const CSS_BUDGET = 220 * 1024;
-if (jsBytes > JS_BUDGET) throw new Error(`JS performance budget exceeded: ${jsBytes} > ${JS_BUDGET}`);
-if (cssBytes > CSS_BUDGET) throw new Error(`CSS performance budget exceeded: ${cssBytes} > ${CSS_BUDGET}`);
+const JS_GZIP_BUDGET = 340 * 1024;
+const CSS_GZIP_BUDGET = 38 * 1024;
+if (jsGzipBytes > JS_GZIP_BUDGET) throw new Error(`JS gzip performance budget exceeded: ${jsGzipBytes} > ${JS_GZIP_BUDGET}`);
+if (cssGzipBytes > CSS_GZIP_BUDGET) throw new Error(`CSS gzip performance budget exceeded: ${cssGzipBytes} > ${CSS_GZIP_BUDGET}`);
 
-console.log(`PASS production: ${manifest.counts.routes} indexable routes; ${graph.saints.length}/63 saints; ${curiosities.stories.length}/63 stories; JS ${Math.round(jsBytes/1024)} KiB; CSS ${Math.round(cssBytes/1024)} KiB.`);
+console.log(`PASS production: ${manifest.counts.routes} indexable routes; ${graph.saints.length}/63 saints; ${curiosities.stories.length}/63 stories; JS ${Math.round(jsBytes/1024)} KiB raw / ${Math.round(jsGzipBytes/1024)} KiB gzip; CSS ${Math.round(cssBytes/1024)} KiB raw / ${Math.round(cssGzipBytes/1024)} KiB gzip.`);
