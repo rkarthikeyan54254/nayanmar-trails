@@ -3176,6 +3176,11 @@ button,select,input,.text,.chips,.fact,.search-results{
   cursor:pointer;
 }
 .share-action:hover{border-color:rgba(225,180,91,.6);color:#f0cc84}
+.site-share-row{
+  display:flex;
+  justify-content:flex-end;
+  margin:6px 0 2px;
+}
 
 .saint-curiosity-actions{
   display:flex;
