@@ -167,7 +167,6 @@ export default function SacredMap({
       bearing: 0,
       attributionControl: false,
       interactive: false,
-      antialias: true,
     });
 
     map.addControl(new maplibregl.AttributionControl({ compact: true }), 'bottom-left');
