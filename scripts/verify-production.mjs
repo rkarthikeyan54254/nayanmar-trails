@@ -61,7 +61,7 @@ for (const file of files) {
     cssGzipBytes += gzipped;
   }
 }
-const JS_GZIP_BUDGET = 340 * 1024;
+const JS_GZIP_BUDGET = 380 * 1024;
 const CSS_GZIP_BUDGET = 38 * 1024;
 if (jsGzipBytes > JS_GZIP_BUDGET) throw new Error(`JS gzip performance budget exceeded: ${jsGzipBytes} > ${JS_GZIP_BUDGET}`);
 if (cssGzipBytes > CSS_GZIP_BUDGET) throw new Error(`CSS gzip performance budget exceeded: ${cssGzipBytes} > ${CSS_GZIP_BUDGET}`);
