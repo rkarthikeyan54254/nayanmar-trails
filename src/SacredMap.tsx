@@ -43,16 +43,20 @@ function recolorBase(map: MapLibreMap) {
     const id = layer.id.toLowerCase();
     try {
       if (layer.type === 'background') {
-        map.setPaintProperty(layer.id, 'background-color', '#061923');
+        map.setPaintProperty(layer.id, 'background-color', '#0b2729');
       } else if (layer.type === 'fill') {
         if (/water|ocean|lake|river/.test(id)) {
-          map.setPaintProperty(layer.id, 'fill-color', '#062c3b');
+          map.setPaintProperty(layer.id, 'fill-color', '#0a3a48');
           map.setPaintProperty(layer.id, 'fill-opacity', 0.98);
           map.setPaintProperty(layer.id, 'fill-outline-color', '#062c3b');
         } else if (/park|wood|forest|landcover|landuse|natural/.test(id)) {
           map.setPaintProperty(layer.id, 'fill-color', '#315f49');
           map.setPaintProperty(layer.id, 'fill-opacity', 0.62);
           map.setPaintProperty(layer.id, 'fill-outline-color', 'rgba(49,95,73,0.16)');
+        } else if (/land|earth|continent|landmass/.test(id)) {
+          map.setPaintProperty(layer.id, 'fill-color', '#143733');
+          map.setPaintProperty(layer.id, 'fill-opacity', 0.94);
+          map.setPaintProperty(layer.id, 'fill-outline-color', 'rgba(191,166,108,0.08)');
         } else if (/building/.test(id)) {
           map.setPaintProperty(layer.id, 'fill-color', '#263a34');
           map.setPaintProperty(layer.id, 'fill-opacity', 0.12);
@@ -66,7 +70,7 @@ function recolorBase(map: MapLibreMap) {
           map.setPaintProperty(layer.id, 'line-opacity', 0.025);
         } else if (/boundary/.test(id)) {
           map.setPaintProperty(layer.id, 'line-color', '#bfa66c');
-          map.setPaintProperty(layer.id, 'line-opacity', 0.18);
+          map.setPaintProperty(layer.id, 'line-opacity', 0.28);
         } else if (/water|river/.test(id)) {
           map.setPaintProperty(layer.id, 'line-color', '#3d94ad');
           map.setPaintProperty(layer.id, 'line-opacity', 0.62);
@@ -158,7 +162,7 @@ export default function SacredMap({
 
     const map = new maplibregl.Map({
       container: mapNode.current,
-      style: 'https://tiles.openfreemap.org/styles/dark',
+      style: 'https://tiles.openfreemap.org/styles/liberty',
       center: [78.95, 10.8],
       zoom: 6.05,
       minZoom: 5.35,
