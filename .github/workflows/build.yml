@@ -23,21 +23,26 @@ jobs:
       - run: npm install
       - run: npm run verify:data
       - run: npm run build
+      - run: npm run verify:production
 
       - name: Capture desktop visual QA
         shell: bash
         run: |
           set -euo pipefail
           mkdir -p artifacts
-          npx vite preview --host 127.0.0.1 --port 4173 > /tmp/nayanmar-vite.log 2>&1 &
+          PORT=4173 node server.mjs > /tmp/nayanmar-server.log 2>&1 &
           SERVER_PID=$!
           trap 'kill $SERVER_PID || true' EXIT
           for i in {1..30}; do
-            if curl -fsS http://127.0.0.1:4173/ >/dev/null; then
+            if curl -fsS http://127.0.0.1:4173/healthz >/dev/null; then
               break
             fi
             sleep 1
           done
+          curl -fsS http://127.0.0.1:4173/healthz | grep -q '"ok":true'
+          curl -fsS http://127.0.0.1:4173/en/nayanmar/20-appar-tirunavukkarasar/ | grep -q 'og:image'
+          curl -fsS http://127.0.0.1:4173/en/story/09-kannappa-nayanar/ | grep -q 'Periya Puranam'
+          curl -fsS http://127.0.0.1:4173/sitemap.xml | grep -q '<urlset'
 
           BROWSER="$(which google-chrome || which chromium || which chromium-browser || true)"
           if [ -z "$BROWSER" ]; then
@@ -78,6 +83,11 @@ jobs:
           capture_at "mobile-400-ta" "http://127.0.0.1:4173/?saint=nayanmar.20&lang=ta" "400,850"
           capture_at "mobile-375-en" "http://127.0.0.1:4173/?saint=nayanmar.09&lang=en" "375,812"
           capture_at "mobile-375-ta" "http://127.0.0.1:4173/?saint=nayanmar.09&lang=ta" "375,812"
+          capture_at "v1-start-here-mobile-en" "http://127.0.0.1:4173/en/" "400,900"
+          capture_at "v1-start-here-mobile-ta" "http://127.0.0.1:4173/ta/" "400,900"
+          capture_at "v1-story-route-mobile-en" "http://127.0.0.1:4173/en/story/09-kannappa-nayanar/" "400,900"
+          capture_at "v1-story-route-mobile-ta" "http://127.0.0.1:4173/ta/story/09-kannappa-nayanar/" "400,900"
+          capture "v1-start-here-desktop" "http://127.0.0.1:4173/en/"
           capture "appar-sthalam-overview-ta" "http://127.0.0.1:4173/?saint=nayanmar.20&site=TO20&lang=ta"
           capture "appar-thevaram-panel" "http://127.0.0.1:4173/?saint=nayanmar.20&site=TO20&tab=hymns"
           capture "sources-methodology" "http://127.0.0.1:4173/?sources=1"
