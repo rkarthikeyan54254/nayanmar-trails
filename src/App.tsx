@@ -469,7 +469,11 @@ export default function App() {
   useEffect(() => {
     document.documentElement.lang = locale;
     const url = new URL(window.location.href);
-    if (!parsePublicRoute(url.pathname)) {
+    const publicRoute = parsePublicRoute(url.pathname);
+    if (publicRoute) {
+      url.pathname = url.pathname.replace(/^\/(en|ta)(?=\/|$)/, `/${locale}`);
+      window.history.replaceState({}, '', url);
+    } else {
       url.searchParams.set('lang', locale);
       window.history.replaceState({}, '', url);
     }
@@ -804,6 +808,28 @@ export default function App() {
     ? curiosities?.stories.find((item) => item.saint_id === selectedSaintId) ?? null
     : null;
 
+  const discoveryStories = useMemo(() => {
+    const ids = ['nayanmar.09', 'nayanmar.23', 'nayanmar.17', 'nayanmar.56', 'nayanmar.27'];
+    return ids.flatMap((id) => {
+      const item = saintById.get(id);
+      const story = curiosities?.stories.find((entry) => entry.saint_id === id);
+      if (!item || !story) return [];
+      return [{
+        saint: item,
+        name: localizedSaintName(item, locale),
+        hook: locale === 'ta' ? story.hook_ta : story.hook_en,
+      }];
+    });
+  }, [curiosities, locale, saintById]);
+
+  const discoverySites = useMemo(() => {
+    return (data?.sites ?? [])
+      .slice()
+      .sort((a, b) => b.patikam_count - a.patikam_count)
+      .slice(0, 4)
+      .map((site) => ({ site, name: localizedSiteName(site, locale) }));
+  }, [data, locale]);
+
   const searchResults = useMemo(() => {
     if (!data || !query.trim()) {
       return {
@@ -984,7 +1010,10 @@ export default function App() {
           >
             <T>Connections</T>
           </button>
-          <button onClick={() => setSourcesOpen(true)}><T>Sources</T></button>
+          <button onClick={() => {
+            setSourcesOpen(true);
+            track('sources_open', { source: 'top_nav' });
+          }}><T>Sources</T></button>
         </nav>
 
         <div className="language-switcher" aria-label={tr(locale, 'Language')}>
@@ -1114,6 +1143,31 @@ export default function App() {
         <small className="hero-credit">{HERO_MEDIA.source} · {HERO_MEDIA.license}</small>
       </section>
 
+      {showStartHere && (
+        <StartHere
+          locale={locale}
+          stories={discoveryStories}
+          sites={discoverySites}
+          onSaint={(item) => {
+            setSelectedSaintId(item.id);
+            requestAnimationFrame(() => document.querySelector('.saint-card')?.scrollIntoView({ behavior: 'smooth', block: 'start' }));
+          }}
+          onStory={(item) => {
+            setSelectedSaintId(item.id);
+            setStoryOpen(true);
+          }}
+          onSite={(site) => {
+            setSelectedSiteId(site.id);
+            setTab('visits');
+            requestAnimationFrame(() => document.querySelector('.detail-card')?.scrollIntoView({ behavior: 'smooth', block: 'start' }));
+          }}
+          onTrail={() => {
+            setSelectedSaintId('nayanmar.20');
+            requestAnimationFrame(() => document.querySelector('.map-card')?.scrollIntoView({ behavior: 'smooth', block: 'start' }));
+          }}
+        />
+      )}
+
       <section className="filters">
         <Filter label={tr(locale, 'Saint')}>
           <select
@@ -1196,8 +1250,18 @@ export default function App() {
           </div>
 
           <div className="saint-heading">
-            <small>{saintRegistryLabel}</small>
-            <h2>{saintName}</h2>
+            <div>
+              <small>{saintRegistryLabel}</small>
+              <h2>{saintName}</h2>
+            </div>
+            {saint && !selectedIsManikkavasakar && (
+              <SaintShare
+                locale={locale}
+                saint={saint}
+                englishName={SAINT_EN[saint.id] ?? saint.label}
+                displayName={saintName}
+              />
+            )}
           </div>
 
           <div className="identity-line">
@@ -1227,9 +1291,20 @@ export default function App() {
                 <b>{locale === 'ta' ? (periyaPuranamTitle || tr(locale, 'Periya Puranam tradition')) : 'Periya Puranam tradition'}</b>
                 <small>{tr(locale, 'Traditional narrative — not presented as independently verified biography.')}</small>
               </div>
-              <button onClick={() => setSourcesOpen(true)}>
-                {tr(locale, 'Read the source trail')} →
-              </button>
+              <div className="saint-curiosity-actions">
+                <button onClick={() => {
+                  setStoryOpen(true);
+                  track('story_open', { saint: selectedSaintId, source: 'card' });
+                }}>
+                  {locale === 'ta' ? 'கதையை முழுமையாக வாசிக்க' : 'Read the story'} →
+                </button>
+                <button onClick={() => {
+                  setSourcesOpen(true);
+                  track('sources_open', { source: 'story_card' });
+                }}>
+                  {tr(locale, 'Read the source trail')} →
+                </button>
+              </div>
             </div>
           )}
 
@@ -1821,9 +1896,44 @@ export default function App() {
         />
       )}
 
+      {storyOpen && saint && saintCuriosity && (
+        <StoryFocus
+          locale={locale}
+          saint={saint}
+          englishName={SAINT_EN[saint.id] ?? saint.label}
+          displayName={saintName}
+          hook={locale === 'ta' ? saintCuriosity.hook_ta : saintCuriosity.hook_en}
+          sites={topLinkedSites.slice(0, 3).map(({ site }) => ({
+            site,
+            name: localizedSiteName(site, locale),
+          }))}
+          onClose={() => {
+            setStoryOpen(false);
+            if (initialRoute?.kind === 'story') {
+              window.history.replaceState({}, '', saintPath(locale, saint, SAINT_EN[saint.id] ?? saint.label));
+            }
+          }}
+          onExploreSaint={() => {
+            setStoryOpen(false);
+            window.history.pushState({}, '', saintPath(locale, saint, SAINT_EN[saint.id] ?? saint.label));
+            requestAnimationFrame(() => document.querySelector('.saint-card')?.scrollIntoView({ behavior: 'smooth', block: 'start' }));
+          }}
+          onOpenSite={(site) => {
+            setStoryOpen(false);
+            setSelectedSiteId(site.id);
+            setTab('visits');
+            window.history.pushState({}, '', sitePath(locale, site));
+            requestAnimationFrame(() => document.querySelector('.detail-card')?.scrollIntoView({ behavior: 'smooth', block: 'start' }));
+          }}
+        />
+      )}
+
       <footer>
         <strong><GopuramIcon /> Nayanmar Trails</strong>
-        <button className="footer-source-link" onClick={() => setSourcesOpen(true)}><T>Sources & methodology</T></button>
+        <button className="footer-source-link" onClick={() => {
+          setSourcesOpen(true);
+          track('sources_open', { source: 'footer' });
+        }}><T>Sources & methodology</T></button>
         <span>Map © OpenFreeMap / OpenMapTiles / OpenStreetMap</span>
       </footer>
     </main>
