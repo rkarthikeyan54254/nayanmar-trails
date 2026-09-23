@@ -75,8 +75,12 @@ jobs:
               printf '%s' "$body" | grep -F "property=\"og:image\" content=\"$CANONICAL_HOST/og/" >/dev/null
             done
 
-            curl -fsSL --max-time 20 "$host/sitemap.xml" | grep -F "<loc>$CANONICAL_HOST/" >/dev/null
-            curl -fsSL --max-time 20 "$host/healthz" | grep -F '"ok":true' >/dev/null
+            sitemap="$(curl -fsSL --max-time 20 "$host/sitemap.xml")"
+            printf '%s' "$sitemap" | grep -F "<loc>$CANONICAL_HOST/" >/dev/null
+
+            health="$(curl -fsSL --max-time 20 "$host/healthz")"
+            printf '%s' "$health" | python3 -c 'import json,sys; assert json.load(sys.stdin).get("ok") is True'
+            echo "Validated live routes on $host"
           done
 
       - name: Capture live desktop and mobile map QA
