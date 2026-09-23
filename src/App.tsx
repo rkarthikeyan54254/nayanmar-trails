@@ -378,6 +378,7 @@ export default function App() {
   );
 
   const [data, setData] = useState<PramanaExport | null>(null);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [tirumurai8, setTirumurai8] = useState<Tirumurai8Snapshot | null>(null);
   const [saivaPlaces, setSaivaPlaces] = useState<SaivaLiterarySnapshot | null>(null);
   const [curiosities, setCuriosities] = useState<SaintCuriositySnapshot | null>(null);
@@ -463,7 +464,12 @@ export default function App() {
         setSaivaPlaces(literaryPlaces);
         setCuriosities(saintCuriosities);
       })
-      .catch((error) => console.error('Unable to load Pramāṇa product exports', error));
+      .catch((error) => {
+        console.error('Unable to load Pramāṇa product exports', error);
+        const message = error instanceof Error ? error.message : 'unknown data load error';
+        setLoadError(message);
+        track('app_error', { message: message.slice(0, 180), stage: 'data_load' });
+      });
   }, []);
 
   useEffect(() => {
@@ -912,10 +918,17 @@ export default function App() {
     setPlaying(false);
     if (didInitSaintSelection.current) {
       setTab('visits');
+      track('saint_selected', { saint: selectedSaintId });
     } else {
       didInitSaintSelection.current = true;
     }
   }, [selectedSaintId]);
+
+  useEffect(() => {
+    if (!data) return;
+    const selected = data.sites.find((item) => item.id === selectedSiteId);
+    if (selected) track('site_selected', { site: selected.site_id });
+  }, [data, selectedSiteId]);
 
   useEffect(() => {
     if (!selectedIsManikkavasakar || !tirumurai8?.loci.length) return;
@@ -951,6 +964,18 @@ export default function App() {
     }, 1500);
     return () => window.clearInterval(timer);
   }, [playing, playbackStops.length]);
+
+  if (loadError) {
+    return (
+      <main className="fatal-error">
+        <div>
+          <h1>Nayanmar Trails</h1>
+          <p>{locale === 'ta' ? 'தரவை இப்போது திறக்க முடியவில்லை.' : 'The evidence data could not be loaded just now.'}</p>
+          <button onClick={() => window.location.reload()}>{locale === 'ta' ? 'மீண்டும் முயற்சி செய்' : 'Try again'}</button>
+        </div>
+      </main>
+    );
+  }
 
   if (!data || !tirumurai8 || !saivaPlaces || !curiosities) {
     return (
@@ -1445,6 +1470,7 @@ export default function App() {
             onSelect={(siteId) => {
               setSelectedSiteId(siteId);
               setTab('visits');
+              track('map_interaction', { action: 'select_sthalam', site: siteId.replace('tevaram_site.', '') });
             }}
           />
 
@@ -1570,6 +1596,14 @@ export default function App() {
                             : `${selectedPatikams.length} by ${saintName.split(' · ')[0]}`}
                         </span>
                       )}
+                    </div>
+
+                    <div className="site-share-row">
+                      <SiteShare
+                        locale={locale}
+                        site={selectedSite}
+                        displayName={localizedSiteName(selectedSite, locale)}
+                      />
                     </div>
 
                     {selectedIsManikkavasakar ? (
