@@ -21,6 +21,7 @@ jobs:
         with:
           node-version: 22
       - run: npm install
+      - run: npm audit --omit=dev --audit-level=high
       - run: npm run verify:data
       - run: npm run build
       - run: npm run verify:production
