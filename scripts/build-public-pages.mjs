@@ -1,5 +1,6 @@
 import { readFile, writeFile, mkdir, rm, stat, readdir } from 'node:fs/promises';
-import { dirname, join } from 'node:path';
+import { dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import sharp from 'sharp';
 import { SAINT_NAMES } from './saint-names.mjs';
 
@@ -136,7 +137,7 @@ async function makeOg(fileName, heading, kind, subline) {
     <text x="92" y="548" font-family="Arial,sans-serif" font-size="24" fill="#b9c4bd">${esc(subline)}</text>
     <line x1="92" y1="580" x2="1108" y2="580" stroke="#d0a257" stroke-opacity=".32"/>
   </svg>`;
-  await sharp(Buffer.from(svg)).png({ compressionLevel: 9 }).toFile(new URL(fileName, ogDir));
+  await sharp(Buffer.from(svg)).png({ compressionLevel: 9 }).toFile(fileURLToPath(new URL(fileName, ogDir)));
 }
 
 function jsonLd(locale, kind, item, canonical, description) {
@@ -215,7 +216,7 @@ async function writeRoute({ locale, kind, item, path, ogFile, ogHeading, ogSubli
   html = html.replace('<div id="root"></div>', `${routeSnapshot(locale, kind, item, title, description)}<div id="root"></div>`);
 
   const target = new URL(`.${path}index.html`, dist);
-  await mkdir(dirname(target.pathname), { recursive: true });
+  await mkdir(dirname(fileURLToPath(target)), { recursive: true });
   await writeFile(target, html);
   routes.push({ locale, kind, path, canonical, title, description, og: `/og/${ogFile}` });
 }
