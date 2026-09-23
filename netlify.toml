@@ -8,6 +8,11 @@ NODE_VERSION = "22"
 PUBLIC_SITE_URL = "https://nayanmartrails.netlify.app"
 
 [[redirects]]
+from = "/healthz"
+to = "/health.json"
+status = 200
+
+[[redirects]]
 from = "/api/event"
 to = "/.netlify/functions/event"
 status = 200
