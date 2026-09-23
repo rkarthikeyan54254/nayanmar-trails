@@ -44,6 +44,14 @@ function recolorBase(map: MapLibreMap) {
     try {
       if (layer.type === 'background') {
         map.setPaintProperty(layer.id, 'background-color', '#0b2729');
+      } else if (layer.type === 'raster') {
+        if (/natural_earth|hillshade|shaded/.test(id)) {
+          map.setPaintProperty(layer.id, 'raster-opacity', 0.12);
+          map.setPaintProperty(layer.id, 'raster-saturation', -0.85);
+          map.setPaintProperty(layer.id, 'raster-contrast', 0.18);
+          map.setPaintProperty(layer.id, 'raster-brightness-min', 0);
+          map.setPaintProperty(layer.id, 'raster-brightness-max', 0.34);
+        }
       } else if (layer.type === 'fill') {
         if (/water|ocean|lake|river/.test(id)) {
           map.setPaintProperty(layer.id, 'fill-color', '#0a3a48');
