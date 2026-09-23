@@ -2546,6 +2546,32 @@ button,select,input,.text,.chips,.fact,.search-results{
 .app[data-locale="ta"] .brand strong{
   font-family:"Cormorant Garamond",Georgia,serif!important;
 }
+/* Map overlays use explicit Latin display fonts in the base theme.
+   Force a Tamil-capable face so localized map labels never render as tofu. */
+.app[data-locale="ta"] :is(
+  .map-compass,
+  .map-region-title,
+  .map-sea-label,
+  .map-neighbor-label,
+  .map-legend,
+  .map-legend>b,
+  .map-layer-message,
+  .map-layer-message strong,
+  .map-fallback-note,
+  .map-fallback-note>b,
+  .district-marker-label
+){
+  font-family:"Noto Sans Tamil",system-ui,sans-serif!important;
+}
+.app[data-locale="ta"] :is(.map-region-title,.map-sea-label,.map-neighbor-label){
+  letter-spacing:.04em;
+}
+.app[data-locale="ta"] .map-region-title{
+  font-weight:700;
+}
+.app[data-locale="ta"] .map-sea-label{
+  font-style:normal;
+}
 .app[data-locale="ta"] .brand{
   overflow:hidden;
 }
@@ -2700,3 +2726,330 @@ button,select,input,.text,.chips,.fact,.search-results{
   }
   .app[data-locale="ta"] .hero p{font-size:9px}
 }
+
+/* ---------- mobile hardening ----------
+   Keep the page itself single-column. Horizontal scrolling is allowed only
+   inside controls that deliberately need it, never at the document level. */
+@media(max-width:900px){
+  html,body,#root,.app{
+    width:100%;
+    max-width:100%;
+    overflow-x:hidden;
+  }
+
+  .topbar{
+    width:100%;
+    min-width:0;
+    grid-template-columns:minmax(0,1fr) auto;
+    gap:8px;
+    padding:9px 10px;
+  }
+  .brand,
+  .brand>div{
+    min-width:0;
+  }
+  .brand{
+    gap:9px;
+  }
+  .brand-mark{
+    width:43px;
+    height:43px;
+  }
+  .brand-mark svg{
+    width:25px;
+    height:25px;
+  }
+  .brand strong{
+    overflow:hidden;
+    text-overflow:ellipsis;
+    font-size:23px;
+    line-height:1.08;
+  }
+  .brand small{
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+    line-height:1.25;
+  }
+  .language-switcher{
+    flex:0 0 auto;
+  }
+
+  .hero{
+    width:100%;
+    min-width:0;
+    min-height:142px;
+    padding:16px 14px 18px;
+  }
+  .hero-copy{
+    width:100%;
+    min-width:0;
+  }
+  .hero-copy>span{
+    line-height:1.35;
+  }
+  .hero h1{
+    max-width:680px;
+    margin:7px auto 5px;
+    font-size:27px;
+    line-height:1.08;
+    text-wrap:balance;
+  }
+  .hero p{
+    max-width:620px;
+    font-size:10.5px;
+    line-height:1.4;
+  }
+
+  .filters{
+    width:100%;
+    min-width:0;
+    display:grid;
+    grid-template-columns:minmax(0,1fr);
+    align-items:stretch;
+    gap:7px;
+    padding:8px;
+    overflow:visible;
+  }
+  .filter:first-child{
+    width:100%;
+    min-width:0;
+    height:48px;
+  }
+  .filter select{
+    min-width:0;
+    width:100%;
+  }
+  .mode-pills{
+    width:100%;
+    min-width:0;
+    margin-left:0;
+    display:grid;
+    grid-template-columns:repeat(4,minmax(0,1fr));
+    gap:5px;
+  }
+  .mode-label{
+    grid-column:1/-1;
+    padding-left:2px;
+  }
+  .mode-pills button{
+    min-width:0;
+    min-height:38px;
+    padding:7px 4px;
+    line-height:1.2;
+    white-space:normal;
+  }
+
+  /* This override intentionally comes after the later tablet rules above.
+     They previously reintroduced a three-column grid at phone widths. */
+  .workspace{
+    width:100%;
+    min-width:0;
+    display:grid;
+    grid-template-columns:minmax(0,1fr);
+    gap:8px;
+    padding:8px;
+  }
+  .workspace>*,
+  .bottom>*{
+    min-width:0;
+    width:100%;
+  }
+  .map-card{
+    order:1;
+    min-height:500px;
+  }
+  .saint-card{
+    order:2;
+    min-height:auto;
+  }
+  .detail-card{
+    order:3;
+    min-height:auto;
+    grid-column:auto;
+  }
+
+  .map-toolbar{
+    left:10px;
+    right:10px;
+    width:auto;
+    transform:none;
+    gap:8px;
+    padding:7px 9px;
+  }
+  .map-toolbar-left{
+    min-width:0;
+    flex:1 1 auto;
+  }
+  .map-toolbar-left span{
+    min-width:0;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+  }
+  .map-toolbar-stats{
+    flex:0 0 auto;
+    gap:7px;
+  }
+  .map-toolbar-stats span:nth-child(n+2){
+    display:none;
+  }
+
+  .map-legend{
+    max-width:calc(100% - 24px);
+  }
+
+  .bottom{
+    width:100%;
+    min-width:0;
+    grid-template-columns:minmax(0,1fr);
+    gap:8px;
+    padding:8px;
+  }
+
+  .sources-modal,
+  .graph-modal{
+    max-width:calc(100vw - 16px);
+  }
+}
+
+@media(max-width:520px){
+  .topbar{
+    padding:8px 9px;
+  }
+  .brand{
+    gap:8px;
+  }
+  .brand-mark{
+    width:40px;
+    height:40px;
+  }
+  .brand-mark svg{
+    width:23px;
+    height:23px;
+  }
+  .brand strong{
+    font-size:21px;
+  }
+  .brand small{
+    margin-top:2px;
+    font-size:6.1px;
+    letter-spacing:.11em;
+  }
+  .language-switcher{
+    padding:2px;
+  }
+  .language-switcher button{
+    min-width:36px;
+    height:29px;
+    padding:0 7px;
+  }
+
+  .hero{
+    min-height:138px;
+    padding:15px 11px 17px;
+  }
+  .hero h1{
+    max-width:360px;
+    font-size:26px;
+    line-height:1.08;
+  }
+  .hero p{
+    max-width:360px;
+    font-size:10px;
+    line-height:1.42;
+  }
+
+  .mode-pills button{
+    font-size:6.6px;
+  }
+
+  .map-card{
+    min-height:480px;
+  }
+  .map-toolbar{
+    top:9px;
+    font-size:6.2px;
+  }
+  .map-toolbar-stats span{
+    white-space:nowrap;
+  }
+
+  .saint-visual{
+    height:235px;
+  }
+  .saint-card{
+    padding:10px;
+  }
+
+  .visitor-info-grid,
+  .journey-stop-list{
+    grid-template-columns:1fr;
+  }
+
+  .sources-modal-head,
+  .sources-modal-footer{
+    align-items:flex-start;
+  }
+  .sources-modal-footer{
+    flex-direction:column;
+  }
+}
+
+/* Tamil mobile needs a little more vertical breathing room than Latin text,
+   but must follow the same single-column geometry. */
+@media(max-width:900px){
+  .app[data-locale="ta"] .topbar{
+    width:100%;
+    min-width:0;
+    grid-template-columns:minmax(0,1fr) auto;
+    gap:8px;
+    padding:9px 10px;
+  }
+  .app[data-locale="ta"] .brand{
+    overflow:visible;
+  }
+  .app[data-locale="ta"] .brand strong{
+    font-size:21px;
+    line-height:1.12;
+  }
+  .app[data-locale="ta"] .brand small{
+    font-size:6px;
+    line-height:1.45;
+  }
+  .app[data-locale="ta"] .hero{
+    min-height:160px;
+    padding:18px 12px 20px;
+  }
+  .app[data-locale="ta"] .hero h1{
+    max-width:680px;
+    font-size:25px;
+    line-height:1.42;
+  }
+  .app[data-locale="ta"] .hero p{
+    max-width:620px;
+    font-size:8.8px;
+    line-height:1.7;
+  }
+  .app[data-locale="ta"] .mode-pills button{
+    min-height:42px;
+    font-size:7.1px;
+    line-height:1.45;
+  }
+}
+
+@media(max-width:520px){
+  .app[data-locale="ta"] .brand strong{
+    font-size:19px;
+  }
+  .app[data-locale="ta"] .hero h1{
+    max-width:360px;
+    font-size:23px;
+    line-height:1.44;
+  }
+  .app[data-locale="ta"] .hero p{
+    max-width:360px;
+    font-size:8.5px;
+  }
+}
+
