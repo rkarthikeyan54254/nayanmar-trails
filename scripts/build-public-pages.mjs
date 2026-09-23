@@ -7,7 +7,7 @@ import { SAINT_NAMES } from './saint-names.mjs';
 const root = new URL('../', import.meta.url);
 const dist = new URL('../dist/', import.meta.url);
 const publicData = new URL('../public/data/', import.meta.url);
-const siteUrl = (process.env.PUBLIC_SITE_URL || 'https://app-production-5d87.up.railway.app').replace(/\/$/, '');
+const siteUrl = (process.env.PUBLIC_SITE_URL || 'https://nayanmartrails.netlify.app').replace(/\/$/, '');
 const release = process.env.RAILWAY_GIT_COMMIT_SHA || process.env.COMMIT_REF || process.env.GITHUB_SHA || 'local';
 
 const graph = JSON.parse(await readFile(new URL('pramana-export-v1.json', publicData), 'utf8'));
