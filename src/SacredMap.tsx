@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef } from 'react';
 import * as maplibregl from 'maplibre-gl';
-import type { Map as MapLibreMap, Marker } from 'maplibre-gl';
+import type { Map as MapLibreMap, Marker, StyleSpecification } from 'maplibre-gl';
 import type { FeatureCollection, LineString, Point } from 'geojson';
 import { GEO_SEEDS } from './geometry';
 import { useLocale } from './i18n';
@@ -37,50 +37,115 @@ const gopuramMarkup = `
   <path class="door" d="M25 39h14v21H25z"/>
 </svg>`;
 
-function recolorBase(map: MapLibreMap) {
-  const layers = map.getStyle().layers ?? [];
-  for (const layer of layers) {
-    const id = layer.id.toLowerCase();
-    try {
-      if (layer.type === 'background') {
-        map.setPaintProperty(layer.id, 'background-color', '#061923');
-      } else if (layer.type === 'fill') {
-        if (/water|ocean|lake|river/.test(id)) {
-          map.setPaintProperty(layer.id, 'fill-color', '#062c3b');
-          map.setPaintProperty(layer.id, 'fill-opacity', 0.98);
-          map.setPaintProperty(layer.id, 'fill-outline-color', '#062c3b');
-        } else if (/park|wood|forest|landcover|landuse|natural/.test(id)) {
-          map.setPaintProperty(layer.id, 'fill-color', '#315f49');
-          map.setPaintProperty(layer.id, 'fill-opacity', 0.62);
-          map.setPaintProperty(layer.id, 'fill-outline-color', 'rgba(49,95,73,0.16)');
-        } else if (/building/.test(id)) {
-          map.setPaintProperty(layer.id, 'fill-color', '#263a34');
-          map.setPaintProperty(layer.id, 'fill-opacity', 0.12);
-          map.setPaintProperty(layer.id, 'fill-outline-color', 'rgba(38,58,52,0.08)');
-        }
-      } else if (layer.type === 'line') {
-        if (/road|highway|street|motorway|trunk|primary|secondary/.test(id)) {
-          map.setPaintProperty(layer.id, 'line-color', '#817652');
-          map.setPaintProperty(layer.id, 'line-opacity', 0.045);
-        } else if (/rail/.test(id)) {
-          map.setPaintProperty(layer.id, 'line-opacity', 0.025);
-        } else if (/boundary/.test(id)) {
-          map.setPaintProperty(layer.id, 'line-color', '#bfa66c');
-          map.setPaintProperty(layer.id, 'line-opacity', 0.18);
-        } else if (/water|river/.test(id)) {
-          map.setPaintProperty(layer.id, 'line-color', '#3d94ad');
-          map.setPaintProperty(layer.id, 'line-opacity', 0.62);
-        }
-      } else if (layer.type === 'symbol') {
-        if (/road|highway|transit|station|poi|shop|airport|rail|housenumber|village|suburb|neighbourhood|place|city|town|state|country/.test(id)) {
-          map.setLayoutProperty(layer.id, 'visibility', 'none');
-        }
-      }
-    } catch {
-      // Public basemap layers can evolve. Unsupported style tweaks stay non-fatal.
-    }
-  }
-}
+const HERITAGE_MAP_STYLE: StyleSpecification = {
+  version: 8,
+  name: 'Nayanmar Trails heritage map',
+  sources: {
+    natural_earth: {
+      type: 'raster',
+      tiles: ['https://tiles.openfreemap.org/natural_earth/ne2sr/{z}/{x}/{y}.png'],
+      tileSize: 256,
+      maxzoom: 6,
+      attribution: 'Natural Earth',
+    },
+    openmaptiles: {
+      type: 'vector',
+      url: 'https://tiles.openfreemap.org/planet',
+      attribution: '© OpenStreetMap contributors',
+    },
+  },
+  layers: [
+    {
+      id: 'heritage-background',
+      type: 'background',
+      paint: { 'background-color': '#0b2729' },
+    },
+    {
+      id: 'heritage-relief',
+      type: 'raster',
+      source: 'natural_earth',
+      maxzoom: 7,
+      paint: {
+        'raster-opacity': 0.24,
+        'raster-saturation': -0.9,
+        'raster-contrast': 0.16,
+        'raster-brightness-min': 0,
+        'raster-brightness-max': 0.36,
+      },
+    },
+    {
+      id: 'heritage-wood',
+      type: 'fill',
+      source: 'openmaptiles',
+      'source-layer': 'landcover',
+      filter: ['==', ['get', 'class'], 'wood'],
+      paint: {
+        'fill-color': '#315f49',
+        'fill-opacity': 0.34,
+      },
+    },
+    {
+      id: 'heritage-grass',
+      type: 'fill',
+      source: 'openmaptiles',
+      'source-layer': 'landcover',
+      filter: ['==', ['get', 'class'], 'grass'],
+      paint: {
+        'fill-color': '#3b6b50',
+        'fill-opacity': 0.2,
+      },
+    },
+    {
+      id: 'heritage-park',
+      type: 'fill',
+      source: 'openmaptiles',
+      'source-layer': 'park',
+      paint: {
+        'fill-color': '#35624d',
+        'fill-opacity': 0.2,
+      },
+    },
+    {
+      id: 'heritage-water',
+      type: 'fill',
+      source: 'openmaptiles',
+      'source-layer': 'water',
+      paint: {
+        'fill-color': '#0a3a48',
+        'fill-opacity': 0.92,
+      },
+    },
+    {
+      id: 'heritage-waterways',
+      type: 'line',
+      source: 'openmaptiles',
+      'source-layer': 'waterway',
+      paint: {
+        'line-color': '#3d94ad',
+        'line-opacity': 0.58,
+        'line-width': 0.8,
+      },
+    },
+    {
+      id: 'heritage-boundaries',
+      type: 'line',
+      source: 'openmaptiles',
+      'source-layer': 'boundary',
+      filter: [
+        'all',
+        ['!=', ['get', 'maritime'], 1],
+        ['has', 'admin_level'],
+        ['<=', ['get', 'admin_level'], 4],
+      ],
+      paint: {
+        'line-color': '#c0aa72',
+        'line-opacity': 0.32,
+        'line-width': 0.8,
+        'line-dasharray': [2, 2],
+      },
+    },
+  ],
+};
 
 function routeCollection(stops: MapStop[]): FeatureCollection<LineString> {
   return {
@@ -158,7 +223,7 @@ export default function SacredMap({
 
     const map = new maplibregl.Map({
       container: mapNode.current,
-      style: 'https://tiles.openfreemap.org/styles/dark',
+      style: HERITAGE_MAP_STYLE,
       center: [78.95, 10.8],
       zoom: 6.05,
       minZoom: 5.35,
@@ -172,7 +237,6 @@ export default function SacredMap({
     map.addControl(new maplibregl.AttributionControl({ compact: true }), 'bottom-left');
 
     map.on('load', () => {
-      recolorBase(map);
       map.fitBounds(
         [[76.72, 7.85], [80.48, 13.48]],
         {
