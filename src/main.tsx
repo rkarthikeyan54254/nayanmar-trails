@@ -5,6 +5,8 @@ import './styles.css';
 import App from './App';
 import { ErrorBoundary } from './ErrorBoundary';
 
+document.getElementById('seo-snapshot')?.remove();
+
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode><ErrorBoundary><App /></ErrorBoundary></React.StrictMode>,
 );
