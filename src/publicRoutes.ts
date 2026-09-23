@@ -1,6 +1,8 @@
 import type { Saint, Site } from './types';
 import type { Locale } from './i18n';
 
+declare const __PUBLIC_SITE_URL__: string;
+
 export type PublicRoute =
   | { kind: 'home'; locale: Locale }
   | { kind: 'saint'; locale: Locale; ordinal: number }
@@ -43,7 +45,7 @@ export function homePath(locale: Locale) {
 }
 
 export function absoluteUrl(path: string) {
-  return new URL(path, window.location.origin).toString();
+  return new URL(path, `${__PUBLIC_SITE_URL__.replace(/\/$/, '')}/`).toString();
 }
 
 export function parsePublicRoute(pathname: string): PublicRoute | null {

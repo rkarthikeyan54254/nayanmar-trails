@@ -6,6 +6,11 @@ const publicData = new URL('../public/data/', import.meta.url);
 const graph = JSON.parse(await readFile(new URL('pramana-export-v1.json', publicData), 'utf8'));
 const curiosities = JSON.parse(await readFile(new URL('pramana-saint-curiosities-v1.json', publicData), 'utf8'));
 const manifest = JSON.parse(await readFile(new URL('data/public-routes-v1.json', dist), 'utf8'));
+const expectedSiteUrl = (process.env.PUBLIC_SITE_URL || 'https://nayanmartrails.netlify.app').replace(/\/$/, '');
+
+if (manifest.base_url !== expectedSiteUrl) {
+  throw new Error(`Public route base URL mismatch: ${manifest.base_url} !== ${expectedSiteUrl}`);
+}
 
 const expectedRoutes = 2 * (1 + graph.saints.length * 2 + graph.sites.length);
 if (manifest.counts.routes !== expectedRoutes) {
@@ -32,6 +37,11 @@ for (const route of manifest.routes) {
   for (const token of ['rel="canonical"', 'og:title', 'og:description', 'og:image', 'application/ld+json', 'seo-snapshot']) {
     if (!html.includes(token)) throw new Error(`Missing ${token} in ${route.path}`);
   }
+  const expectedCanonical = `${expectedSiteUrl}${route.path}`;
+  if (route.canonical !== expectedCanonical) throw new Error(`Canonical mismatch in manifest for ${route.path}`);
+  if (!html.includes(`<link rel="canonical" href="${expectedCanonical}"`)) throw new Error(`Canonical host mismatch in ${route.path}`);
+  if (!html.includes(`<meta property="og:url" content="${expectedCanonical}"`)) throw new Error(`OG URL host mismatch in ${route.path}`);
+  if (!html.includes(`<meta property="og:image" content="${expectedSiteUrl}/og/`)) throw new Error(`OG image host mismatch in ${route.path}`);
   const ogMatch = html.match(/property="og:image" content="[^"]+\/og\/([^"]+)"/);
   if (!ogMatch) throw new Error(`Missing route OG image in ${route.path}`);
   await stat(new URL(`og/${ogMatch[1]}`, dist));
@@ -40,6 +50,8 @@ for (const route of manifest.routes) {
 const sitemap = await readFile(new URL('sitemap.xml', dist), 'utf8');
 const robots = await readFile(new URL('robots.txt', dist), 'utf8');
 if (!sitemap.includes('<urlset') || !robots.includes('Sitemap:')) throw new Error('SEO discovery files missing');
+if (!sitemap.includes(`<loc>${expectedSiteUrl}/`)) throw new Error('Sitemap does not use the canonical public origin');
+if (!robots.includes(`Sitemap: ${expectedSiteUrl}/sitemap.xml`)) throw new Error('robots.txt does not use the canonical public origin');
 await stat(new URL('health.json', dist));
 
 const assetDir = new URL('assets/', dist);
@@ -48,6 +60,7 @@ let jsBytes = 0;
 let cssBytes = 0;
 let jsGzipBytes = 0;
 let cssGzipBytes = 0;
+let clientHasCanonicalOrigin = false;
 for (const file of files) {
   if (!file.endsWith('.js') && !file.endsWith('.css')) continue;
   const body = await readFile(new URL(file, assetDir));
@@ -55,12 +68,15 @@ for (const file of files) {
   if (file.endsWith('.js')) {
     jsBytes += body.length;
     jsGzipBytes += gzipped;
+    if (body.toString('utf8').includes(expectedSiteUrl)) clientHasCanonicalOrigin = true;
   }
   if (file.endsWith('.css')) {
     cssBytes += body.length;
     cssGzipBytes += gzipped;
   }
 }
+if (!clientHasCanonicalOrigin) throw new Error('Client bundle is missing the canonical public origin for share URLs');
+
 const JS_GZIP_BUDGET = 380 * 1024;
 const CSS_GZIP_BUDGET = 38 * 1024;
 if (jsGzipBytes > JS_GZIP_BUDGET) throw new Error(`JS gzip performance budget exceeded: ${jsGzipBytes} > ${JS_GZIP_BUDGET}`);
