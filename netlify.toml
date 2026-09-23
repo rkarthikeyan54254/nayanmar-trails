@@ -5,6 +5,7 @@ functions = "netlify/functions"
 
 [build.environment]
 NODE_VERSION = "22"
+PUBLIC_SITE_URL = "https://nayanmartrails.netlify.app"
 
 [[redirects]]
 from = "/api/event"
