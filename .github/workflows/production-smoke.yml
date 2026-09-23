@@ -1,0 +1,115 @@
+name: Production smoke
+
+on:
+  workflow_dispatch:
+  workflow_run:
+    workflows: ["Build verification"]
+    types: [completed]
+
+permissions:
+  contents: read
+
+jobs:
+  production-smoke:
+    if: ${{ github.event_name == 'workflow_dispatch' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main') }}
+    runs-on: ubuntu-latest
+    env:
+      CANONICAL_HOST: https://nayanmartrails.netlify.app
+      RAILWAY_HOST: https://app-production-5d87.up.railway.app
+      EXPECTED_SHA: ${{ github.event.workflow_run.head_sha || github.sha }}
+
+    steps:
+      - name: Wait for both production hosts
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          wait_for_release() {
+            local host="$1"
+            local label="$2"
+
+            for i in {1..36}; do
+              body="$(curl -fsSL --max-time 20 "$host/data/public-routes-v1.json" || true)"
+              release="$(printf '%s' "$body" | python3 -c 'import json,sys; print(json.load(sys.stdin).get("release",""))' 2>/dev/null || true)"
+              base_url="$(printf '%s' "$body" | python3 -c 'import json,sys; print(json.load(sys.stdin).get("base_url",""))' 2>/dev/null || true)"
+
+              if [[ "$release" == "$EXPECTED_SHA" && "$base_url" == "$CANONICAL_HOST" ]]; then
+                echo "$label ready at $release"
+                return 0
+              fi
+
+              sleep 10
+            done
+
+            echo "$label did not reach expected release $EXPECTED_SHA with canonical $CANONICAL_HOST" >&2
+            return 1
+          }
+
+          wait_for_release "$CANONICAL_HOST" "Netlify"
+          wait_for_release "$RAILWAY_HOST" "Railway"
+
+      - name: Validate live routes and metadata
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          manifest="$(curl -fsSL "$CANONICAL_HOST/data/public-routes-v1.json")"
+          sthalam_path="$(printf '%s' "$manifest" | python3 -c 'import json,sys; d=json.load(sys.stdin); print(next(r["path"] for r in d["routes"] if r["kind"]=="sthalam" and r["locale"]=="en"))')"
+
+          html_routes=(
+            "/en/"
+            "/ta/"
+            "/en/nayanmar/20-appar-tirunavukkarasar/"
+            "/ta/nayanmar/20-appar-tirunavukkarasar/"
+            "/en/story/09-kannappa-nayanar/"
+            "/ta/story/09-kannappa-nayanar/"
+            "$sthalam_path"
+          )
+
+          for host in "$CANONICAL_HOST" "$RAILWAY_HOST"; do
+            for route in "${html_routes[@]}"; do
+              body="$(curl -fsSL --max-time 20 "$host$route")"
+              expected="$CANONICAL_HOST$route"
+              printf '%s' "$body" | grep -F "rel=\"canonical\" href=\"$expected\"" >/dev/null
+              printf '%s' "$body" | grep -F "property=\"og:url\" content=\"$expected\"" >/dev/null
+              printf '%s' "$body" | grep -F "property=\"og:image\" content=\"$CANONICAL_HOST/og/" >/dev/null
+            done
+
+            curl -fsSL --max-time 20 "$host/sitemap.xml" | grep -F "<loc>$CANONICAL_HOST/" >/dev/null
+            curl -fsSL --max-time 20 "$host/healthz" | grep -F '"ok":true' >/dev/null
+          done
+
+      - name: Capture live desktop and mobile map QA
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts
+
+          BROWSER="$(which google-chrome || which chromium || which chromium-browser || true)"
+          if [ -z "$BROWSER" ]; then
+            echo "No headless browser available"
+            exit 1
+          fi
+
+          capture() {
+            local name="$1"
+            local url="$2"
+            local viewport="$3"
+            timeout 60s "$BROWSER"               --headless               --no-sandbox               --disable-gpu               --disable-dev-shm-usage               --hide-scrollbars               --run-all-compositor-stages-before-draw               --virtual-time-budget=12000               --window-size="$viewport"               --screenshot="artifacts/$name.png"               "$url"
+            test -s "artifacts/$name.png"
+          }
+
+          capture "netlify-desktop-en" "$CANONICAL_HOST/?saint=nayanmar.20&lang=en" "1600,1050"
+          capture "netlify-mobile-400-en" "$CANONICAL_HOST/?saint=nayanmar.20&lang=en" "400,850"
+          capture "netlify-mobile-375-ta" "$CANONICAL_HOST/?saint=nayanmar.20&lang=ta" "375,812"
+
+          capture "railway-desktop-en" "$RAILWAY_HOST/?saint=nayanmar.20&lang=en" "1600,1050"
+          capture "railway-mobile-400-en" "$RAILWAY_HOST/?saint=nayanmar.20&lang=en" "400,850"
+          capture "railway-mobile-375-ta" "$RAILWAY_HOST/?saint=nayanmar.20&lang=ta" "375,812"
+
+      - name: Upload live production QA
+        uses: actions/upload-artifact@v4
+        with:
+          name: nayanmar-live-production-qa
+          path: artifacts/*.png
+          if-no-files-found: error
