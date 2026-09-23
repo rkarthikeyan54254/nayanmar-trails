@@ -158,7 +158,7 @@ export default function SacredMap({
 
     const map = new maplibregl.Map({
       container: mapNode.current,
-      style: 'https://tiles.openfreemap.org/styles/liberty',
+      style: 'https://tiles.openfreemap.org/styles/dark',
       center: [78.95, 10.8],
       zoom: 6.05,
       minZoom: 5.35,
