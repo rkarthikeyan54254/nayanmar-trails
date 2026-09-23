@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef } from 'react';
-import maplibregl, { Map as MapLibreMap, Marker } from 'maplibre-gl';
+import * as maplibregl from 'maplibre-gl';
+import type { Map as MapLibreMap, Marker } from 'maplibre-gl';
 import type { FeatureCollection, LineString, Point } from 'geojson';
 import { GEO_SEEDS } from './geometry';
 import { useLocale } from './i18n';
