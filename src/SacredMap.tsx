@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef } from 'react';
-import maplibregl, { Map as MapLibreMap, Marker } from 'maplibre-gl';
+import * as maplibregl from 'maplibre-gl';
+import type { Map as MapLibreMap, Marker } from 'maplibre-gl';
 import type { FeatureCollection, LineString, Point } from 'geojson';
 import { GEO_SEEDS } from './geometry';
 import { useLocale } from './i18n';
@@ -157,7 +158,7 @@ export default function SacredMap({
 
     const map = new maplibregl.Map({
       container: mapNode.current,
-      style: 'https://tiles.openfreemap.org/styles/liberty',
+      style: 'https://tiles.openfreemap.org/styles/dark',
       center: [78.95, 10.8],
       zoom: 6.05,
       minZoom: 5.35,
@@ -166,7 +167,6 @@ export default function SacredMap({
       bearing: 0,
       attributionControl: false,
       interactive: false,
-      antialias: true,
     });
 
     map.addControl(new maplibregl.AttributionControl({ compact: true }), 'bottom-left');

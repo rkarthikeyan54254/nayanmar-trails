@@ -1,16 +1,17 @@
 {
   "name": "nayanmar-trails",
   "private": true,
-  "version": "0.1.0",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite --host 0.0.0.0",
-    "build": "tsc -b && vite build",
+    "build": "tsc -b && vite build && node scripts/build-public-pages.mjs",
     "start": "node server.mjs",
-    "verify:data": "node scripts/verify-data.mjs"
+    "verify:data": "node scripts/verify-data.mjs",
+    "verify:production": "node scripts/verify-production.mjs"
   },
   "dependencies": {
-    "maplibre-gl": "^4.7.1",
+    "maplibre-gl": "^6.11.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   },
@@ -21,6 +22,7 @@
     "typescript": "^5.5.4",
     "vite": "^5.4.8",
     "@types/geojson": "^7946.0.14",
-    "@types/node": "^22.7.4"
+    "@types/node": "^22.7.4",
+    "sharp": "^0.33.5"
   }
 }

@@ -7,6 +7,9 @@ import GopuramIcon from './GopuramIcon';
 import SacredMap, { type CoveragePoint, type EvidenceMode, type MapStop } from './SacredMap';
 import type { Patikam, PramanaExport, Saint, Site } from './types';
 import { LocaleContext, T, tr, useLocale, type Locale } from './i18n';
+import { parsePublicRoute, saintPath, sitePath, storyPath } from './publicRoutes';
+import { StartHere, StoryFocus, SaintShare, SiteShare } from './V1Discovery';
+import { track } from './analytics';
 
 type DetailTab = 'hymns' | 'chronology' | 'visits' | 'evidence';
 
@@ -363,18 +366,34 @@ function localizedSaintName(saint: Saint | null, locale: Locale) {
 }
 
 export default function App() {
+  const initialRouteRef = useRef(parsePublicRoute(window.location.pathname));
+  const initialRoute = initialRouteRef.current;
+  const initialParamsRef = useRef(new URLSearchParams(window.location.search));
+  const initialParams = initialParamsRef.current;
+  const showStartHere = initialRoute?.kind === 'home' || (
+    !initialRoute &&
+    !initialParams.get('saint') &&
+    !initialParams.get('site') &&
+    !initialParams.get('story')
+  );
+
   const [data, setData] = useState<PramanaExport | null>(null);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [tirumurai8, setTirumurai8] = useState<Tirumurai8Snapshot | null>(null);
   const [saivaPlaces, setSaivaPlaces] = useState<SaivaLiterarySnapshot | null>(null);
   const [curiosities, setCuriosities] = useState<SaintCuriositySnapshot | null>(null);
   const [locale, setLocale] = useState<Locale>(() =>
-    new URLSearchParams(window.location.search).get('lang') === 'ta' ? 'ta' : 'en',
+    initialRoute?.locale ?? (initialParams.get('lang') === 'ta' ? 'ta' : 'en'),
   );
-  const [selectedSaintId, setSelectedSaintId] = useState(
-    () => new URLSearchParams(window.location.search).get('saint') || 'nayanmar.20',
-  );
+  const [selectedSaintId, setSelectedSaintId] = useState(() => {
+    if (initialRoute?.kind === 'saint' || initialRoute?.kind === 'story') {
+      return `nayanmar.${String(initialRoute.ordinal).padStart(2, '0')}`;
+    }
+    return initialParams.get('saint') || 'nayanmar.20';
+  });
   const [selectedSiteId, setSelectedSiteId] = useState(() => {
-    const site = new URLSearchParams(window.location.search).get('site');
+    if (initialRoute?.kind === 'sthalam') return `tevaram_site.${initialRoute.siteId}`;
+    const site = initialParams.get('site');
     return site ? (site.startsWith('tevaram_site.') ? site : `tevaram_site.${site}`) : 'tevaram_site.KV01';
   });
   const [mode, setMode] = useState<EvidenceMode>('all');
@@ -388,23 +407,27 @@ export default function App() {
     () => new URLSearchParams(window.location.search).get('graph') === '1',
   );
   const [sourcesOpen, setSourcesOpen] = useState(
-    () => new URLSearchParams(window.location.search).get('sources') === '1',
+    () => initialParams.get('sources') === '1',
+  );
+  const [storyOpen, setStoryOpen] = useState(
+    () => initialRoute?.kind === 'story' || initialParams.get('story') === '1',
   );
   const [query, setQuery] = useState('');
   const didInitSaintSelection = useRef(false);
   const preserveInitialSiteDeepLink = useRef(
-    Boolean(new URLSearchParams(window.location.search).get('site')),
+    initialRoute?.kind === 'sthalam' || Boolean(initialParams.get('site')),
   );
   const preserveInitialTabDeepLink = useRef(
-    Boolean(new URLSearchParams(window.location.search).get('tab')),
+    Boolean(initialParams.get('tab')),
   );
 
   useEffect(() => {
-    if (!graphOpen && !sourcesOpen) return;
+    if (!graphOpen && !sourcesOpen && !storyOpen) return;
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
         setGraphOpen(false);
         setSourcesOpen(false);
+        setStoryOpen(false);
       }
     };
     document.addEventListener('keydown', onKeyDown);
@@ -414,7 +437,7 @@ export default function App() {
       document.removeEventListener('keydown', onKeyDown);
       document.body.style.overflow = previousOverflow;
     };
-  }, [graphOpen, sourcesOpen]);
+  }, [graphOpen, sourcesOpen, storyOpen]);
 
   useEffect(() => {
     Promise.all([
@@ -441,15 +464,33 @@ export default function App() {
         setSaivaPlaces(literaryPlaces);
         setCuriosities(saintCuriosities);
       })
-      .catch((error) => console.error('Unable to load Pramāṇa product exports', error));
+      .catch((error) => {
+        console.error('Unable to load Pramāṇa product exports', error);
+        const message = error instanceof Error ? error.message : 'unknown data load error';
+        setLoadError(message);
+        track('app_error', { message: message.slice(0, 180), stage: 'data_load' });
+      });
   }, []);
 
   useEffect(() => {
     document.documentElement.lang = locale;
     const url = new URL(window.location.href);
-    url.searchParams.set('lang', locale);
-    window.history.replaceState({}, '', url);
+    const publicRoute = parsePublicRoute(url.pathname);
+    if (publicRoute) {
+      url.pathname = url.pathname.replace(/^\/(en|ta)(?=\/|$)/, `/${locale}`);
+      window.history.replaceState({}, '', url);
+    } else {
+      url.searchParams.set('lang', locale);
+      window.history.replaceState({}, '', url);
+    }
   }, [locale]);
+
+  useEffect(() => {
+    track('page_view', { route: initialRoute?.kind ?? 'explorer' });
+    if (initialRoute && initialRoute.kind !== 'home') {
+      track('route_open', { route: initialRoute.kind });
+    }
+  }, []);
 
   const selectedIsManikkavasakar = selectedSaintId === MANIKKAVASAKAR_ID;
 
@@ -773,43 +814,121 @@ export default function App() {
     ? curiosities?.stories.find((item) => item.saint_id === selectedSaintId) ?? null
     : null;
 
+  const discoveryStories = useMemo(() => {
+    const ids = ['nayanmar.09', 'nayanmar.23', 'nayanmar.17', 'nayanmar.56', 'nayanmar.27'];
+    return ids.flatMap((id) => {
+      const item = saintById.get(id);
+      const story = curiosities?.stories.find((entry) => entry.saint_id === id);
+      if (!item || !story) return [];
+      return [{
+        saint: item,
+        name: localizedSaintName(item, locale),
+        hook: locale === 'ta' ? story.hook_ta : story.hook_en,
+      }];
+    });
+  }, [curiosities, locale, saintById]);
+
+  const discoverySites = useMemo(() => {
+    return (data?.sites ?? [])
+      .slice()
+      .sort((a, b) => b.patikam_count - a.patikam_count)
+      .slice(0, 4)
+      .map((site) => ({ site, name: localizedSiteName(site, locale) }));
+  }, [data, locale]);
+
   const searchResults = useMemo(() => {
     if (!data || !query.trim()) {
-      return { saints: [] as Saint[], sites: [] as Site[], manikkavasakar: false };
+      return {
+        saints: [] as Saint[],
+        stories: [] as Saint[],
+        sites: [] as Site[],
+        manikkavasakar: false,
+      };
     }
-    const needle = query.trim().toLowerCase();
+
+    const normalize = (value: string) => value
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase()
+      .replace(/[^a-z0-9\u0B80-\u0BFF]+/g, ' ')
+      .trim();
+    const needle = normalize(query);
+
+    const score = (values: Array<string | null | undefined>) => {
+      let best = 0;
+      for (const raw of values) {
+        if (!raw) continue;
+        const value = normalize(String(raw));
+        if (value === needle) best = Math.max(best, 100);
+        else if (value.startsWith(needle)) best = Math.max(best, 70);
+        else if (value.includes(needle)) best = Math.max(best, 45);
+        else if (needle.split(' ').every((token) => value.includes(token))) best = Math.max(best, 25);
+      }
+      return best;
+    };
 
     const saints = data.saints
-      .filter((item) =>
-        [item.label, item.label_ta, ...(item.aliases ?? [])]
-          .filter(Boolean)
-          .some((value) => String(value).toLowerCase().includes(needle)),
-      )
-      .slice(0, 3);
+      .map((item) => ({
+        item,
+        score: score([SAINT_EN[item.id], item.label, item.label_ta, ...(item.aliases ?? [])]),
+      }))
+      .filter((entry) => entry.score > 0)
+      .sort((a, b) => b.score - a.score || a.item.ordinal - b.item.ordinal)
+      .slice(0, 4)
+      .map((entry) => entry.item);
+
+    const storyBySaint = new Map((curiosities?.stories ?? []).map((item) => [item.saint_id, item]));
+    const stories = data.saints
+      .map((item) => {
+        const story = storyBySaint.get(item.id);
+        return {
+          item,
+          score: story ? score([story.hook_en, story.hook_ta]) : 0,
+        };
+      })
+      .filter((entry) => entry.score > 0 && !saints.some((saintItem) => saintItem.id === entry.item.id))
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 2)
+      .map((entry) => entry.item);
 
     const sites = data.sites
-      .filter((item) =>
-        [item.label, item.label_ta, item.modern_name_nic, item.district, ...(item.aliases ?? [])]
-          .filter(Boolean)
-          .some((value) => String(value).toLowerCase().includes(needle)),
-      )
-      .slice(0, 5);
+      .map((item) => ({
+        item,
+        score: score([
+          item.label,
+          item.label_ta,
+          item.modern_name_nic,
+          item.district,
+          item.taluk,
+          ...(item.aliases ?? []),
+        ]),
+      }))
+      .filter((entry) => entry.score > 0)
+      .sort((a, b) => b.score - a.score || b.item.patikam_count - a.item.patikam_count)
+      .slice(0, 6)
+      .map((entry) => entry.item);
 
-    const manikkavasakar = ['manikkavasakar', 'manikkavacakar', 'மாணிக்கவாசகர்']
-      .some((value) => value.toLowerCase().includes(needle) || needle.includes(value.toLowerCase()));
+    const manikkavasakar = score(['manikkavasakar', 'manikkavacakar', 'மாணிக்கவாசகர்']) > 0;
 
-    return { saints, sites, manikkavasakar };
-  }, [data, query]);
+    return { saints, stories, sites, manikkavasakar };
+  }, [curiosities, data, query]);
 
   useEffect(() => {
     setProgress(0);
     setPlaying(false);
     if (didInitSaintSelection.current) {
       setTab('visits');
+      track('saint_selected', { saint: selectedSaintId });
     } else {
       didInitSaintSelection.current = true;
     }
   }, [selectedSaintId]);
+
+  useEffect(() => {
+    if (!data) return;
+    const selected = data.sites.find((item) => item.id === selectedSiteId);
+    if (selected) track('site_selected', { site: selected.site_id });
+  }, [data, selectedSiteId]);
 
   useEffect(() => {
     if (!selectedIsManikkavasakar || !tirumurai8?.loci.length) return;
@@ -845,6 +964,18 @@ export default function App() {
     }, 1500);
     return () => window.clearInterval(timer);
   }, [playing, playbackStops.length]);
+
+  if (loadError) {
+    return (
+      <main className="fatal-error">
+        <div>
+          <h1>Nayanmar Trails</h1>
+          <p>{locale === 'ta' ? 'தரவை இப்போது திறக்க முடியவில்லை.' : 'The evidence data could not be loaded just now.'}</p>
+          <button onClick={() => window.location.reload()}>{locale === 'ta' ? 'மீண்டும் முயற்சி செய்' : 'Try again'}</button>
+        </div>
+      </main>
+    );
+  }
 
   if (!data || !tirumurai8 || !saivaPlaces || !curiosities) {
     return (
@@ -904,7 +1035,10 @@ export default function App() {
           >
             <T>Connections</T>
           </button>
-          <button onClick={() => setSourcesOpen(true)}><T>Sources</T></button>
+          <button onClick={() => {
+            setSourcesOpen(true);
+            track('sources_open', { source: 'top_nav' });
+          }}><T>Sources</T></button>
         </nav>
 
         <div className="language-switcher" aria-label={tr(locale, 'Language')}>
@@ -939,6 +1073,7 @@ export default function App() {
                   onClick={() => {
                     setSelectedSaintId(item.id);
                     setQuery('');
+                    track('search_select', { kind: 'saint', saint: item.id });
                   }}
                 >
                   <GopuramIcon />
@@ -953,6 +1088,7 @@ export default function App() {
                   onClick={() => {
                     setSelectedSaintId(MANIKKAVASAKAR_ID);
                     setQuery('');
+                    track('search_select', { kind: 'saint', saint: MANIKKAVASAKAR_ID });
                   }}
                 >
                   <GopuramIcon />
@@ -969,6 +1105,7 @@ export default function App() {
                     setSelectedSiteId(item.id);
                     setTab('visits');
                     setQuery('');
+                    track('search_select', { kind: 'sthalam', site: item.site_id });
                   }}
                 >
                   <GopuramIcon />
@@ -978,7 +1115,27 @@ export default function App() {
                   </span>
                 </button>
               ))}
-              {!searchResults.saints.length && !searchResults.sites.length && !searchResults.manikkavasakar && (
+              {searchResults.stories.map((item) => {
+                const story = curiosities?.stories.find((entry) => entry.saint_id === item.id);
+                return (
+                  <button
+                    key={`story:${item.id}`}
+                    onClick={() => {
+                      setSelectedSaintId(item.id);
+                      setStoryOpen(true);
+                      setQuery('');
+                      track('search_select', { kind: 'story', saint: item.id });
+                    }}
+                  >
+                    <span className="search-story-glyph">✦</span>
+                    <span>
+                      {localizedSaintName(item, locale)}
+                      <small>{locale === 'ta' ? 'கதையில் பொருந்தியது' : 'Matched in the story'}{story ? ' · Periya Puranam' : ''}</small>
+                    </span>
+                  </button>
+                );
+              })}
+              {!searchResults.saints.length && !searchResults.stories.length && !searchResults.sites.length && !searchResults.manikkavasakar && (
                 <em>{tr(locale, 'No matching saint or sthalam')}</em>
               )}
             </div>
@@ -1010,6 +1167,31 @@ export default function App() {
         <div className="hero-tower right"><GopuramIcon /></div>
         <small className="hero-credit">{HERO_MEDIA.source} · {HERO_MEDIA.license}</small>
       </section>
+
+      {showStartHere && (
+        <StartHere
+          locale={locale}
+          stories={discoveryStories}
+          sites={discoverySites}
+          onSaint={(item) => {
+            setSelectedSaintId(item.id);
+            requestAnimationFrame(() => document.querySelector('.saint-card')?.scrollIntoView({ behavior: 'smooth', block: 'start' }));
+          }}
+          onStory={(item) => {
+            setSelectedSaintId(item.id);
+            setStoryOpen(true);
+          }}
+          onSite={(site) => {
+            setSelectedSiteId(site.id);
+            setTab('visits');
+            requestAnimationFrame(() => document.querySelector('.detail-card')?.scrollIntoView({ behavior: 'smooth', block: 'start' }));
+          }}
+          onTrail={() => {
+            setSelectedSaintId('nayanmar.20');
+            requestAnimationFrame(() => document.querySelector('.map-card')?.scrollIntoView({ behavior: 'smooth', block: 'start' }));
+          }}
+        />
+      )}
 
       <section className="filters">
         <Filter label={tr(locale, 'Saint')}>
@@ -1093,8 +1275,18 @@ export default function App() {
           </div>
 
           <div className="saint-heading">
-            <small>{saintRegistryLabel}</small>
-            <h2>{saintName}</h2>
+            <div>
+              <small>{saintRegistryLabel}</small>
+              <h2>{saintName}</h2>
+            </div>
+            {saint && !selectedIsManikkavasakar && (
+              <SaintShare
+                locale={locale}
+                saint={saint}
+                englishName={SAINT_EN[saint.id] ?? saint.label}
+                displayName={saintName}
+              />
+            )}
           </div>
 
           <div className="identity-line">
@@ -1124,9 +1316,20 @@ export default function App() {
                 <b>{locale === 'ta' ? (periyaPuranamTitle || tr(locale, 'Periya Puranam tradition')) : 'Periya Puranam tradition'}</b>
                 <small>{tr(locale, 'Traditional narrative — not presented as independently verified biography.')}</small>
               </div>
-              <button onClick={() => setSourcesOpen(true)}>
-                {tr(locale, 'Read the source trail')} →
-              </button>
+              <div className="saint-curiosity-actions">
+                <button onClick={() => {
+                  setStoryOpen(true);
+                  track('story_open', { saint: selectedSaintId, source: 'card' });
+                }}>
+                  {locale === 'ta' ? 'கதையை முழுமையாக வாசிக்க' : 'Read the story'} →
+                </button>
+                <button onClick={() => {
+                  setSourcesOpen(true);
+                  track('sources_open', { source: 'story_card' });
+                }}>
+                  {tr(locale, 'Read the source trail')} →
+                </button>
+              </div>
             </div>
           )}
 
@@ -1267,6 +1470,7 @@ export default function App() {
             onSelect={(siteId) => {
               setSelectedSiteId(siteId);
               setTab('visits');
+              track('map_interaction', { action: 'select_sthalam', site: siteId.replace('tevaram_site.', '') });
             }}
           />
 
@@ -1392,6 +1596,14 @@ export default function App() {
                             : `${selectedPatikams.length} by ${saintName.split(' · ')[0]}`}
                         </span>
                       )}
+                    </div>
+
+                    <div className="site-share-row">
+                      <SiteShare
+                        locale={locale}
+                        site={selectedSite}
+                        displayName={localizedSiteName(selectedSite, locale)}
+                      />
                     </div>
 
                     {selectedIsManikkavasakar ? (
@@ -1718,9 +1930,44 @@ export default function App() {
         />
       )}
 
+      {storyOpen && saint && saintCuriosity && (
+        <StoryFocus
+          locale={locale}
+          saint={saint}
+          englishName={SAINT_EN[saint.id] ?? saint.label}
+          displayName={saintName}
+          hook={locale === 'ta' ? saintCuriosity.hook_ta : saintCuriosity.hook_en}
+          sites={topLinkedSites.slice(0, 3).map(({ site }) => ({
+            site,
+            name: localizedSiteName(site, locale),
+          }))}
+          onClose={() => {
+            setStoryOpen(false);
+            if (initialRoute?.kind === 'story') {
+              window.history.replaceState({}, '', saintPath(locale, saint, SAINT_EN[saint.id] ?? saint.label));
+            }
+          }}
+          onExploreSaint={() => {
+            setStoryOpen(false);
+            window.history.pushState({}, '', saintPath(locale, saint, SAINT_EN[saint.id] ?? saint.label));
+            requestAnimationFrame(() => document.querySelector('.saint-card')?.scrollIntoView({ behavior: 'smooth', block: 'start' }));
+          }}
+          onOpenSite={(site) => {
+            setStoryOpen(false);
+            setSelectedSiteId(site.id);
+            setTab('visits');
+            window.history.pushState({}, '', sitePath(locale, site));
+            requestAnimationFrame(() => document.querySelector('.detail-card')?.scrollIntoView({ behavior: 'smooth', block: 'start' }));
+          }}
+        />
+      )}
+
       <footer>
         <strong><GopuramIcon /> Nayanmar Trails</strong>
-        <button className="footer-source-link" onClick={() => setSourcesOpen(true)}><T>Sources & methodology</T></button>
+        <button className="footer-source-link" onClick={() => {
+          setSourcesOpen(true);
+          track('sources_open', { source: 'footer' });
+        }}><T>Sources & methodology</T></button>
         <span>Map © OpenFreeMap / OpenMapTiles / OpenStreetMap</span>
       </footer>
     </main>

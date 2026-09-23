@@ -56,3 +56,37 @@ Nayanmar Trails uses explicit reader modes rather than mixing Tamil and English 
 ## Saint curiosity layer
 
 `public/data/pramana-saint-curiosities-v1.json` contains one bilingual curiosity hook for each of the 63 Nayanmars. These are concise reader-facing retellings of the Periya Puranam traditional narrative layer. The Tamil hooks are independently edited as native Tamil prose rather than mechanically aligned translations of the English hooks. They are explicitly scoped as `traditional_reference` and are not presented as independently verified historical biography. Product verification requires exactly 63 records, English + Tamil copy for each record, and an exact match to the Pramāṇa 63-saint registry.
+## v1 production contract
+
+Nayanmar Trails v1 is organized around a simple reader loop: **discover → become curious → read a story → explore a place → inspect the source trail → share**.
+
+Production surfaces include:
+
+- a `Start Here` discovery layer for first-time readers;
+- one story-first entry point for every one of the 63 Nayanmars;
+- stable English and Tamil public URLs for saints, stories and Tēvāram sthalams;
+- route-specific Open Graph preview cards for sharing;
+- search across saint names/aliases, story text and sthalam names/aliases;
+- generated indexable English and Tamil pages with canonical URLs, `hreflang`, structured metadata, sitemap and robots metadata;
+- first-party, privacy-minimal interaction events for the core funnel. Search text and other free-form reader input are not sent as analytics properties;
+- a `/healthz` production health endpoint and static `/health.json` build manifest;
+- fail-visible data loading and an application error boundary;
+- CI gates for corpus integrity, public-route coverage, social metadata, performance budget and desktop/mobile visual QA.
+
+The public-site generator is `scripts/build-public-pages.mjs`; the post-build release gate is `scripts/verify-production.mjs`.
+
+### Public route shape
+
+- `/en/nayanmar/<ordinal>-<slug>/`
+- `/ta/nayanmar/<ordinal>-<slug>/`
+- `/en/story/<ordinal>-<slug>/`
+- `/ta/story/<ordinal>-<slug>/`
+- `/en/sthalam/<catalogue-id>-<slug>/`
+- `/ta/sthalam/<catalogue-id>-<slug>/`
+
+The route parser intentionally keys saints by the canonical 1–63 ordinal and Tēvāram sthalams by catalogue ID, so editorial slug wording can evolve without changing evidence identity.
+
+### Analytics boundary
+
+The v1 event stream records only a generated session identifier, page path, locale, event type and a small allowlisted property object. It does not intentionally collect names, email addresses, location coordinates or search-query text. `Do Not Track` is respected by the browser client.
+
