@@ -806,31 +806,80 @@ export default function App() {
 
   const searchResults = useMemo(() => {
     if (!data || !query.trim()) {
-      return { saints: [] as Saint[], sites: [] as Site[], manikkavasakar: false };
+      return {
+        saints: [] as Saint[],
+        stories: [] as Saint[],
+        sites: [] as Site[],
+        manikkavasakar: false,
+      };
     }
-    const needle = query.trim().toLowerCase();
+
+    const normalize = (value: string) => value
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase()
+      .replace(/[^a-z0-9\u0B80-\u0BFF]+/g, ' ')
+      .trim();
+    const needle = normalize(query);
+
+    const score = (values: Array<string | null | undefined>) => {
+      let best = 0;
+      for (const raw of values) {
+        if (!raw) continue;
+        const value = normalize(String(raw));
+        if (value === needle) best = Math.max(best, 100);
+        else if (value.startsWith(needle)) best = Math.max(best, 70);
+        else if (value.includes(needle)) best = Math.max(best, 45);
+        else if (needle.split(' ').every((token) => value.includes(token))) best = Math.max(best, 25);
+      }
+      return best;
+    };
 
     const saints = data.saints
-      .filter((item) =>
-        [item.label, item.label_ta, ...(item.aliases ?? [])]
-          .filter(Boolean)
-          .some((value) => String(value).toLowerCase().includes(needle)),
-      )
-      .slice(0, 3);
+      .map((item) => ({
+        item,
+        score: score([SAINT_EN[item.id], item.label, item.label_ta, ...(item.aliases ?? [])]),
+      }))
+      .filter((entry) => entry.score > 0)
+      .sort((a, b) => b.score - a.score || a.item.ordinal - b.item.ordinal)
+      .slice(0, 4)
+      .map((entry) => entry.item);
+
+    const storyBySaint = new Map((curiosities?.stories ?? []).map((item) => [item.saint_id, item]));
+    const stories = data.saints
+      .map((item) => {
+        const story = storyBySaint.get(item.id);
+        return {
+          item,
+          score: story ? score([story.hook_en, story.hook_ta]) : 0,
+        };
+      })
+      .filter((entry) => entry.score > 0 && !saints.some((saintItem) => saintItem.id === entry.item.id))
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 2)
+      .map((entry) => entry.item);
 
     const sites = data.sites
-      .filter((item) =>
-        [item.label, item.label_ta, item.modern_name_nic, item.district, ...(item.aliases ?? [])]
-          .filter(Boolean)
-          .some((value) => String(value).toLowerCase().includes(needle)),
-      )
-      .slice(0, 5);
+      .map((item) => ({
+        item,
+        score: score([
+          item.label,
+          item.label_ta,
+          item.modern_name_nic,
+          item.district,
+          item.taluk,
+          ...(item.aliases ?? []),
+        ]),
+      }))
+      .filter((entry) => entry.score > 0)
+      .sort((a, b) => b.score - a.score || b.item.patikam_count - a.item.patikam_count)
+      .slice(0, 6)
+      .map((entry) => entry.item);
 
-    const manikkavasakar = ['manikkavasakar', 'manikkavacakar', 'மாணிக்கவாசகர்']
-      .some((value) => value.toLowerCase().includes(needle) || needle.includes(value.toLowerCase()));
+    const manikkavasakar = score(['manikkavasakar', 'manikkavacakar', 'மாணிக்கவாசகர்']) > 0;
 
-    return { saints, sites, manikkavasakar };
-  }, [data, query]);
+    return { saints, stories, sites, manikkavasakar };
+  }, [curiosities, data, query]);
 
   useEffect(() => {
     setProgress(0);
@@ -970,6 +1019,7 @@ export default function App() {
                   onClick={() => {
                     setSelectedSaintId(item.id);
                     setQuery('');
+                    track('search_select', { kind: 'saint', saint: item.id });
                   }}
                 >
                   <GopuramIcon />
@@ -984,6 +1034,7 @@ export default function App() {
                   onClick={() => {
                     setSelectedSaintId(MANIKKAVASAKAR_ID);
                     setQuery('');
+                    track('search_select', { kind: 'saint', saint: MANIKKAVASAKAR_ID });
                   }}
                 >
                   <GopuramIcon />
@@ -1000,6 +1051,7 @@ export default function App() {
                     setSelectedSiteId(item.id);
                     setTab('visits');
                     setQuery('');
+                    track('search_select', { kind: 'sthalam', site: item.site_id });
                   }}
                 >
                   <GopuramIcon />
@@ -1009,7 +1061,27 @@ export default function App() {
                   </span>
                 </button>
               ))}
-              {!searchResults.saints.length && !searchResults.sites.length && !searchResults.manikkavasakar && (
+              {searchResults.stories.map((item) => {
+                const story = curiosities?.stories.find((entry) => entry.saint_id === item.id);
+                return (
+                  <button
+                    key={`story:${item.id}`}
+                    onClick={() => {
+                      setSelectedSaintId(item.id);
+                      setStoryOpen(true);
+                      setQuery('');
+                      track('search_select', { kind: 'story', saint: item.id });
+                    }}
+                  >
+                    <span className="search-story-glyph">✦</span>
+                    <span>
+                      {localizedSaintName(item, locale)}
+                      <small>{locale === 'ta' ? 'கதையில் பொருந்தியது' : 'Matched in the story'}{story ? ' · Periya Puranam' : ''}</small>
+                    </span>
+                  </button>
+                );
+              })}
+              {!searchResults.saints.length && !searchResults.stories.length && !searchResults.sites.length && !searchResults.manikkavasakar && (
                 <em>{tr(locale, 'No matching saint or sthalam')}</em>
               )}
             </div>
