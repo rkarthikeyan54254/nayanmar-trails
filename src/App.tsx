@@ -20,8 +20,10 @@ const NAALVAR = [...MUVAR, MANIKKAVASAKAR_ID];
 
 type Tirumurai8Locus = {
   id: string;
-  site_id: string;
+  site_id: string | null;
   site_entity_id: string;
+  locus_kind?: string;
+  source_note_ta?: string;
   display_name: string;
   label_ta: string;
   section_numbers: number[];
@@ -628,6 +630,7 @@ export default function App() {
     if (selectedIsManikkavasakar) {
       return (tirumurai8?.loci ?? [])
         .map((locus) => {
+          if (!locus.site_id) return null;
           const seed = GEO_SEEDS.find((item) => item.siteId === locus.site_id);
           if (!seed) return null;
           return {
@@ -802,6 +805,9 @@ export default function App() {
   const kolaruContext = (saivaPlaces?.links ?? []).find(
     (link) => link.id === 'literary-place.tevaram.2_85.kt125',
   ) ?? null;
+  const sourceHeaderLoci = (tirumurai8?.loci ?? []).filter(
+    (locus) => locus.locus_kind === 'source_header_composition_locus',
+  );
   const selectedSiteKolaruContext =
     selectedSaintId === 'nayanmar.27' && selectedSiteId === 'tevaram_site.KT125'
       ? kolaruContext
@@ -1435,6 +1441,27 @@ export default function App() {
               })
             )}
           </div>
+
+          {selectedIsManikkavasakar && sourceHeaderLoci.length > 0 && (
+            <div className="authority-box">
+              <b>{locale === 'ta' ? 'மூலத் தலைப்பில் நேரடியாகக் கூறப்படும் இரண்டு தலங்கள்' : 'Two explicit source-header composition loci'}</b>
+              <p>
+                {locale === 'ta'
+                  ? 'நிலைப்படுத்தப்பட்ட Project Madurai பதிப்பின் தலைப்புகள் திருவெம்பாவையை திருவண்ணாமலையுடனும், திருப்பள்ளியெழுச்சியை திருப்பெருந்துறையுடனும் தனித்தனியாக இணைக்கின்றன. இது பதிப்பு/மூலத் தகவல்; தனித்த வரலாற்றுச் சான்று அல்ல.'
+                  : 'The pinned Project Madurai headings separately place Tiruvempavai at Tiruvannamalai and Tiruppalliyezhuchi at Tirupperunturai. This is edition/source metadata, not independent historical verification.'}
+              </p>
+              <div className="literary-section-grid">
+                {sourceHeaderLoci.map((locus) => (
+                  <span key={locus.id} className="composition">
+                    <b>{locus.section_numbers[0]}</b>
+                    {locale === 'ta'
+                      ? `${locus.section_titles_ta[0]} · ${locus.label_ta || locus.display_name}`
+                      : `${locus.section_titles_ta[0]} · ${locus.display_name}`}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
 
           {selectedIsManikkavasakar && uttarakosamangai && (
             <LiterarySthalamHighlight
