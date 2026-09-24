@@ -62,15 +62,19 @@ The interactive learning/game layer is specified in `docs/nayanmar-quest-master-
 
 Quest is additive to the Explorer: it gamifies story discovery, memory, sacred geography and source literacy without scoring devotion or ranking saints. Pramāṇa remains the evidence authority. English and Tamil are separately authored reader experiences.
 
-The v0.1 production vertical slice is a Kannappar quest with:
+The v0.2 Quest cohort contains seven grounded experiences: Kannappar, Appar, Sambandar, Sundarar, Manikkavasakar, Karaikkal Ammaiyar and Poosalar. Manikkavasakar remains a Naalvar/Tirumurai 8 companion and is never counted as a 64th Nayanmar.
+
+Every quest uses the shared loop:
 - prediction / curiosity hook;
-- grounded traditional story reveal;
+- grounded story or textual-locus reveal;
 - memory challenge;
-- traditional-place challenge;
+- qualified sacred-geography / textual-locus challenge;
 - Pramāṇa Detective;
 - “Who am I?”;
 - unscored reflection;
 - local Memory Shrine unlock.
+
+The Quest Hub shows cohort progress while the numbered shrine count remains **x / 63**; Manikkavasakar completion is shown separately.
 
 ## v1 production contract
 
