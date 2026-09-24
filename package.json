@@ -7,7 +7,7 @@
     "dev": "vite --host 0.0.0.0",
     "build": "tsc -b && vite build && node scripts/build-public-pages.mjs",
     "start": "node server.mjs",
-    "verify:data": "node scripts/verify-data.mjs",
+    "verify:data": "node scripts/verify-data.mjs && node scripts/verify-quests.mjs",
     "verify:production": "node scripts/verify-production.mjs"
   },
   "dependencies": {
