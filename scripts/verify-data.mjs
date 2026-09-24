@@ -171,11 +171,42 @@ const unknownGeometryIds = geometryIds.filter((siteId) => !siteIds.has(siteId));
 if (unknownGeometryIds.length) {
   throw new Error(`Geometry seeds are not present in Pramana export: ${unknownGeometryIds.join(', ')}`);
 }
-const missingTirumurai8Geometry = tirumurai8.loci
+const mappedTirumurai8Loci = tirumurai8.loci.filter(
+  (locus) => typeof locus.site_id === 'string' && locus.site_id.length > 0,
+);
+const missingTirumurai8Geometry = mappedTirumurai8Loci
   .map((locus) => locus.site_id)
   .filter((siteId) => !uniqueGeometryIds.has(siteId) || !siteIds.has(siteId));
 if (missingTirumurai8Geometry.length) {
-  throw new Error(`Tirumurai 8 loci lack qualified product geometry: ${missingTirumurai8Geometry.join(', ')}`);
+  throw new Error(`Mapped Tirumurai 8 loci lack qualified product geometry: ${missingTirumurai8Geometry.join(', ')}`);
+}
+
+// A source can assert a composition locus before the product has reviewed map geometry.
+// Such a locus must remain explicitly unplotted rather than receiving invented coordinates.
+const unplottedTirumurai8Loci = tirumurai8.loci.filter(
+  (locus) => locus.site_id === null,
+);
+for (const locus of unplottedTirumurai8Loci) {
+  if (
+    locus.locus_kind !== 'source_header_composition_locus' ||
+    locus.authority_scope !== 'primary_text_metadata' ||
+    !String(locus.site_entity_id ?? '').startsWith('saiva_place.') ||
+    !String(locus.locus_basis ?? '').includes('No map geometry is asserted')
+  ) {
+    throw new Error(
+      `Unplotted Tirumurai 8 locus is not safely qualified: ${locus.id}`,
+    );
+  }
+}
+const tirupperunturaiLocus = tirumurai8.loci.find(
+  (locus) => locus.id === 'tirumurai8.locus.tirupperunturai.tiruppalliyezhuchi',
+);
+if (
+  !tirupperunturaiLocus ||
+  tirupperunturaiLocus.site_id !== null ||
+  tirupperunturaiLocus.site_entity_id !== 'saiva_place.tirupperunturai'
+) {
+  throw new Error('Tiruppalliyezhuchi/Tirupperunturai must remain an explicit unplotted source-header locus');
 }
 
 const exactGeographyRatio = geometryIds.length / doc.sites.length;
