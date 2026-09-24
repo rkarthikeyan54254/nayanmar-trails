@@ -521,3 +521,80 @@ If yes, the Quest layer is doing its job.
 - The first reward is a Memory Shrine tile and deepam, not XP.
 - The first intelligence mechanic is Pramana Detective.
 - The north-star outcome is recognition, memory and voluntary retelling.
+
+
+---
+
+## 18. v0.2 cohort checkpoint — seven live quests
+
+The first scale checkpoint is deliberately **seven experiences** before any attempt to expand to all 63.
+
+### Naalvar
+
+1. **Appar · Tirunavukkarasar**
+   - transformation;
+   - uzhavāram service;
+   - Tēvāram edition metadata;
+   - traditional birthplace/mukti-place roles;
+   - route inference kept separate from historical chronology.
+
+2. **Sambandar**
+   - jñāna-pāl traditional narrative;
+   - first hymn as story-memory anchor;
+   - Tēvāram edition metadata;
+   - traditional place roles;
+   - story evidence kept separate from hymn metadata.
+
+3. **Sundarar · Arurar**
+   - wedding interruption and palm-leaf traditional narrative;
+   - intimate/conversational bhakti as the memory anchor;
+   - Tēvāram edition metadata;
+   - traditional place roles.
+
+4. **Manikkavasakar**
+   - **Naalvar / Tirumurai 8 companion, not a 64th Nayanmar**;
+   - Tiruvācakam/Tirukkōvaiyār source structure;
+   - qualified textual loci;
+   - Kōyil/Chidambaram product mapping remains qualified;
+   - Tirukkazhukkunram explicit section-title locus;
+   - Uttarakosamangai remains a literary/textual reference and is not promoted into the formal 276-site Tēvāram catalogue;
+   - section-order playback never becomes biographical travel history.
+
+### Featured Nayanmars
+
+5. **Kannappar**
+   - intense traditional narrative;
+   - ritual/form versus sincerity memory hook;
+   - Uduppur and Tirukkalatti traditional place associations.
+
+6. **Karaikkal Ammaiyar**
+   - renunciation;
+   - distinctive sacred iconography;
+   - Kailasa traditional narrative;
+   - Karaikkal / Tiruvālangādu place memory.
+
+7. **Poosalar**
+   - inward/mental temple;
+   - no-wealth / inner-consecration story hook;
+   - Tiruninravur appears in both birthplace and mukti-place traditional roles.
+
+### Cohort product behaviour
+
+- A Quest Hub is the front door rather than a Kannappar-only launcher.
+- Completion is stored locally per quest.
+- The Memory Shrine counts only numbered Nayanmars toward **x / 63**.
+- Manikkavasakar completion is shown separately as a **Naalvar companion**.
+- All seven quests use the same reusable engine:
+  **prediction → story → memory → geography/locus → Pramana Detective → Who Am I → reflection → Memory Shrine**.
+- English and Tamil are independently authored. Tamil is not a sentence-by-sentence translation layer.
+- The cohort is the stop point for product review before authoring the next expansion batch.
+
+### Cohort acceptance criteria
+
+Before the next expansion, verify that a learner can:
+- distinguish the four Naalvar correctly;
+- remember at least one defining story/value cue for each quest;
+- connect each numbered saint to at least one qualified place association;
+- explain why traditional narrative, edition metadata and independent historical proof are not interchangeable;
+- understand why Manikkavasakar does not become a 64th Nayanmar;
+- complete the experience comfortably on 375/400px mobile in either language.
