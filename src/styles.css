@@ -3700,3 +3700,75 @@ body{font-size:15px}
   .saint-curiosity-actions{grid-template-columns:1fr 1fr}
   .saint-curiosity-actions button{min-height:50px;padding:8px!important}
 }
+
+
+/* ---------- parity QA corrections ---------- */
+@media(min-width:901px){
+  .hero{
+    grid-template-columns:105px minmax(700px,1fr) 120px;
+  }
+  .hero-tower.left svg{width:58px;height:68px}
+  .hero-tower.right,
+  .hero-quote{display:none}
+  .hero-copy{padding-right:80px}
+  .detail-card .text{font-size:10.8px}
+  .detail-card .chips span{font-size:8.8px}
+  .detail-card .fact{font-size:9.5px}
+  .detail-card .fact small{font-size:7.6px}
+}
+
+/* The generated reference uses the real temple photograph as the hero endpoint,
+   not a second decorative tower icon. */
+.hero-photo{object-position:58% 48%}
+
+/* Mobile must remain a complete, readable composition rather than a cropped desktop hero. */
+@media(max-width:900px){
+  .hero{
+    height:auto!important;
+    min-height:224px!important;
+    overflow:hidden;
+    align-items:center;
+  }
+  .hero-copy{
+    width:100%;
+    padding:12px 4px 10px;
+  }
+  .hero-copy>span{font-size:7.2px;line-height:1.4}
+  .hero h1{
+    max-width:none!important;
+    margin:7px auto 5px;
+    font-size:29px!important;
+    line-height:1.13!important;
+  }
+  .hero p{
+    max-width:365px!important;
+    font-size:10.8px!important;
+    line-height:1.45!important;
+  }
+  .hero-lamp{display:none}
+  .map-temple-marker{width:64px;height:45px}
+  .marker-tower{width:22px;height:28px;bottom:12px}
+  .marker-tower svg{width:22px;height:28px}
+  .marker-glow{width:24px;height:24px;bottom:11px}
+  .marker-label{font-size:7px;max-width:72px}
+  .map-temple-marker.linked .marker-tower{transform:translateX(-50%) scale(1.03)}
+  .map-temple-marker.selected .marker-tower{transform:translateX(-50%) scale(1.08)}
+  .map-temple-marker.linked .marker-glow{transform:translateX(-50%) scale(1.08)}
+  .map-temple-marker.selected .marker-glow{transform:translateX(-50%) scale(1.18)}
+}
+@media(max-width:520px){
+  .hero{min-height:236px!important}
+  .hero h1{font-size:28px!important;line-height:1.12!important}
+  .hero p{font-size:10.4px!important}
+  .app[data-locale="ta"] .hero{min-height:300px!important}
+  .app[data-locale="ta"] .hero h1{
+    max-width:350px!important;
+    font-size:27px!important;
+    line-height:1.5!important;
+  }
+  .app[data-locale="ta"] .hero p{
+    max-width:350px!important;
+    font-size:9.6px!important;
+    line-height:1.65!important;
+  }
+}
