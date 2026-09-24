@@ -3384,3 +3384,475 @@ button,select,input,.text,.chips,.fact,.search-results{
 .app[data-locale="ta"] .story-focus h1{line-height:1.42}
 .app[data-locale="ta"] .story-focus-hook{font-size:13px;line-height:1.9}
 
+
+
+/* ---------- generated-mockup parity refresh v1 ---------- */
+:root{
+  --gold:#f2bf63;
+  --gold2:#d89d3f;
+  --cream:#f6e9c9;
+  --muted:#9eb0aa;
+  --panel:#082833;
+  --panel2:#0b3240;
+}
+body{font-size:15px}
+.panel{
+  border-color:rgba(215,169,84,.42);
+  background:
+    radial-gradient(circle at 85% 0,rgba(65,130,119,.07),transparent 34%),
+    linear-gradient(180deg,rgba(8,39,50,.985),rgba(4,23,32,.985));
+  box-shadow:0 18px 42px rgba(0,0,0,.30),inset 0 1px rgba(255,255,255,.035);
+}
+
+/* More architectural temple emblem */
+.gopuram-icon{overflow:visible}
+.gopuram-icon .gopuram-tier,
+.gopuram-icon .gopuram-base,
+.gopuram-icon .gopuram-finial{fill:currentColor}
+.gopuram-icon .gopuram-band{fill:currentColor;opacity:.72}
+.gopuram-icon .gopuram-door{fill:#173039}
+.gopuram-icon .gopuram-arch{fill:#f5d078;opacity:.78}
+.gopuram-icon .gopuram-niches{fill:#082733;opacity:.78}
+.gopuram-icon .gopuram-highlight{fill:none;stroke:#ffe4a1;stroke-width:.65;opacity:.34}
+.brand-mark svg{width:31px;height:35px}
+.brand-mark{
+  border-color:rgba(241,191,99,.68);
+  background:radial-gradient(circle at 50% 40%,rgba(235,179,77,.18),transparent 55%),#082934;
+}
+.hero-tower svg{width:74px;height:86px}
+.saint-temple{opacity:.88}
+.saint-temple svg{width:58px;height:72px}
+
+/* Legibility pass */
+.topbar nav button{font-size:12.5px}
+.header-search input{font-size:10.5px}
+.header-motto{font-size:11.5px}
+.language-switcher button{font-size:9px}
+.filter,.filter select{font-size:10px}
+.mode-pills button{font-size:9.5px}
+.mode-label{font-size:8.5px}
+.naalvar-switcher>span{font-size:8.5px}
+.naalvar-switcher button{font-size:9px}
+.map-toolbar{font-size:8.6px}
+.marker-label{font-size:9px}
+.map-neighbor-label{font-size:9.5px}
+.map-sea-label{font-size:8.5px}
+.map-legend{font-size:7.8px;line-height:1.48}
+.map-legend>b{font-size:10px}
+.tabs button{font-size:9.3px}
+.chips span{font-size:8.2px}
+.text{font-size:10.1px;line-height:1.58}
+.microcopy{font-size:8px!important}
+.badge{font-size:7.5px}
+.fact small{font-size:7.2px}
+.fact{font-size:9px}
+.detail-section-head h3{font-size:16px}
+.detail-section-head small{font-size:7.4px}
+.section-title h3,.major-temples h3,.bottom h3{font-size:16px}
+.section-title>span{font-size:8px}
+.stat b{font-size:21px}
+.stat small{font-size:8px;line-height:1.35}
+.major-temples button{font-size:9.1px;padding:5px 2px}
+.major-temples small{font-size:7.3px}
+.major-talam-copy em{font-size:7.4px}
+.journey-progress{font-size:8px}
+.authority-box b{font-size:10px}
+.authority-box p{font-size:8.2px;line-height:1.5}
+.saint-story-source small{font-size:7px}
+.saint-story-source b{font-size:10.5px}
+.identity-line{font-size:8.4px}
+
+/* Hero: match the approved cinematic mockup */
+.hero{
+  height:162px;
+  grid-template-columns:112px minmax(650px,1fr) 205px 78px;
+  padding:14px 24px;
+  border-bottom-color:rgba(220,174,88,.34);
+}
+.hero-photo{
+  inset:-52% 0 auto;
+  height:250%;
+  object-position:center 50%;
+  filter:sepia(.22) saturate(.92) contrast(1.1) brightness(.60);
+  opacity:.72;
+}
+.hero-photo-shade{
+  background:
+    linear-gradient(90deg,rgba(3,22,29,.86) 0%,rgba(3,26,33,.42) 30%,rgba(4,25,31,.16) 64%,rgba(3,21,29,.34) 100%),
+    linear-gradient(180deg,rgba(3,20,27,.10),rgba(2,18,25,.58));
+}
+.hero-copy>span{font-size:8px;letter-spacing:.26em;color:#e0b45d}
+.hero h1{font-size:41px;line-height:1.02;color:#f6d58f;text-shadow:0 3px 20px rgba(0,0,0,.65)}
+.hero p{font-size:14.5px;line-height:1.3;color:#d2d9d1}
+.hero-quote{font-size:11px;color:#cbb88e}
+.hero-tower.left{opacity:.92;color:#f1bf61}
+.hero-tower.right{opacity:.88;color:#efb85a}
+.hero-lamp{left:143px;top:53px;font-size:25px}
+.hero-credit{font-size:6px;color:rgba(220,224,210,.55)}
+
+/* Discovery row now has the image-backed editorial cards from the mockup */
+.start-here{padding:17px 18px 20px}
+.start-here-head{margin-bottom:12px}
+.start-here-head small{font-size:7.4px;color:#d1a655}
+.start-here-head h2{font-size:26px;color:#f3d397}
+.start-here-head p{font-size:9px;color:#9db0a9}
+.start-here-grid{gap:10px}
+.start-card{
+  min-height:166px;
+  position:relative;
+  isolation:isolate;
+  overflow:hidden;
+  padding:15px 16px;
+  border-color:rgba(75,145,151,.32);
+  background:#082832;
+}
+.start-card.with-media::after{
+  content:"";
+  position:absolute;
+  z-index:-2;
+  top:0;right:0;bottom:0;
+  width:50%;
+  background-image:var(--start-card-image);
+  background-size:cover;
+  background-position:center;
+  filter:sepia(.17) saturate(.84) contrast(1.04);
+  opacity:.72;
+  transition:transform .25s ease,opacity .25s ease;
+}
+.start-card.with-media::before{
+  content:"";
+  position:absolute;
+  z-index:-1;
+  inset:0;
+  background:
+    linear-gradient(90deg,#082832 0%,#082832 44%,rgba(8,40,50,.92) 58%,rgba(6,31,40,.18) 100%),
+    linear-gradient(180deg,rgba(2,18,25,.03),rgba(2,18,25,.52));
+}
+.start-card.media-story::after{width:47%;background-position:center 22%}
+.start-card.media-saint::after{background-position:center 45%}
+.start-card.media-sthalam::after{background-position:center 44%}
+.start-card.media-trail::after{background-position:center 50%}
+.start-card:hover::after{transform:scale(1.035);opacity:.82}
+.start-card>*{position:relative;z-index:2;max-width:57%}
+.start-card-icon{width:31px;height:31px;margin-bottom:9px;border:1px solid rgba(226,174,79,.26)}
+.start-card-icon svg{width:18px;height:20px}
+.start-card small{font-size:6.8px;color:#a7b3aa}
+.start-card b{font-size:16px;color:#f0ca80}
+.start-card p{font-size:9.3px;line-height:1.48;color:#c2cbc3;-webkit-line-clamp:4}
+.start-card em{font-size:8.5px;font-weight:600;color:#f0bb5c}
+.start-card-credit{
+  position:absolute;
+  right:6px;
+  bottom:4px;
+  max-width:46%!important;
+  color:rgba(221,226,215,.66)!important;
+  font-size:5.2px!important;
+  letter-spacing:0!important;
+  text-align:right;
+  text-shadow:0 1px 3px #000;
+}
+
+/* Core three-column stage */
+@media(min-width:901px){
+  .workspace{
+    grid-template-columns:300px minmax(590px,1fr) 370px;
+    gap:10px;
+    padding:10px 13px 0;
+  }
+  .saint-card,.map-card,.detail-card{min-height:790px}
+  .saint-card{padding:12px 13px 14px}
+  .saint-visual{height:270px}
+  .map-toolbar{top:12px}
+  .detail{padding:12px}
+}
+.saint-heading>small{font-size:7.4px}
+.saint-heading h2{font-size:28px;line-height:1.02}
+.tamil{font-size:16px}
+.share-action{padding:7px 10px;font-size:7.5px}
+.saint-curiosity{padding:12px;margin:10px 0 11px}
+.saint-curiosity-head small{font-size:6.8px}
+.saint-curiosity-head span{font-size:6.6px}
+.saint-curiosity p{font-size:10.8px;line-height:1.55;color:#d9ddd4}
+.saint-curiosity-source b{font-size:8px}
+.saint-curiosity-source small{font-size:7.2px;line-height:1.45}
+.saint-curiosity-actions{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+  margin-top:10px;
+}
+.saint-curiosity-actions button{
+  min-height:47px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  margin:0!important;
+  padding:8px 10px!important;
+  border-radius:8px;
+  font:700 11px/1.2 "Cormorant Garamond","Noto Serif Tamil",serif;
+  cursor:pointer;
+  transition:transform .14s ease,box-shadow .14s ease,border-color .14s ease;
+}
+.saint-curiosity-actions button:first-child{
+  border:1px solid #f3c76c;
+  background:linear-gradient(180deg,#f4c76d,#d99a38);
+  color:#09242d;
+  box-shadow:0 8px 18px rgba(213,152,50,.18);
+}
+.saint-curiosity-actions button:last-child{
+  border:1px solid rgba(235,187,91,.76);
+  background:rgba(7,35,43,.86);
+  color:#f1c573;
+}
+.saint-curiosity-actions button:hover{transform:translateY(-1px);box-shadow:0 8px 20px rgba(0,0,0,.22)}
+
+/* Right-side sthalam panel */
+.temple-visual{height:182px;border-color:rgba(230,183,94,.5)}
+.temple-visual>img{filter:sepia(.08) saturate(.92) contrast(1.06) brightness(.78)}
+.temple-shade{background:linear-gradient(90deg,rgba(4,24,33,.76),rgba(4,24,33,.04) 62%),linear-gradient(180deg,transparent 38%,rgba(3,20,29,.82))}
+.temple-art svg{width:78px;height:91px}
+.temple-title>small{font-size:7px}
+.temple-title h2{font-size:27px}
+.temple-title p{font-size:11px}
+.temple-credit{font-size:6px}
+.site-share-row .share-action{font-size:7.2px}
+
+/* Map markers: more realistic silhouette, slightly larger but less cartoonish */
+.marker-tower{width:32px;height:39px;bottom:15px}
+.marker-tower svg{width:32px;height:39px;fill:#f1bb5c;filter:drop-shadow(0 0 5px rgba(249,190,85,.35))}
+.marker-tower .band,.marker-tower .finial{fill:#f8cd78}
+.marker-tower .base{fill:#d99b3e}
+.marker-tower .arch{fill:#ffd889;opacity:.86}
+.marker-tower .door{fill:#4a321b}
+.marker-tower .niches{fill:#5a3d20;opacity:.8}
+.marker-glow{width:34px;height:34px;bottom:12px}
+.map-temple-marker.linked .marker-tower svg{fill:#ffd06f}
+.map-temple-marker.selected .marker-tower svg{fill:#ffe59f}
+
+/* Bottom analytics row gets the same visual weight as the mockup */
+.bottom{
+  grid-template-columns:2.05fr 1.2fr 1.05fr .78fr;
+  gap:10px;
+  padding:10px 13px 13px;
+}
+.bottom>.panel{min-height:190px;padding:13px}
+.section-head p{font-size:8.2px;line-height:1.4}
+.section-head p b{display:block;margin-top:2px;color:#9db0a8}
+.play-row{margin-top:18px}
+.now b{font-size:13px}
+.now small{font-size:8px}
+.timeline-labels{font-size:6.8px}
+.registry-copy b{font-size:9.4px}
+.registry-copy small{font-size:6.6px}
+.naalvar-mini button{font-size:6.7px;padding:4px 7px}
+.graph-expand{font-size:7.6px;padding:5px 8px}
+.graph-preview-button{min-height:142px}
+.network{height:142px}
+.network line{stroke:#c99643;stroke-width:1;opacity:.58}
+.network-node-halo{fill:#e7a849;opacity:.07;stroke:#dba249;stroke-width:.7}
+.network-temple{fill:#e3aa4c;filter:drop-shadow(0 0 4px rgba(223,165,70,.35))}
+.network-temple .network-temple-band,.network-temple .network-temple-finial{fill:#f4c76e}
+.network-temple .network-temple-base{fill:#c58a37}
+.network-temple .network-temple-door{fill:#17313a}
+.network .node-label{fill:#c7d0c7;font-size:7.2px;font-weight:600;text-shadow:0 1px 2px #000}
+.network .node-count{fill:#0b2730;font-size:8px;font-weight:700}
+.network .center-halo{fill:#64d4bd;opacity:.13;stroke:#71d6c1;stroke-width:1}
+.network .center{fill:#67d2bd;stroke:#d8fff5;stroke-width:1.3;filter:drop-shadow(0 0 5px rgba(103,210,189,.48))}
+.network .center-text{font-size:10px}
+.density-map{height:148px;grid-template-columns:1fr 24px;gap:6px}
+.density-map svg{height:142px}
+.density-land{fill:#184842;stroke:#8eae8d;stroke-width:1.5}
+.density-glow{fill:#f3a94b;opacity:.52}
+.density-hotspot{fill:#efad4f;stroke:#ffdb86;stroke-width:1;opacity:.9}
+.density-map text{font-size:6.7px}
+.density-caption{height:118px;font-size:5.6px;color:#879a92}
+.density-caption i{width:8px;height:68px;background:linear-gradient(#ffd276,#e7a24a,#4e9c82);box-shadow:0 0 8px rgba(222,168,76,.22)}
+.totals .stat{min-height:73px;padding:10px 4px}
+.totals .stat b{font-size:23px}
+.totals .stat small{font-size:8px}
+
+/* Mobile retains the richer look but avoids desktop density */
+@media(max-width:900px){
+  body{font-size:16px}
+  .hero{min-height:155px;padding:16px 12px}
+  .hero-photo{inset:0;height:100%;object-position:center}
+  .hero h1{font-size:31px;line-height:1.16}
+  .hero p{font-size:11.5px}
+  .start-here-head h2{font-size:25px}
+  .start-here-head p{font-size:10px}
+  .start-card{min-height:150px;padding:15px}
+  .start-card.with-media::after{width:45%}
+  .start-card>*{max-width:62%}
+  .start-card b{font-size:17px}
+  .start-card p{font-size:10px}
+  .start-card em{font-size:9px}
+  .saint-heading h2{font-size:28px}
+  .saint-curiosity p{font-size:11px}
+  .saint-curiosity-actions button{font-size:12px}
+  .text{font-size:11px}
+  .bottom>.panel{min-height:175px}
+}
+@media(max-width:520px){
+  .start-card.with-media::after{width:42%;opacity:.62}
+  .start-card.with-media::before{background:linear-gradient(90deg,#082832 0%,#082832 54%,rgba(8,40,50,.78) 72%,rgba(6,31,40,.16) 100%)}
+  .start-card>*{max-width:72%}
+  .start-card-credit{display:none}
+  .saint-curiosity-actions{grid-template-columns:1fr 1fr}
+  .saint-curiosity-actions button{min-height:50px;padding:8px!important}
+}
+
+
+/* ---------- parity QA corrections ---------- */
+@media(min-width:901px){
+  .hero{
+    grid-template-columns:105px minmax(700px,1fr) 120px;
+  }
+  .hero-tower.left svg{width:58px;height:68px}
+  .hero-tower.right,
+  .hero-quote{display:none}
+  .hero-copy{padding-right:80px}
+  .detail-card .text{font-size:10.8px}
+  .detail-card .chips span{font-size:8.8px}
+  .detail-card .fact{font-size:9.5px}
+  .detail-card .fact small{font-size:7.6px}
+}
+
+/* The generated reference uses the real temple photograph as the hero endpoint,
+   not a second decorative tower icon. */
+.hero-photo{object-position:58% 48%}
+
+/* Mobile must remain a complete, readable composition rather than a cropped desktop hero. */
+@media(max-width:900px){
+  .hero{
+    height:auto!important;
+    min-height:224px!important;
+    overflow:hidden;
+    align-items:center;
+  }
+  .hero-copy{
+    width:100%;
+    padding:12px 4px 10px;
+  }
+  .hero-copy>span{font-size:7.2px;line-height:1.4}
+  .hero h1{
+    max-width:none!important;
+    margin:7px auto 5px;
+    font-size:29px!important;
+    line-height:1.13!important;
+  }
+  .hero p{
+    max-width:365px!important;
+    font-size:10.8px!important;
+    line-height:1.45!important;
+  }
+  .hero-lamp{display:none}
+  .map-temple-marker{width:64px;height:45px}
+  .marker-tower{width:22px;height:28px;bottom:12px}
+  .marker-tower svg{width:22px;height:28px}
+  .marker-glow{width:24px;height:24px;bottom:11px}
+  .marker-label{font-size:7px;max-width:72px}
+  .map-temple-marker.linked .marker-tower{transform:translateX(-50%) scale(1.03)}
+  .map-temple-marker.selected .marker-tower{transform:translateX(-50%) scale(1.08)}
+  .map-temple-marker.linked .marker-glow{transform:translateX(-50%) scale(1.08)}
+  .map-temple-marker.selected .marker-glow{transform:translateX(-50%) scale(1.18)}
+}
+@media(max-width:520px){
+  .hero{min-height:236px!important}
+  .hero h1{font-size:28px!important;line-height:1.12!important}
+  .hero p{font-size:10.4px!important}
+  .app[data-locale="ta"] .hero{min-height:300px!important}
+  .app[data-locale="ta"] .hero h1{
+    max-width:350px!important;
+    font-size:27px!important;
+    line-height:1.5!important;
+  }
+  .app[data-locale="ta"] .hero p{
+    max-width:350px!important;
+    font-size:9.6px!important;
+    line-height:1.65!important;
+  }
+}
+
+
+/* English mobile hero keeps the cinematic split while restoring readable line lengths. */
+@media(max-width:900px){
+  .hero{
+    grid-template-columns:minmax(0,1fr)!important;
+  }
+  .app[data-locale="en"] .hero{
+    min-height:246px!important;
+  }
+  .app[data-locale="en"] .hero-copy{
+    display:flex;
+    flex-direction:column;
+    align-items:flex-start;
+    justify-content:center;
+    width:100%;
+    padding:13px 5px 14px 7px;
+    text-align:left;
+  }
+  .app[data-locale="en"] .hero-copy>span{
+    width:64%;
+    text-align:left;
+  }
+  .app[data-locale="en"] .hero h1{
+    width:64%;
+    max-width:260px!important;
+    margin:7px 0 6px!important;
+    font-size:27px!important;
+    line-height:1.12!important;
+    text-align:left;
+    text-wrap:wrap;
+  }
+  .app[data-locale="en"] .hero p{
+    width:64%;
+    max-width:260px!important;
+    margin:0!important;
+    font-size:10.8px!important;
+    line-height:1.47!important;
+    text-align:left;
+  }
+}
+@media(max-width:420px){
+  .app[data-locale="en"] .hero h1,
+  .app[data-locale="en"] .hero p,
+  .app[data-locale="en"] .hero-copy>span{
+    width:66%;
+  }
+  .app[data-locale="en"] .hero h1{
+    max-width:245px!important;
+    font-size:26px!important;
+  }
+}
+
+
+.hero-mobile-break{display:none}
+@media(max-width:900px){
+  .app[data-locale="en"] .hero-copy{
+    align-items:center;
+    padding:13px 8px 15px;
+    text-align:center;
+  }
+  .app[data-locale="en"] .hero-copy>span{
+    width:auto;
+    text-align:center;
+  }
+  .app[data-locale="en"] .hero h1{
+    width:100%;
+    max-width:370px!important;
+    margin:8px auto 7px!important;
+    font-size:27px!important;
+    line-height:1.14!important;
+    text-align:center;
+    text-wrap:wrap;
+  }
+  .app[data-locale="en"] .hero p{
+    width:100%;
+    max-width:345px!important;
+    margin:0 auto!important;
+    font-size:10.8px!important;
+    line-height:1.5!important;
+    text-align:center;
+  }
+  .app[data-locale="en"] .hero-mobile-break{display:block}
+}

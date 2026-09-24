@@ -1156,7 +1156,11 @@ export default function App() {
         <div className="hero-tower left"><GopuramIcon /></div>
         <div className="hero-copy">
           <span><T>ANCIENT PATHS · LIVING DEVOTION</T></span>
-          <h1><T>Follow the Nayanmars across sacred Tamil Nadu</T></h1>
+          <h1>
+          {locale === 'ta'
+            ? tr(locale, 'Follow the Nayanmars across sacred Tamil Nadu')
+            : <>Follow the Nayanmars <br className="hero-mobile-break" />across sacred Tamil Nadu</>}
+        </h1>
           <p>{tr(locale, 'Explore sthalams, Tēvāram pathigams, saint traditions and the sacred geography that connects them.')}</p>
         </div>
         <blockquote className="hero-quote">
@@ -2922,6 +2926,29 @@ function ConnectionModal({
 }
 
 
+function NetworkTempleGlyph({ x, y, scale }: { x: number; y: number; scale: number }) {
+  return (
+    <g
+      className="network-temple"
+      transform={`translate(${x - 32 * scale} ${y - 36 * scale}) scale(${scale})`}
+      aria-hidden="true"
+    >
+      <circle className="network-temple-finial" cx="32" cy="3.5" r="2.25" />
+      <path className="network-temple-finial" d="M29.2 6h5.6l2.2 4H27z" />
+      <path d="M25.5 11h13l3.2 6H22.3z" />
+      <path className="network-temple-band" d="M21.2 18h21.6l2.6 2.8H18.6z" />
+      <path d="M19 22h26l3.7 7.2H15.3z" />
+      <path className="network-temple-band" d="M14 30.3h36l2.6 3.1H11.4z" />
+      <path d="M12.5 35h39l4.1 8.3H8.4z" />
+      <path className="network-temple-band" d="M7 44.7h50l2.4 3.3H4.6z" />
+      <path d="M6.4 49.6h51.2L61 58H3z" />
+      <path className="network-temple-base" d="M2.5 59.7h59v8.8h-59z" />
+      <path className="network-temple-door" d="M25.7 48.8h12.6v19.7H25.7z" />
+    </g>
+  );
+}
+
+
 function Network({
   saint,
   sites,
@@ -2936,12 +2963,12 @@ function Network({
   onSelect?: (site: Site) => void;
 }) {
   const locale = useLocale();
-  const width = expanded ? 720 : 360;
-  const height = expanded ? 360 : 148;
+  const width = expanded ? 720 : 400;
+  const height = expanded ? 360 : 170;
   const cx = width / 2;
-  const cy = expanded ? 170 : 73;
-  const rx = expanded ? 255 : 137;
-  const ry = expanded ? 120 : 52;
+  const cy = expanded ? 170 : 82;
+  const rx = expanded ? 255 : 154;
+  const ry = expanded ? 120 : 60;
 
   return (
     <svg
@@ -2976,12 +3003,17 @@ function Network({
               : undefined}
           >
             <line x1={cx} y1={cy} x2={x} y2={y} />
-            <circle cx={x} cy={y} r={radius} />
-            {expanded && <text className="node-count" x={x} y={y + 3} textAnchor="middle">{count}</text>}
+            <circle className="network-node-halo" cx={x} cy={y} r={radius + (expanded ? 12 : 8)} />
+            <NetworkTempleGlyph
+              x={x}
+              y={y}
+              scale={(expanded ? .58 : .34) + Math.min(count, 9) * (expanded ? .012 : .01)}
+            />
+            {expanded && <text className="node-count" x={x} y={y + 4} textAnchor="middle">{count}</text>}
             <text
               className="node-label"
               x={x}
-              y={y + (expanded ? radius + 18 : 16)}
+              y={y + (expanded ? radius + 26 : 23)}
               textAnchor="middle"
             >
               {label.slice(0, expanded ? 22 : 13)}
@@ -2999,12 +3031,12 @@ function Network({
 }
 
 function DensityPanel({ points }: { points: CoveragePoint[] }) {
-  const width = 180;
-  const height = 118;
+  const width = 240;
+  const height = 150;
   const bounds = { minLng: 76.7, maxLng: 80.55, minLat: 7.85, maxLat: 13.65 };
   const project = (lng: number, lat: number) => {
-    const x = 22 + ((lng - bounds.minLng) / (bounds.maxLng - bounds.minLng)) * 122;
-    const y = 8 + ((bounds.maxLat - lat) / (bounds.maxLat - bounds.minLat)) * 101;
+    const x = 30 + ((lng - bounds.minLng) / (bounds.maxLng - bounds.minLng)) * 164;
+    const y = 10 + ((bounds.maxLat - lat) / (bounds.maxLat - bounds.minLat)) * 128;
     return [x, y] as const;
   };
   const polygon = TAMIL_NADU_SCHEMATIC
@@ -3023,7 +3055,7 @@ function DensityPanel({ points }: { points: CoveragePoint[] }) {
         <polygon points={polygon} className="density-land" />
         {points.map((point) => {
           const [x, y] = project(point.lng, point.lat);
-          const radius = 4 + (point.count / max) * 10;
+          const radius = 5 + (point.count / max) * 12;
           return (
             <g key={point.key}>
               <circle cx={x} cy={y} r={radius * 1.55} className="density-glow" filter="url(#densityGlow)" />
