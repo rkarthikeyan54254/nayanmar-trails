@@ -662,8 +662,8 @@ export const QUESTS: QuestDefinition[] = [
       ),
     },
     story: L(
-      'Pramana carries Manikkavasakar through a separate Tirumurai 8 lane. The current snapshot preserves 51 Tiruvācakam sections with 661 source units and 400 Tirukkōvaiyār source-order units. It maps explicit or qualified textual loci such as Kōyil/Chidambaram and Tirukkazhukkunram, while explicitly refusing to turn section order into a biographical journey. Manikkavasakar remains one of the Naalvar and is not inserted into the numbered 63 Nayanmars.',
-      'மாணிக்கவாசகரை பிரமாணம் திருமுறை 8-க்கான தனி அடுக்கில் வைத்திருக்கிறது. தற்போதைய நிலைப்படுத்தப்பட்ட தரவில் திருவாசகத்தின் 51 பகுதிகள், 661 மூல அலகுகள், திருக்கோவையாரின் 400 மூல வரிசை அலகுகள் உள்ளன. “கோயில்” என்ற குறிப்பைச் சிதம்பரத்துடன் மரபுச் சைவ அடையாளத்தின் அடிப்படையில் இணைப்பதையும், திருக்கழுக்குன்றம் போன்ற வெளிப்படையான உரைக் குறிப்புகளையும் காட்டுகிறது. ஆனால் இந்தப் பகுதிகளின் வரிசையை மாணிக்கவாசகரின் வரலாற்றுப் பயணமாக மாற்றுவதில்லை. அவர் நால்வரில் ஒருவர்; அறுபத்து மூவரின் எண்ணிக்கைக்குள் சேர்க்கப்படவில்லை.',
+      'Pramana carries Manikkavasakar through a separate Tirumurai 8 lane. The pinned Project Madurai headings explicitly place Tiruvempavai at Tiruvannamalai and Tiruppalliyezhuchi at Tirupperunturai; they are preserved as two distinct source-header composition loci. The snapshot also carries qualified loci such as Kōyil/Chidambaram and Tirukkazhukkunram, while refusing to turn section order into a biographical journey. Manikkavasakar remains one of the Naalvar and is not inserted into the numbered 63 Nayanmars.',
+      'மாணிக்கவாசகரை பிரமாணம் திருமுறை 8-க்கான தனி அடுக்கில் வைத்திருக்கிறது. நிலைப்படுத்தப்பட்ட Project Madurai பதிப்பின் மூலத் தலைப்பில் திருவெம்பாவை “திருவண்ணாமலையில் அருளியது” என்றும், திருப்பள்ளியெழுச்சி “திருப்பெருந்துறையில் அருளியது” என்றும் தனித்தனியாகப் பதிவு செய்யப்பட்டுள்ளது. இவை இரண்டு வேறு source-header composition loci ஆகவே பாதுகாக்கப்படுகின்றன. “கோயில்”/சிதம்பரம், திருக்கழுக்குன்றம் போன்ற பிற தலத் தொடர்புகளும் தனித்த ஆதார வரம்புடன் காட்டப்படுகின்றன. ஆனால் பகுதி வரிசையை மாணிக்கவாசகரின் வரலாற்றுப் பயணமாக மாற்றுவதில்லை. அவர் நால்வரில் ஒருவர்; அறுபத்து மூவரின் எண்ணிக்கைக்குள் சேர்க்கப்படவில்லை.',
     ),
     prediction: {
       prompt: L(
@@ -697,30 +697,30 @@ export const QUESTS: QuestDefinition[] = [
     },
     geography: {
       intro: L(
-        'The Tirumurai 8 snapshot carries qualified textual loci. Kōyil is conventionally mapped to Chidambaram; Tirukkazhukkunram is explicitly named in a Tiruvācakam section title.',
-        'திருமுறை 8 தரவில் உரை சார்ந்த தலக் குறிப்புகள் உள்ளன. “கோயில்” என்ற சொல்லை சைவ மரபின் அடிப்படையில் சிதம்பரத்துடன் இணைக்கிறது; திருக்கழுக்குன்றம் ஒரு திருவாசகப் பகுதி தலைப்பிலேயே வெளிப்படையாக வருகிறது.',
+        'Two source headings in the pinned Tiruvācakam edition give two different composition loci: Tiruvempavai → Tiruvannamalai; Tiruppalliyezhuchi → Tirupperunturai.',
+        'நிலைப்படுத்தப்பட்ட திருவாசகப் பதிப்பின் இரண்டு மூலத் தலைப்புகள் இரண்டு வேறு தலங்களைச் சொல்கின்றன: திருவெம்பாவை → திருவண்ணாமலை; திருப்பள்ளியெழுச்சி → திருப்பெருந்துறை.',
       ),
-      leftLabel: L('Qualified Kōyil mapping', '“கோயில்” — மரபுச் சைவ அடையாள இணைப்பு'),
-      leftValue: L('Chidambaram · சிதம்பரம்', 'சிதம்பரம்'),
-      rightLabel: L('Explicit section-title locus', 'பகுதி தலைப்பில் வெளிப்படையான தலம்'),
-      rightValue: L('Tirukkazhukkunram · திருக்கழுக்குன்றம்', 'திருக்கழுக்குன்றம்'),
+      leftLabel: L('Tiruvempavai · source-header locus', 'திருவெம்பாவை · மூலத் தலைப்புத் தலம்'),
+      leftValue: L('Tiruvannamalai · திருவண்ணாமலை', 'திருவண்ணாமலை'),
+      rightLabel: L('Tiruppalliyezhuchi · source-header locus', 'திருப்பள்ளியெழுச்சி · மூலத் தலைப்புத் தலம்'),
+      rightValue: L('Tirupperunturai · திருப்பெருந்துறை', 'திருப்பெருந்துறை'),
       question: L(
-        'Which place is explicitly named in a Tiruvācakam section title in the pinned snapshot?',
-        'நிலைப்படுத்தப்பட்ட திருவாசகத் தரவில் ஒரு பகுதி தலைப்பிலேயே வெளிப்படையாக பெயர் வரும் தலம் எது?',
+        'Which place does the pinned source header attach to Tiruppalliyezhuchi?',
+        'நிலைப்படுத்தப்பட்ட மூலத் தலைப்பில் திருப்பள்ளியெழுச்சியுடன் இணைக்கப்படும் தலம் எது?',
       ),
-      choices: [C('chidambaram', 'Chidambaram', 'சிதம்பரம்'), C('kazhukkunram', 'Tirukkazhukkunram', 'திருக்கழுக்குன்றம்')],
-      correctId: 'kazhukkunram',
+      choices: [C('tiruvannamalai', 'Tiruvannamalai', 'திருவண்ணாமலை'), C('tirupperunturai', 'Tirupperunturai', 'திருப்பெருந்துறை')],
+      correctId: 'tirupperunturai',
       correct: L(
-        'Tirukkazhukkunram is explicitly named in section 30.',
-        'திருக்கழுக்குன்றம் 30-ஆம் திருவாசகப் பகுதி தலைப்பிலேயே வெளிப்படையாக வருகிறது.',
+        'Tiruppalliyezhuchi is headed “at Tirupperunturai”; Tiruvempavai is separately headed “at Tiruvannamalai.”',
+        'திருப்பள்ளியெழுச்சியின் மூலத் தலைப்பு “திருப்பெருந்துறையில் அருளியது” என்று கூறுகிறது; திருவெம்பாவை தனியாக “திருவண்ணாமலையில் அருளியது” என்று பதிவு செய்யப்பட்டுள்ளது.',
       ),
       wrong: L(
-        'Chidambaram is the qualified conventional identification of Kōyil in this product mapping.',
-        'சிதம்பரம் “கோயில்” என்ற சொல்லின் மரபுச் சைவ அடையாளத்தின் அடிப்படையிலான product mapping.',
+        'Tiruvannamalai belongs to the Tiruvempavai source heading. Tiruppalliyezhuchi is attached to Tirupperunturai.',
+        'திருவண்ணாமலை என்பது திருவெம்பாவையின் மூலத் தலைப்புத் தலம். திருப்பள்ளியெழுச்சி திருப்பெருந்துறையுடன் இணைக்கப்படுகிறது.',
       ),
       scope: L(
-        'A textual locus is not automatically a historically verified visit or composition event.',
-        'ஒரு உரைக் தலக் குறிப்பு தானாகவே வரலாற்றில் உறுதி செய்யப்பட்ட வருகையோ பாடல் இயற்றிய இடமோ ஆகாது.',
+        'These are source-header composition loci in the pinned edition. They are not independently verified historical travel events.',
+        'இவை நிலைப்படுத்தப்பட்ட பதிப்பின் மூலத் தலைப்பில் வரும் composition loci. தனித்த வரலாற்றுப் பயணச் சான்றாக இவை காட்டப்படவில்லை.',
       ),
     },
     detective: {
@@ -737,6 +737,18 @@ export const QUESTS: QuestDefinition[] = [
           ),
           safe: true,
           explanation: L('This is an explicit product/evidence rule.', 'இது தளத்தின் தெளிவான ஆதார விதி.'),
+        },
+        {
+          id: 'two-loci',
+          claim: L(
+            'The pinned source headings place Tiruvempavai at Tiruvannamalai and Tiruppalliyezhuchi at Tirupperunturai.',
+            'நிலைப்படுத்தப்பட்ட மூலத் தலைப்புகள் திருவெம்பாவையை திருவண்ணாமலையிலும், திருப்பள்ளியெழுச்சியை திருப்பெருந்துறையிலும் தனித்தனியாகக் குறிப்பிடுகின்றன.',
+          ),
+          safe: true,
+          explanation: L(
+            'Supported as primary_text_metadata from the two source headings.',
+            'இரண்டு மூலத் தலைப்புகளிலிருந்தும் primary_text_metadata ஆக இது ஆதரிக்கப்படுகிறது.',
+          ),
         },
         {
           id: 'route',
@@ -783,7 +795,7 @@ export const QUESTS: QuestDefinition[] = [
     reflection: [COMMON_REFLECTION.learning, C('care', 'Careful reading', 'கவனமான வாசிப்பு'), COMMON_REFLECTION.inward],
     recap: {
       story: L('Naalvar identity; Tirumurai 8 textual loci without an invented biography route.', 'நால்வர் அடையாளம்; ஊகப் பயணமில்லாத திருமுறை 8 உரைக் தலக் குறிப்புகள்.'),
-      places: L('Textual loci: Chidambaram/Kōyil · Tirukkazhukkunram; Uttarakosamangai remains literary, not a formal Tēvāram site.', 'உரைக் தலங்கள்: சிதம்பரம்/கோயில் · திருக்கழுக்குன்றம்; திருஉத்தரகோசமங்கை இலக்கியத் தொடர்பாகவே உள்ளது, தேவாரத் திருத்தலப் பட்டியலில் அல்ல.'),
+      places: L('Source-header loci: Tiruvempavai → Tiruvannamalai · Tiruppalliyezhuchi → Tirupperunturai. Other qualified loci include Chidambaram/Kōyil and Tirukkazhukkunram; Uttarakosamangai remains literary, not a formal Tēvāram site.', 'மூலத் தலைப்புத் தலங்கள்: திருவெம்பாவை → திருவண்ணாமலை · திருப்பள்ளியெழுச்சி → திருப்பெருந்துறை. பிற தகுதிப்படுத்தப்பட்ட தலங்களில் சிதம்பரம்/கோயில், திருக்கழுக்குன்றம் உள்ளன; திருஉத்தரகோசமங்கை இலக்கியத் தொடர்பாகவே உள்ளது, தேவாரத் திருத்தலப் பட்டியலில் அல்ல.'),
       source: L('Tirumurai 8 product metadata + Saiva literary-place layer', 'திருமுறை 8 பதிப்பு தரவு + சைவ இலக்கியத் தல அடுக்கு'),
     },
   },
