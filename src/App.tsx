@@ -7,8 +7,8 @@ import GopuramIcon from './GopuramIcon';
 import SacredMap, { type CoveragePoint, type EvidenceMode, type MapStop } from './SacredMap';
 import type { Patikam, PramanaExport, Saint, Site } from './types';
 import { LocaleContext, T, tr, useLocale, type Locale } from './i18n';
-import { parsePublicRoute, saintPath, sitePath, storyPath } from './publicRoutes';
-import { StartHere, StoryFocus, SaintShare, SiteShare } from './V1Discovery';
+import { companionPath, parsePublicRoute, saintPath, sitePath, storyPath } from './publicRoutes';
+import { ShareButton, StartHere, StoryFocus, SaintShare, SiteShare } from './V1Discovery';
 import QuestMode, { QuestInvitation } from './QuestMode';
 import { track } from './analytics';
 
@@ -392,6 +392,7 @@ export default function App() {
     if (initialRoute?.kind === 'saint' || initialRoute?.kind === 'story') {
       return `nayanmar.${String(initialRoute.ordinal).padStart(2, '0')}`;
     }
+    if (initialRoute?.kind === 'companion') return MANIKKAVASAKAR_ID;
     return initialParams.get('saint') || 'nayanmar.20';
   });
   const [selectedSiteId, setSelectedSiteId] = useState(() => {
@@ -711,12 +712,12 @@ export default function App() {
   const playbackIsGeographic = routeStops.length >= 2;
   const playbackKind = locale === 'ta'
     ? selectedIsManikkavasakar
-      ? 'திருமுறை 8 தல வரிசை'
+      ? 'திருமுறை 8 தலக் குறிப்புகள்'
       : playbackIsGeographic
         ? 'திருத்தலப் பயணம்'
         : 'மரபில் வரும் தலங்கள்'
     : selectedIsManikkavasakar
-      ? 'Tirumurai 8 journey'
+      ? 'Tirumurai 8 loci'
       : playbackIsGeographic
         ? 'Pilgrimage'
         : 'Traditional place';
@@ -807,6 +808,9 @@ export default function App() {
   ) ?? null;
   const sourceHeaderLoci = (tirumurai8?.loci ?? []).filter(
     (locus) => locus.locus_kind === 'source_header_composition_locus',
+  );
+  const unplottedTirumurai8Loci = (tirumurai8?.loci ?? []).filter(
+    (locus) => !locus.site_id,
   );
   const selectedSiteKolaruContext =
     selectedSaintId === 'nayanmar.27' && selectedSiteId === 'tevaram_site.KT125'
@@ -923,7 +927,34 @@ export default function App() {
       .slice(0, 6)
       .map((entry) => entry.item);
 
-    const manikkavasakar = score(['manikkavasakar', 'manikkavacakar', 'மாணிக்கவாசகர்']) > 0;
+    const manikkavasakar = score([
+      'manikkavasakar',
+      'manikkavacakar',
+      'மாணிக்கவாசகர்',
+      'tiruvacakam',
+      'thiruvachakam',
+      'திருவாசகம்',
+      'tirukkovaiyar',
+      'திருக்கோவையார்',
+      'tiruvempavai',
+      'thiruvempavai',
+      'திருவெம்பாவை',
+      'tiruppalliyezhuchi',
+      'thiruppalliyezhuchi',
+      'திருப்பள்ளியெழுச்சி',
+      'tiruvannamalai',
+      'thiruvannamalai',
+      'திருவண்ணாமலை',
+      'tirupperunturai',
+      'thirupperunturai',
+      'திருப்பெருந்துறை',
+      'uttarakosamangai',
+      'திருஉத்தரகோசமங்கை',
+      'tirukkazhukkunram',
+      'திருக்கழுக்குன்றம்',
+      'chidambaram',
+      'சிதம்பரம்',
+    ]) > 0;
 
     return { saints, stories, sites, manikkavasakar };
   }, [curiosities, data, query]);
@@ -1084,7 +1115,9 @@ export default function App() {
           <input
             value={query}
             onChange={(event) => setQuery(event.target.value)}
-            placeholder={tr(locale, 'Search Nayanmars, sthalams, or places…')}
+            placeholder={locale === 'ta'
+              ? 'நாயன்மார், பாடல்கள், திருத்தலங்கள், தலங்கள் தேடுங்கள்…'
+              : 'Search saints, hymns, sthalams, or places…'}
           />
           {query && (
             <div className="search-results">
@@ -1115,7 +1148,11 @@ export default function App() {
                   <GopuramIcon />
                   <span>
                     {locale === 'ta' ? tirumurai8.author.label_ta : 'Manikkavasakar'}
-                    <small>{tr(locale, 'Naalvar · Tirumurai 8 · not numbered among the 63')}</small>
+                    <small>
+                      {locale === 'ta'
+                        ? 'நால்வர் · திருமுறை 8 · பாடல்கள் மற்றும் தலக் குறிப்புகள்'
+                        : 'Naalvar · Tirumurai 8 · works & textual loci'}
+                    </small>
                   </span>
                 </button>
               )}
@@ -1317,6 +1354,14 @@ export default function App() {
                 saint={saint}
                 englishName={SAINT_EN[saint.id] ?? saint.label}
                 displayName={saintName}
+              />
+            )}
+            {selectedIsManikkavasakar && (
+              <ShareButton
+                label={locale === 'ta' ? 'இந்தப் பக்கத்தைப் பகிர்' : 'Share page'}
+                title={saintName}
+                path={companionPath(locale)}
+                kind="saint"
               />
             )}
           </div>
