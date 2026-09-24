@@ -927,7 +927,7 @@ export default function App() {
       .slice(0, 6)
       .map((entry) => entry.item);
 
-    const manikkavasakar = score([
+    const manikkavasakarTerms = [
       'manikkavasakar',
       'manikkavacakar',
       'மாணிக்கவாசகர்',
@@ -936,28 +936,29 @@ export default function App() {
       'திருவாசகம்',
       'tirukkovaiyar',
       'திருக்கோவையார்',
-      'tiruvempavai',
-      'thiruvempavai',
-      'திருவெம்பாவை',
-      'tiruppalliyezhuchi',
-      'thiruppalliyezhuchi',
-      'திருப்பள்ளியெழுச்சி',
-      'tiruvannamalai',
-      'thiruvannamalai',
-      'திருவண்ணாமலை',
-      'tirupperunturai',
-      'thirupperunturai',
-      'திருப்பெருந்துறை',
-      'uttarakosamangai',
-      'திருஉத்தரகோசமங்கை',
-      'tirukkazhukkunram',
-      'திருக்கழுக்குன்றம்',
-      'chidambaram',
-      'சிதம்பரம்',
-    ]) > 0;
+      ...(tirumurai8?.loci ?? []).flatMap((locus) => [
+        locus.display_name,
+        locus.label_ta,
+        ...locus.section_titles_ta,
+        locus.source_note_ta,
+      ]),
+      ...(saivaPlaces?.places ?? []).flatMap((place) => [
+        place.label,
+        place.label_ta,
+        ...(place.aliases ?? []),
+      ]),
+      ...(saivaPlaces?.links ?? []).flatMap((link) => [
+        link.source_note_ta,
+        link.source_header_composition_place_ta,
+        link.source_form_ta,
+        link.normalized_place_ta,
+        link.traditional_place_ta,
+      ]),
+    ];
+    const manikkavasakar = score(manikkavasakarTerms) > 0;
 
     return { saints, stories, sites, manikkavasakar };
-  }, [curiosities, data, query]);
+  }, [curiosities, data, query, saivaPlaces, tirumurai8]);
 
   useEffect(() => {
     setProgress(0);
