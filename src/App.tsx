@@ -1156,7 +1156,11 @@ export default function App() {
         <div className="hero-tower left"><GopuramIcon /></div>
         <div className="hero-copy">
           <span><T>ANCIENT PATHS · LIVING DEVOTION</T></span>
-          <h1><T>Follow the Nayanmars across sacred Tamil Nadu</T></h1>
+          <h1>
+          {locale === 'ta'
+            ? tr(locale, 'Follow the Nayanmars across sacred Tamil Nadu')
+            : <>Follow the Nayanmars <br className="hero-mobile-break" />across sacred Tamil Nadu</>}
+        </h1>
           <p>{tr(locale, 'Explore sthalams, Tēvāram pathigams, saint traditions and the sacred geography that connects them.')}</p>
         </div>
         <blockquote className="hero-quote">
