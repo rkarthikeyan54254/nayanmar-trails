@@ -49,7 +49,7 @@ const gopuramMarkup = `
     <rect x="36.6" y="38" width="3.7" height="3.2" rx=".6"/>
     <rect x="44.5" y="38" width="3.7" height="3.2" rx=".6"/>
   </g>
-</svg>`
+</svg>`;
 
 const HERITAGE_MAP_STYLE: StyleSpecification = {
   version: 8,
