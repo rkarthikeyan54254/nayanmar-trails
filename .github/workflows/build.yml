@@ -114,6 +114,8 @@ jobs:
           capture "sources-methodology-ta" "http://127.0.0.1:4173/?sources=1&lang=ta"
           capture "nayanmar-tradition-fallback" "http://127.0.0.1:4173/?saint=nayanmar.01"
           capture "manikkavasakar-naalvar" "http://127.0.0.1:4173/?saint=tirumurai8.manikkavacakar"
+          capture_at "manikkavasakar-public-route-en" "http://127.0.0.1:4173/en/naalvar/manikkavasakar/" "400,1800"
+          capture_at "manikkavasakar-public-route-ta" "http://127.0.0.1:4173/ta/naalvar/manikkavasakar/" "375,1800"
           capture_at "manikkavasakar-source-header-loci-ta" "http://127.0.0.1:4173/?saint=tirumurai8.manikkavacakar&lang=ta" "400,1800"
           capture "manikkavasakar-uttarakosamangai-context" "http://127.0.0.1:4173/?saint=tirumurai8.manikkavacakar&tab=chronology"
           capture "manikkavasakar-uttarakosamangai-context-ta" "http://127.0.0.1:4173/?saint=tirumurai8.manikkavacakar&tab=chronology&lang=ta"
