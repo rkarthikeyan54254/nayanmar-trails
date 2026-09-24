@@ -43,6 +43,12 @@ export const SAINT_MEDIA: Record<string, MediaCredit> = {
 };
 
 export const TEMPLE_MEDIA: Record<string, MediaCredit> = {
+  'tevaram_site.TO20': {
+    src: commons('Thiuvotriyur1.jpg', 1100),
+    title: 'Thyagaraswamy Temple, Thiruvottiyur',
+    license: 'CC BY-SA 4.0',
+    source: 'Wikimedia Commons',
+  },
   'tevaram_site.KV01': {
     src: commons('A view of Nataraja Shiva Temple at Chidambaram, Tamil Nadu (10).jpg', 1100),
     title: 'Gopuram of the Nataraja Temple, Chidambaram',
