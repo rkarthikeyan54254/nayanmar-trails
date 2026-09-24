@@ -3821,3 +3821,35 @@ body{font-size:15px}
     font-size:26px!important;
   }
 }
+
+
+.hero-mobile-break{display:none}
+@media(max-width:900px){
+  .app[data-locale="en"] .hero-copy{
+    align-items:center;
+    padding:13px 8px 15px;
+    text-align:center;
+  }
+  .app[data-locale="en"] .hero-copy>span{
+    width:auto;
+    text-align:center;
+  }
+  .app[data-locale="en"] .hero h1{
+    width:100%;
+    max-width:370px!important;
+    margin:8px auto 7px!important;
+    font-size:27px!important;
+    line-height:1.14!important;
+    text-align:center;
+    text-wrap:wrap;
+  }
+  .app[data-locale="en"] .hero p{
+    width:100%;
+    max-width:345px!important;
+    margin:0 auto!important;
+    font-size:10.8px!important;
+    line-height:1.5!important;
+    text-align:center;
+  }
+  .app[data-locale="en"] .hero-mobile-break{display:block}
+}
