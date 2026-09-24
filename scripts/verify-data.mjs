@@ -9,6 +9,7 @@ const mapPath = new URL('../src/SacredMap.tsx', import.meta.url);
 const appPath = new URL('../src/App.tsx', import.meta.url);
 const stylesPath = new URL('../src/styles.css', import.meta.url);
 const i18nPath = new URL('../src/i18n.tsx', import.meta.url);
+const publicRoutesPath = new URL('../src/publicRoutes.ts', import.meta.url);
 
 const doc = JSON.parse(await readFile(exportPath, 'utf8'));
 const tirumurai8 = JSON.parse(await readFile(tirumurai8Path, 'utf8'));
@@ -19,6 +20,7 @@ const mapText = await readFile(mapPath, 'utf8');
 const appText = await readFile(appPath, 'utf8');
 const stylesText = await readFile(stylesPath, 'utf8');
 const i18nText = await readFile(i18nPath, 'utf8');
+const publicRoutesText = await readFile(publicRoutesPath, 'utf8');
 
 const required = [
   'traditional_reference',
@@ -113,6 +115,26 @@ if (!tirumurai8.meta?.beta_ready || !tirumurai8.meta?.source_commit) {
 }
 if (!Array.isArray(tirumurai8.loci) || tirumurai8.loci.length < 2) {
   throw new Error('Expected at least two qualified Tirumurai 8 product loci');
+}
+if (!publicRoutesText.includes("/naalvar/manikkavasakar/") ||
+    !publicRoutesText.includes("kind: 'companion'")) {
+  throw new Error('Manikkavasakar must have a stable bilingual public companion route');
+}
+for (const searchTerm of [
+  'tiruvempavai',
+  'திருவெம்பாவை',
+  'tiruppalliyezhuchi',
+  'திருப்பள்ளியெழுச்சி',
+  'tirupperunturai',
+  'திருப்பெருந்துறை',
+]) {
+  if (!appText.toLowerCase().includes(searchTerm.toLowerCase())) {
+    throw new Error(`Manikkavasakar search coverage missing: ${searchTerm}`);
+  }
+}
+if (!appText.includes('unplottedTirumurai8Loci') ||
+    !appText.includes('map geometry not yet curated')) {
+  throw new Error('Unplotted Tirumurai 8 source loci must remain visible rather than silently disappearing from the product');
 }
 
 if (saivaPlaces.meta?.source_repo !== 'rkarthikeyan54254/pramana' ||
