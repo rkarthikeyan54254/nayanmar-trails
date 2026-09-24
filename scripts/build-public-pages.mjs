@@ -12,6 +12,7 @@ const release = process.env.RAILWAY_GIT_COMMIT_SHA || process.env.COMMIT_REF || 
 
 const graph = JSON.parse(await readFile(new URL('pramana-export-v1.json', publicData), 'utf8'));
 const curiosities = JSON.parse(await readFile(new URL('pramana-saint-curiosities-v1.json', publicData), 'utf8'));
+const tirumurai8 = JSON.parse(await readFile(new URL('pramana-tirumurai8-v1.json', publicData), 'utf8'));
 const shell = await readFile(new URL('index.html', dist), 'utf8');
 const storyBySaint = new Map(curiosities.stories.map((item) => [item.saint_id, item]));
 
@@ -49,6 +50,7 @@ function pathFor(locale, kind, item) {
   if (kind === 'home') return `/${locale}/`;
   if (kind === 'saint') return `/${locale}/nayanmar/${saintSlug(item)}/`;
   if (kind === 'story') return `/${locale}/story/${saintSlug(item)}/`;
+  if (kind === 'companion') return `/${locale}/naalvar/manikkavasakar/`;
   return `/${locale}/sthalam/${siteSlug(item)}/`;
 }
 
@@ -66,6 +68,11 @@ function titleFor(locale, kind, item) {
       ? locale === 'ta' ? `${name} — பெரியபுராணக் கதை | நாயன்மார் பாதைகள்` : `${name} — Periya Puranam Story | Nayanmar Trails`
       : `${name} | Nayanmar Trails`;
   }
+  if (kind === 'companion') {
+    return locale === 'ta'
+      ? 'மாணிக்கவாசகர் — திருமுறை 8, திருவெம்பாவை, திருப்பள்ளியெழுச்சி | நாயன்மார் பாதைகள்'
+      : 'Manikkavasakar — Tirumurai 8, Tiruvempavai & Tiruppalliyezhuchi | Nayanmar Trails';
+  }
   const name = locale === 'ta' ? (item.label_ta || item.modern_name_nic || item.label) : (item.modern_name_nic || item.label);
   return `${name} | Nayanmar Trails`;
 }
@@ -78,6 +85,11 @@ function descriptionFor(locale, kind, item) {
     const story = storyBySaint.get(item.id);
     if (story) return (locale === 'ta' ? story.hook_ta : story.hook_en).slice(0, 260);
     return locale === 'ta' ? 'நாயன்மார் கதை, திருத்தலங்கள் மற்றும் ஆதாரங்களைப் பாருங்கள்.' : 'Explore this Nayanmar, connected sthalams and the evidence trail.';
+  }
+  if (kind === 'companion') {
+    return locale === 'ta'
+      ? 'மாணிக்கவாசகர் நால்வரில் ஒருவர்; அறுபத்து மூவரின் எண்ணிக்கைக்கு வெளியே உள்ள திருமுறை 8 துணை. திருவெம்பாவை–திருவண்ணாமலை, திருப்பள்ளியெழுச்சி–திருப்பெருந்துறை உள்ளிட்ட உரைத் தலக் குறிப்புகளை ஆதார வரம்புடன் பாருங்கள்.'
+      : 'Explore Manikkavasakar as a Naalvar/Tirumurai 8 companion, including the source-header loci Tiruvempavai → Tiruvannamalai and Tiruppalliyezhuchi → Tirupperunturai, without promoting them to independently verified biography.';
   }
   const name = locale === 'ta' ? (item.label_ta || item.modern_name_nic || item.label) : (item.modern_name_nic || item.label);
   return locale === 'ta'
@@ -145,7 +157,9 @@ function jsonLd(locale, kind, item, canonical, description) {
     ? (locale === 'ta' ? 'நாயன்மார் பாதைகள்' : 'Nayanmar Trails')
     : kind === 'saint' || kind === 'story'
       ? (locale === 'ta' ? (item.label_ta || SAINT_NAMES[item.id] || item.label) : (SAINT_NAMES[item.id] || item.label))
-      : (locale === 'ta' ? (item.label_ta || item.modern_name_nic || item.label) : (item.modern_name_nic || item.label));
+      : kind === 'companion'
+        ? (locale === 'ta' ? tirumurai8.author.label_ta : tirumurai8.author.display_label)
+        : (locale === 'ta' ? (item.label_ta || item.modern_name_nic || item.label) : (item.modern_name_nic || item.label));
   return {
     '@context': 'https://schema.org',
     '@type': kind === 'story' ? 'Article' : 'WebPage',
@@ -170,6 +184,7 @@ function routeSnapshot(locale, kind, item, title, description) {
   let kicker = locale === 'ta' ? 'நாயன்மார் பாதைகள்' : 'Nayanmar Trails';
   let heading = title.split(' | ')[0].split(' — ')[0];
   if (kind === 'story') kicker = locale === 'ta' ? 'பெரியபுராண மரபிலிருந்து' : 'From Periya Puranam tradition';
+  if (kind === 'companion') kicker = locale === 'ta' ? 'நால்வர் · திருமுறை 8' : 'Naalvar · Tirumurai 8 companion';
   if (kind === 'sthalam') kicker = locale === 'ta' ? 'தேவாரத் திருத்தலம்' : 'Tēvāram sthalam';
   return `<section id="seo-snapshot" lang="${locale}" style="max-width:900px;margin:40px auto;padding:24px;font-family:system-ui;color:#e9ddc3;background:#041923">
     <small style="color:#d4a34e">${esc(kicker)}</small>
@@ -228,6 +243,12 @@ for (const saint of graph.saints) {
   const englishName = SAINT_NAMES[saint.id] || saint.label;
   await makeOg(`saint-${String(saint.ordinal).padStart(2, '0')}.png`, englishName, 'saint', '63 Nayanmars · Sacred geography · Evidence');
 }
+await makeOg(
+  'naalvar-manikkavasakar.png',
+  'Manikkavasakar',
+  'saint',
+  'Naalvar · Tirumurai 8 · Tiruvempavai · Tiruppalliyezhuchi',
+);
 for (const site of graph.sites) {
   const heading = site.modern_name_nic || site.label || site.site_id;
   await makeOg(`sthalam-${site.site_id.toLowerCase()}.png`, heading, 'sthalam', `${site.patikam_count} linked Tēvāram pathigam${site.patikam_count === 1 ? '' : 's'}`);
@@ -240,6 +261,13 @@ for (const locale of ['en', 'ta']) {
     await writeRoute({ locale, kind: 'saint', item: saint, path: pathFor(locale, 'saint', saint), ogFile });
     await writeRoute({ locale, kind: 'story', item: saint, path: pathFor(locale, 'story', saint), ogFile });
   }
+  await writeRoute({
+    locale,
+    kind: 'companion',
+    item: tirumurai8.author,
+    path: pathFor(locale, 'companion', tirumurai8.author),
+    ogFile: 'naalvar-manikkavasakar.png',
+  });
   for (const site of graph.sites) {
     await writeRoute({ locale, kind: 'sthalam', item: site, path: pathFor(locale, 'sthalam', site), ogFile: `sthalam-${site.site_id.toLowerCase()}.png` });
   }
@@ -257,6 +285,7 @@ await writeFile(new URL('data/public-routes-v1.json', dist), JSON.stringify({
     saints: graph.saints.length,
     sthalams: graph.sites.length,
     stories: curiosities.stories.length,
+    companions: 1,
   },
   routes,
 }, null, 2));
@@ -282,4 +311,4 @@ rootHtml = rootHtml.replace('</head>', `
 </head>`);
 await writeFile(new URL('index.html', dist), rootHtml);
 
-console.log(`Generated ${routes.length} indexable public routes and ${graph.saints.length + graph.sites.length + 1} social cards for release ${release}.`);
+console.log(`Generated ${routes.length} indexable public routes and ${graph.saints.length + graph.sites.length + 2} social cards for release ${release}.`);

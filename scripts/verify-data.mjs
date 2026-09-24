@@ -9,6 +9,7 @@ const mapPath = new URL('../src/SacredMap.tsx', import.meta.url);
 const appPath = new URL('../src/App.tsx', import.meta.url);
 const stylesPath = new URL('../src/styles.css', import.meta.url);
 const i18nPath = new URL('../src/i18n.tsx', import.meta.url);
+const publicRoutesPath = new URL('../src/publicRoutes.ts', import.meta.url);
 
 const doc = JSON.parse(await readFile(exportPath, 'utf8'));
 const tirumurai8 = JSON.parse(await readFile(tirumurai8Path, 'utf8'));
@@ -19,6 +20,7 @@ const mapText = await readFile(mapPath, 'utf8');
 const appText = await readFile(appPath, 'utf8');
 const stylesText = await readFile(stylesPath, 'utf8');
 const i18nText = await readFile(i18nPath, 'utf8');
+const publicRoutesText = await readFile(publicRoutesPath, 'utf8');
 
 const required = [
   'traditional_reference',
@@ -114,6 +116,19 @@ if (!tirumurai8.meta?.beta_ready || !tirumurai8.meta?.source_commit) {
 if (!Array.isArray(tirumurai8.loci) || tirumurai8.loci.length < 2) {
   throw new Error('Expected at least two qualified Tirumurai 8 product loci');
 }
+if (!publicRoutesText.includes("/naalvar/manikkavasakar/") ||
+    !publicRoutesText.includes("kind: 'companion'")) {
+  throw new Error('Manikkavasakar must have a stable bilingual public companion route');
+}
+if (!appText.includes('manikkavasakarTerms') ||
+    !appText.includes('tirumurai8?.loci') ||
+    !appText.includes('saivaPlaces?.links')) {
+  throw new Error('Manikkavasakar search must be data-driven from Tirumurai 8 loci and literary-place links');
+}
+if (!appText.includes('unplottedTirumurai8Loci') ||
+    !appText.includes('map geometry not yet curated')) {
+  throw new Error('Unplotted Tirumurai 8 source loci must remain visible rather than silently disappearing from the product');
+}
 
 if (saivaPlaces.meta?.source_repo !== 'rkarthikeyan54254/pramana' ||
     !saivaPlaces.meta?.source_commit) {
@@ -133,6 +148,45 @@ const uttaraComposition = uttaraLinks.filter(
 );
 if (uttaraComposition.length !== 1 || !uttaraComposition[0].subject.endsWith('.s06')) {
   throw new Error('Only Tiruvacakam section 6 may be an Uttarakosamangai source-heading composition locus');
+}
+
+// Every source-heading composition locus from Pramana must remain represented in the product.
+// Mapped/unmapped Tirumurai 8 loci are matched by object + section; Uttarakosamangai is
+// intentionally represented by the dedicated literary-place component rather than map geometry.
+const compositionLinks = saivaPlaces.links.filter(
+  (link) =>
+    link.predicate === 'SOURCE_HEADER_COMPOSITION_LOCUS' &&
+    link.subject.startsWith('tirumurai8.tiruvacakam.s'),
+);
+for (const link of compositionLinks) {
+  const section = Number(link.subject.match(/\.s(\d+)$/)?.[1] ?? 0);
+  const directLocus = tirumurai8.loci.find(
+    (locus) =>
+      locus.site_entity_id === link.object &&
+      locus.section_numbers.includes(section),
+  );
+  const representedByLiteraryDetail =
+    link.object === 'saiva_place.tiru_uttarakosamangai' &&
+    appText.includes("place.id === 'saiva_place.tiru_uttarakosamangai'");
+  if (!directLocus && !representedByLiteraryDetail) {
+    throw new Error(
+      `Pramana source-header composition locus is not represented in Nayanmar Trails: ${link.id}`,
+    );
+  }
+}
+for (const locus of tirumurai8.loci.filter((item) => item.locus_kind === 'source_header_composition_locus')) {
+  for (const section of locus.section_numbers) {
+    const matchingLink = compositionLinks.find(
+      (link) =>
+        link.object === locus.site_entity_id &&
+        Number(link.subject.match(/\.s(\d+)$/)?.[1] ?? 0) === section,
+    );
+    if (!matchingLink) {
+      throw new Error(
+        `Product source-header locus has no matching Pramana literary-place edge: ${locus.id} section ${section}`,
+      );
+    }
+  }
 }
 const s17 = uttaraLinks.find((link) => link.subject.endsWith('.s17'));
 if (s17?.predicate !== 'TEXTUALLY_REFERENCES_STHALAM_ALIAS' ||

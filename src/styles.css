@@ -5759,3 +5759,118 @@ body{font-size:15px}
   .quest-hub-card-copy h4{font-size:18px}
   .quest-complete-actions{grid-template-columns:1fr!important}
 }
+
+
+/* ---------- Manikkavasakar discovery hardening ---------- */
+.unplotted-loci-note{
+  margin:11px 0 2px 58px;
+  display:grid;
+  grid-template-columns:12px minmax(0,1fr);
+  gap:8px;
+  align-items:start;
+  padding:9px 10px;
+  border:1px solid rgba(218,167,79,.24);
+  border-radius:8px;
+  background:rgba(135,91,33,.06);
+}
+.unplotted-loci-dot{
+  width:9px;height:9px;
+  margin-top:3px;
+  border:1px solid #d7a34a;
+  border-radius:50%;
+  background:transparent;
+  box-shadow:0 0 8px rgba(215,163,74,.24);
+}
+.unplotted-loci-note b{
+  display:block;
+  color:#d9b66d;
+  font:700 10px/1.25 "Cormorant Garamond","Noto Serif Tamil",serif;
+}
+.unplotted-loci-note small{
+  display:block;
+  margin-top:3px;
+  color:#879c95;
+  font-size:7.5px;
+  line-height:1.45;
+}
+.graph-unplotted-chip{
+  margin:8px 4px 0;
+  display:flex;
+  align-items:flex-start;
+  gap:7px;
+  padding:7px 8px;
+  border:1px solid rgba(213,165,79,.2);
+  border-radius:7px;
+  background:rgba(142,93,35,.06);
+  color:#8da099;
+  font-size:7px;
+  line-height:1.45;
+}
+.graph-unplotted-chip span{
+  color:#d5a14a;
+  font-size:11px;
+  line-height:1;
+}
+.graph-unplotted-list{
+  margin-top:10px;
+  padding-top:9px;
+  border-top:1px solid rgba(78,140,145,.15);
+}
+.graph-unplotted-list>small{
+  display:block;
+  margin-bottom:6px;
+  color:#a78a58;
+  font-size:6.5px;
+  letter-spacing:.1em;
+}
+.graph-unplotted-list>div{
+  display:grid;
+  grid-template-columns:22px minmax(0,1fr);
+  gap:7px;
+  align-items:start;
+  padding:8px;
+  border:1px dashed rgba(215,165,78,.27);
+  border-radius:7px;
+  background:rgba(132,88,33,.05);
+}
+.graph-unplotted-list>div>span{
+  color:#d7a44c;
+  font-size:13px;
+}
+.graph-unplotted-list p{margin:0}
+.graph-unplotted-list b{
+  display:block;
+  color:#d9ba79;
+  font:700 10px/1.25 "Cormorant Garamond","Noto Serif Tamil",serif;
+}
+.graph-unplotted-list em{
+  display:block;
+  margin-top:2px;
+  color:#83968f;
+  font-style:normal;
+  font-size:7px;
+  line-height:1.4;
+}
+.app[data-locale="ta"] .unplotted-loci-note b,
+.app[data-locale="ta"] .graph-unplotted-list b{
+  font-family:"Noto Serif Tamil",serif;
+  line-height:1.6;
+}
+.app[data-locale="ta"] .unplotted-loci-note small,
+.app[data-locale="ta"] .graph-unplotted-chip,
+.app[data-locale="ta"] .graph-unplotted-list{
+  font-family:"Noto Sans Tamil",system-ui,sans-serif;
+  line-height:1.7;
+}
+@media(max-width:900px){
+  .unplotted-loci-note{
+    margin:10px 0 2px;
+    padding:8px 9px;
+  }
+  .unplotted-loci-note b{font-size:10.5px}
+  .unplotted-loci-note small{font-size:8px}
+  .graph-unplotted-chip{
+    margin-top:7px;
+    font-size:7.5px;
+  }
+}

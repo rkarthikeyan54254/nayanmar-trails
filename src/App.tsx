@@ -7,8 +7,8 @@ import GopuramIcon from './GopuramIcon';
 import SacredMap, { type CoveragePoint, type EvidenceMode, type MapStop } from './SacredMap';
 import type { Patikam, PramanaExport, Saint, Site } from './types';
 import { LocaleContext, T, tr, useLocale, type Locale } from './i18n';
-import { parsePublicRoute, saintPath, sitePath, storyPath } from './publicRoutes';
-import { StartHere, StoryFocus, SaintShare, SiteShare } from './V1Discovery';
+import { companionPath, parsePublicRoute, saintPath, sitePath, storyPath } from './publicRoutes';
+import { ShareButton, StartHere, StoryFocus, SaintShare, SiteShare } from './V1Discovery';
 import QuestMode, { QuestInvitation } from './QuestMode';
 import { track } from './analytics';
 
@@ -392,6 +392,7 @@ export default function App() {
     if (initialRoute?.kind === 'saint' || initialRoute?.kind === 'story') {
       return `nayanmar.${String(initialRoute.ordinal).padStart(2, '0')}`;
     }
+    if (initialRoute?.kind === 'companion') return MANIKKAVASAKAR_ID;
     return initialParams.get('saint') || 'nayanmar.20';
   });
   const [selectedSiteId, setSelectedSiteId] = useState(() => {
@@ -711,12 +712,12 @@ export default function App() {
   const playbackIsGeographic = routeStops.length >= 2;
   const playbackKind = locale === 'ta'
     ? selectedIsManikkavasakar
-      ? 'திருமுறை 8 தல வரிசை'
+      ? 'திருமுறை 8 தலக் குறிப்புகள்'
       : playbackIsGeographic
         ? 'திருத்தலப் பயணம்'
         : 'மரபில் வரும் தலங்கள்'
     : selectedIsManikkavasakar
-      ? 'Tirumurai 8 journey'
+      ? 'Tirumurai 8 loci'
       : playbackIsGeographic
         ? 'Pilgrimage'
         : 'Traditional place';
@@ -807,6 +808,9 @@ export default function App() {
   ) ?? null;
   const sourceHeaderLoci = (tirumurai8?.loci ?? []).filter(
     (locus) => locus.locus_kind === 'source_header_composition_locus',
+  );
+  const unplottedTirumurai8Loci = (tirumurai8?.loci ?? []).filter(
+    (locus) => !locus.site_id,
   );
   const selectedSiteKolaruContext =
     selectedSaintId === 'nayanmar.27' && selectedSiteId === 'tevaram_site.KT125'
@@ -923,10 +927,38 @@ export default function App() {
       .slice(0, 6)
       .map((entry) => entry.item);
 
-    const manikkavasakar = score(['manikkavasakar', 'manikkavacakar', 'மாணிக்கவாசகர்']) > 0;
+    const manikkavasakarTerms = [
+      'manikkavasakar',
+      'manikkavacakar',
+      'மாணிக்கவாசகர்',
+      'tiruvacakam',
+      'thiruvachakam',
+      'திருவாசகம்',
+      'tirukkovaiyar',
+      'திருக்கோவையார்',
+      ...(tirumurai8?.loci ?? []).flatMap((locus) => [
+        locus.display_name,
+        locus.label_ta,
+        ...locus.section_titles_ta,
+        locus.source_note_ta,
+      ]),
+      ...(saivaPlaces?.places ?? []).flatMap((place) => [
+        place.label,
+        place.label_ta,
+        ...(place.aliases ?? []),
+      ]),
+      ...(saivaPlaces?.links ?? []).flatMap((link) => [
+        link.source_note_ta,
+        link.source_header_composition_place_ta,
+        link.source_form_ta,
+        link.normalized_place_ta,
+        link.traditional_place_ta,
+      ]),
+    ];
+    const manikkavasakar = score(manikkavasakarTerms) > 0;
 
     return { saints, stories, sites, manikkavasakar };
-  }, [curiosities, data, query]);
+  }, [curiosities, data, query, saivaPlaces, tirumurai8]);
 
   useEffect(() => {
     setProgress(0);
@@ -1084,7 +1116,9 @@ export default function App() {
           <input
             value={query}
             onChange={(event) => setQuery(event.target.value)}
-            placeholder={tr(locale, 'Search Nayanmars, sthalams, or places…')}
+            placeholder={locale === 'ta'
+              ? 'நாயன்மார், பாடல்கள், திருத்தலங்கள், தலங்கள் தேடுங்கள்…'
+              : 'Search saints, hymns, sthalams, or places…'}
           />
           {query && (
             <div className="search-results">
@@ -1115,7 +1149,11 @@ export default function App() {
                   <GopuramIcon />
                   <span>
                     {locale === 'ta' ? tirumurai8.author.label_ta : 'Manikkavasakar'}
-                    <small>{tr(locale, 'Naalvar · Tirumurai 8 · not numbered among the 63')}</small>
+                    <small>
+                      {locale === 'ta'
+                        ? 'நால்வர் · திருமுறை 8 · பாடல்கள் மற்றும் தலக் குறிப்புகள்'
+                        : 'Naalvar · Tirumurai 8 · works & textual loci'}
+                    </small>
                   </span>
                 </button>
               )}
@@ -1317,6 +1355,14 @@ export default function App() {
                 saint={saint}
                 englishName={SAINT_EN[saint.id] ?? saint.label}
                 displayName={saintName}
+              />
+            )}
+            {selectedIsManikkavasakar && (
+              <ShareButton
+                label={locale === 'ta' ? 'இந்தப் பக்கத்தைப் பகிர்' : 'Share page'}
+                title={saintName}
+                path={companionPath(locale)}
+                kind="saint"
               />
             )}
           </div>
@@ -1770,15 +1816,27 @@ export default function App() {
             <div>
               <h3>{locale === 'ta' ? playbackKind : `${playbackKind} playback`}</h3>
               <p>
-                {playbackIsGeographic
+                {selectedIsManikkavasakar ? (
+                  locale === 'ta' ? (
+                    <>
+                      வரைபடத்தில் உறுதிப்படுத்தப்பட்ட திருமுறை 8 தலக் குறிப்புகளை வாசிப்பு வரிசையில் பார்க்கலாம்.
+                      <b>திருப்பெருந்துறை மூலத் தலைப்பில் தெளிவாக வந்தாலும், பரிசீலிக்கப்பட்ட வரைபட இடம் இல்லாததால் இப்போது புள்ளியாக காட்டப்படவில்லை. இந்த இணைப்புக் கோடு வரலாற்றுப் பயண வரிசை அல்ல.</b>
+                    </>
+                  ) : (
+                    <>
+                      Follow the mapped Tirumurai 8 textual loci in a reading sequence.
+                      <b>Tirupperunturai is explicit in the source heading but intentionally remains unplotted until reviewed product geometry exists. The line is not a historical itinerary.</b>
+                    </>
+                  )
+                ) : playbackIsGeographic
                   ? <><T>Follow the selected sthalams in an exploratory sequence.</T><b><T>The line is not a claimed ancient road.</T></b></>
                   : <><T>Explore birthplace, related-place and mukti-place traditions.</T><b><T>No route is invented between them.</T></b></>}
               </p>
             </div>
-            <Badge kind={playbackIsGeographic ? 'inference' : 'tradition'}>
+            <Badge kind={selectedIsManikkavasakar ? 'edition' : playbackIsGeographic ? 'inference' : 'tradition'}>
               {locale === 'ta'
-                ? playbackIsGeographic ? 'வழிகாட்டுக் காட்சி' : 'மரபு'
-                : playbackIsGeographic ? 'PRESENTATION' : 'TRADITION'}
+                ? selectedIsManikkavasakar ? 'உரைத் தலக் குறிப்புகள்' : playbackIsGeographic ? 'வழிகாட்டுக் காட்சி' : 'மரபு'
+                : selectedIsManikkavasakar ? 'TEXT LOCI' : playbackIsGeographic ? 'PRESENTATION' : 'TRADITION'}
             </Badge>
           </div>
 
@@ -1837,6 +1895,22 @@ export default function App() {
               <span key={stop.id}>{stop.name}</span>
             ))}
           </div>
+
+          {selectedIsManikkavasakar && unplottedTirumurai8Loci.length > 0 && (
+            <div className="unplotted-loci-note">
+              <span className="unplotted-loci-dot" />
+              <div>
+                <b>{locale === 'ta' ? 'வரைபடத்தில் இன்னும் புள்ளியாக்கப்படாத மூலத் தலக் குறிப்பு' : 'Explicit source locus not yet plotted'}</b>
+                {unplottedTirumurai8Loci.map((locus) => (
+                  <small key={locus.id}>
+                    {locale === 'ta'
+                      ? `${locus.section_titles_ta[0]} · ${locus.label_ta || locus.display_name}`
+                      : `${locus.section_titles_ta[0]} · ${locus.display_name}`}
+                  </small>
+                ))}
+              </div>
+            </div>
+          )}
 
           <div className="saint-registry">
             <div className="registry-copy">
@@ -1919,10 +1993,10 @@ export default function App() {
                 <span>
                   {locale === 'ta'
                     ? selectedIsManikkavasakar
-                      ? `${tirumurai8.loci.length} பாடல் தலங்கள்`
+                      ? `${routeStops.length} வரைபடத் தலங்கள் · ${unplottedTirumurai8Loci.length} வரைபடமிடாத மூலத் தலம்`
                       : `${siteLinks.size} தொடர்புள்ள திருத்தலங்கள்`
                     : selectedIsManikkavasakar
-                      ? `${tirumurai8.loci.length} textual loci`
+                      ? `${routeStops.length} mapped loci · ${unplottedTirumurai8Loci.length} unplotted source locus`
                       : `${siteLinks.size} linked sthalams`}
                 </span>
               </div>
@@ -1939,6 +2013,14 @@ export default function App() {
                 sites={topLinkedSites.slice(0, 8)}
               />
             </button>
+            {selectedIsManikkavasakar && unplottedTirumurai8Loci.length > 0 && (
+              <div className="graph-unplotted-chip">
+                <span>◇</span>
+                {locale === 'ta'
+                  ? 'திருப்பள்ளியெழுச்சி · திருப்பெருந்துறை — மூலத் தலக் குறிப்பு; வரைபட இடம் இன்னும் பரிசீலனையில்'
+                  : 'Tiruppalliyezhuchi · Tirupperunturai — source-header locus; map geometry not yet curated'}
+              </div>
+            )}
           </div>
         )}
 
@@ -1974,6 +2056,7 @@ export default function App() {
           sites={topLinkedSites}
           centerLabel={selectedIsManikkavasakar ? (locale === 'ta' ? 'மா' : 'M') : undefined}
           totalConnections={selectedIsManikkavasakar ? tirumurai8.loci.length : siteLinks.size}
+          unplottedLoci={selectedIsManikkavasakar ? unplottedTirumurai8Loci : []}
           onClose={() => setGraphOpen(false)}
           onSelect={(site) => {
             setSelectedSiteId(site.id);
@@ -2861,6 +2944,7 @@ function ConnectionModal({
   sites,
   centerLabel,
   totalConnections,
+  unplottedLoci,
   onClose,
   onSelect,
 }: {
@@ -2870,6 +2954,7 @@ function ConnectionModal({
   sites: Array<{ site: Site; count: number }>;
   centerLabel?: string;
   totalConnections: number;
+  unplottedLoci: Tirumurai8Locus[];
   onClose: () => void;
   onSelect: (site: Site) => void;
 }) {
@@ -2903,10 +2988,10 @@ function ConnectionModal({
             <p>
               {locale === 'ta'
                 ? selectedIsManikkavasakar
-                  ? 'நிலைப்படுத்தப்பட்ட திருமுறை 8 பதிப்பில் திருவாசகத்துடன் தெளிவாக இணைக்கப்பட்ட தலங்கள்.'
+                  ? `நிலைப்படுத்தப்பட்ட திருமுறை 8 பதிப்பில் ${totalConnections} தலக் குறிப்புகள் உள்ளன; ${sites.length} வரைபடத்தில் காட்டப்படுகின்றன, ${unplottedLoci.length} மூலத் தலம் பரிசீலிக்கப்பட்ட வரைபட இடமின்றி தனியாக வைக்கப்பட்டுள்ளது.`
                   : `இந்த நாயன்மாருடன் தேவாரப் பதிகங்கள் வழியாக ${totalConnections} திருத்தலங்கள் இணைகின்றன.`
                 : selectedIsManikkavasakar
-                  ? 'Qualified Tiruvācakam textual loci from the pinned Tirumurai 8 release.'
+                  ? `${totalConnections} qualified Tiruvācakam loci: ${sites.length} mapped and ${unplottedLoci.length} explicit source-header locus kept unplotted until geometry is reviewed.`
                   : `${totalConnections} Tēvāram-linked sthalams for this saint.`}
             </p>
           </div>
@@ -2958,6 +3043,20 @@ function ConnectionModal({
                 );
               })}
             </div>
+            {selectedIsManikkavasakar && unplottedLoci.length > 0 && (
+              <div className="graph-unplotted-list">
+                <small>{locale === 'ta' ? 'வரைபடமிடாத மூலத் தலக் குறிப்பு' : 'UNPLOTTED SOURCE LOCUS'}</small>
+                {unplottedLoci.map((locus) => (
+                  <div key={locus.id}>
+                    <span>◇</span>
+                    <p>
+                      <b>{locale === 'ta' ? (locus.label_ta || locus.display_name) : locus.display_name}</b>
+                      <em>{locus.section_titles_ta.join(' · ')}</em>
+                    </p>
+                  </div>
+                ))}
+              </div>
+            )}
           </aside>
         </div>
 

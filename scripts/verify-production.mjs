@@ -12,12 +12,21 @@ if (manifest.base_url !== expectedSiteUrl) {
   throw new Error(`Public route base URL mismatch: ${manifest.base_url} !== ${expectedSiteUrl}`);
 }
 
-const expectedRoutes = 2 * (1 + graph.saints.length * 2 + graph.sites.length);
+const expectedRoutes = 2 * (2 + graph.saints.length * 2 + graph.sites.length);
 if (manifest.counts.routes !== expectedRoutes) {
   throw new Error(`Expected ${expectedRoutes} public routes, got ${manifest.counts.routes}`);
 }
 if (graph.saints.length !== 63 || curiosities.stories.length !== 63) {
   throw new Error('Production release requires 63 saints and 63 story hooks');
+}
+for (const path of ['/en/naalvar/manikkavasakar/', '/ta/naalvar/manikkavasakar/']) {
+  const route = manifest.routes.find((item) => item.path === path);
+  if (!route || route.kind !== 'companion') {
+    throw new Error(`Missing stable Manikkavasakar companion route: ${path}`);
+  }
+}
+if (manifest.counts.companions !== 1) {
+  throw new Error('Public route manifest must record exactly one Naalvar companion');
 }
 
 const tamilStories = curiosities.stories.map((item) => item.hook_ta || '');
