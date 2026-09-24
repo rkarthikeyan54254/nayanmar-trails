@@ -9,6 +9,7 @@ import type { Patikam, PramanaExport, Saint, Site } from './types';
 import { LocaleContext, T, tr, useLocale, type Locale } from './i18n';
 import { parsePublicRoute, saintPath, sitePath, storyPath } from './publicRoutes';
 import { StartHere, StoryFocus, SaintShare, SiteShare } from './V1Discovery';
+import QuestMode, { QuestInvitation } from './QuestMode';
 import { track } from './analytics';
 
 type DetailTab = 'hymns' | 'chronology' | 'visits' | 'evidence';
@@ -415,6 +416,10 @@ export default function App() {
   const [storyOpen, setStoryOpen] = useState(
     () => initialRoute?.kind === 'story' || initialParams.get('story') === '1',
   );
+  const [questOpen, setQuestOpen] = useState(
+    () => initialParams.get('quest') === 'kannappar',
+  );
+  const questInitialStep = Math.max(0, Number(initialParams.get('questStep') || 0) || 0);
   const [query, setQuery] = useState('');
   const didInitSaintSelection = useRef(false);
   const preserveInitialSiteDeepLink = useRef(
@@ -1023,6 +1028,12 @@ export default function App() {
 
         <nav>
           <button className="active"><T>Explore</T></button>
+          <button
+            className="quest-nav-button"
+            onClick={() => setQuestOpen(true)}
+          >
+            {locale === 'ta' ? 'தேடல்' : 'Quest'}
+          </button>
           <button onClick={() => document.querySelector('.timeline')?.scrollIntoView({ behavior: 'smooth' })}><T>Journeys</T></button>
           <button onClick={() => setTab('visits')}><T>Sthalams</T></button>
           <button onClick={() => setTab('hymns')}><T>Tēvāram</T></button>
@@ -1197,6 +1208,13 @@ export default function App() {
             setSelectedSaintId('nayanmar.20');
             requestAnimationFrame(() => document.querySelector('.map-card')?.scrollIntoView({ behavior: 'smooth', block: 'start' }));
           }}
+        />
+      )}
+
+      {showStartHere && (
+        <QuestInvitation
+          locale={locale}
+          onOpen={() => setQuestOpen(true)}
         />
       )}
 
@@ -1911,6 +1929,13 @@ export default function App() {
           <Stat value={data.meta.counts.tevaram_sites} label={locale === 'ta' ? 'திருத்தலங்கள்' : 'Sthalams'} />
         </div>
       </section>
+
+      <QuestMode
+        locale={locale}
+        open={questOpen}
+        initialStep={questInitialStep}
+        onClose={() => setQuestOpen(false)}
+      />
 
       {graphOpen && (
         <ConnectionModal
