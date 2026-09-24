@@ -3772,3 +3772,52 @@ body{font-size:15px}
     line-height:1.65!important;
   }
 }
+
+
+/* English mobile hero keeps the cinematic split while restoring readable line lengths. */
+@media(max-width:900px){
+  .app[data-locale="en"] .hero{
+    min-height:246px!important;
+  }
+  .app[data-locale="en"] .hero-copy{
+    display:flex;
+    flex-direction:column;
+    align-items:flex-start;
+    justify-content:center;
+    width:100%;
+    padding:13px 5px 14px 7px;
+    text-align:left;
+  }
+  .app[data-locale="en"] .hero-copy>span{
+    width:64%;
+    text-align:left;
+  }
+  .app[data-locale="en"] .hero h1{
+    width:64%;
+    max-width:260px!important;
+    margin:7px 0 6px!important;
+    font-size:27px!important;
+    line-height:1.12!important;
+    text-align:left;
+    text-wrap:wrap;
+  }
+  .app[data-locale="en"] .hero p{
+    width:64%;
+    max-width:260px!important;
+    margin:0!important;
+    font-size:10.8px!important;
+    line-height:1.47!important;
+    text-align:left;
+  }
+}
+@media(max-width:420px){
+  .app[data-locale="en"] .hero h1,
+  .app[data-locale="en"] .hero p,
+  .app[data-locale="en"] .hero-copy>span{
+    width:66%;
+  }
+  .app[data-locale="en"] .hero h1{
+    max-width:245px!important;
+    font-size:26px!important;
+  }
+}
