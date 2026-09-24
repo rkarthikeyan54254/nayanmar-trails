@@ -1,9 +1,10 @@
-import { useEffect } from 'react';
+import { useEffect, type CSSProperties } from 'react';
 import GopuramIcon from './GopuramIcon';
 import type { Saint, Site } from './types';
 import type { Locale } from './i18n';
 import { absoluteUrl, saintPath, sitePath, storyPath } from './publicRoutes';
 import { track } from './analytics';
+import { DISCOVERY_MEDIA } from './media';
 
 type StoryItem = {
   saint: Saint;
@@ -15,6 +16,15 @@ type SiteItem = {
   site: Site;
   name: string;
 };
+
+function cardMediaStyle(kind: keyof typeof DISCOVERY_MEDIA): CSSProperties {
+  return { '--start-card-image': `url("${DISCOVERY_MEDIA[kind].src}")` } as CSSProperties;
+}
+
+function CardMediaCredit({ kind }: { kind: keyof typeof DISCOVERY_MEDIA }) {
+  const media = DISCOVERY_MEDIA[kind];
+  return <span className="start-card-credit">{media.source} · {media.license}</span>;
+}
 
 export function ShareButton({
   label,
@@ -94,7 +104,8 @@ export function StartHere({
       <div className="start-here-grid">
         {leadStory && (
           <button
-            className="start-card story"
+            className="start-card story with-media media-story"
+            style={cardMediaStyle('story')}
             onClick={() => {
               track('start_here_action', { action: 'story', saint: leadStory.saint.id });
               onStory(leadStory.saint);
@@ -105,12 +116,14 @@ export function StartHere({
             <b>{leadStory.name}</b>
             <p>{leadStory.hook}</p>
             <em>{locale === 'ta' ? 'கதையை வாசிக்க →' : 'Read the story →'}</em>
+            <CardMediaCredit kind="story" />
           </button>
         )}
 
         {leadSaint && (
           <button
-            className="start-card"
+            className="start-card with-media media-saint"
+            style={cardMediaStyle('saint')}
             onClick={() => {
               track('start_here_action', { action: 'saint', saint: leadSaint.saint.id });
               onSaint(leadSaint.saint);
@@ -125,12 +138,14 @@ export function StartHere({
                 : 'See the story, connected sthalams and the evidence trail together.'}
             </p>
             <em>{locale === 'ta' ? 'அறிந்து கொள் →' : 'Meet the saint →'}</em>
+            <CardMediaCredit kind="saint" />
           </button>
         )}
 
         {leadSite && (
           <button
-            className="start-card"
+            className="start-card with-media media-sthalam"
+            style={cardMediaStyle('sthalam')}
             onClick={() => {
               track('start_here_action', { action: 'sthalam', site: leadSite.site.site_id });
               onSite(leadSite.site);
@@ -145,11 +160,13 @@ export function StartHere({
                 : 'Who sang here? Which pathigams are linked? Open the place and follow the sources.'}
             </p>
             <em>{locale === 'ta' ? 'திருத்தலத்தைப் பார்க்க →' : 'Open the sthalam →'}</em>
+            <CardMediaCredit kind="sthalam" />
           </button>
         )}
 
         <button
-          className="start-card trail"
+          className="start-card trail with-media media-trail"
+          style={cardMediaStyle('trail')}
           onClick={() => {
             track('start_here_action', { action: 'trail' });
             onTrail();
@@ -164,6 +181,7 @@ export function StartHere({
               : 'Move through the mapped Tēvāram-linked sthalams and see how the sacred geography connects.'}
           </p>
           <em>{locale === 'ta' ? 'பாதையைத் திற →' : 'Open the trail →'}</em>
+          <CardMediaCredit kind="trail" />
         </button>
       </div>
     </section>
