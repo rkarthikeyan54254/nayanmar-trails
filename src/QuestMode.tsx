@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import GopuramIcon from './GopuramIcon';
 import { DISCOVERY_MEDIA } from './media';
 import { track } from './analytics';
@@ -133,7 +133,7 @@ function QuestShell({
   onClose,
   onBack,
 }: {
-  children: React.ReactNode;
+  children: ReactNode;
   locale: QuestLocale;
   stageIndex: number;
   onClose: () => void;
@@ -271,7 +271,7 @@ export default function QuestMode({
               <button className="quest-primary" onClick={() => {
                 track('quest_start', { quest: quest.id, locale });
                 next();
-              }}>{persisted.completed ? copy.resume : copy.start} <i>→</i></button>
+              }}>{persisted.completed ? copy.replay : copy.start} <i>→</i></button>
               <span>{copy.duration}</span>
             </div>
           </div>
