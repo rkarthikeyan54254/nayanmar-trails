@@ -1187,6 +1187,13 @@ export default function App() {
       </section>
 
       {showStartHere && (
+        <QuestInvitation
+          locale={locale}
+          onOpen={() => setQuestOpen(true)}
+        />
+      )}
+
+      {showStartHere && (
         <StartHere
           locale={locale}
           stories={discoveryStories}
@@ -1208,13 +1215,6 @@ export default function App() {
             setSelectedSaintId('nayanmar.20');
             requestAnimationFrame(() => document.querySelector('.map-card')?.scrollIntoView({ behavior: 'smooth', block: 'start' }));
           }}
-        />
-      )}
-
-      {showStartHere && (
-        <QuestInvitation
-          locale={locale}
-          onOpen={() => setQuestOpen(true)}
         />
       )}
 
