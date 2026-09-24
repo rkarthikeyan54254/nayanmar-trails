@@ -10,6 +10,12 @@ export type AnalyticsEvent =
   | 'sources_open'
   | 'share'
   | 'route_open'
+  | 'quest_open'
+  | 'quest_start'
+  | 'quest_step'
+  | 'quest_answer'
+  | 'quest_complete'
+  | 'quest_replay'
   | 'app_error';
 
 const SESSION_KEY = 'nayanmar-trails-session';
