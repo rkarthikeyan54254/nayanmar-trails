@@ -396,7 +396,10 @@ export default function App() {
     const site = initialParams.get('site');
     return site ? (site.startsWith('tevaram_site.') ? site : `tevaram_site.${site}`) : 'tevaram_site.KV01';
   });
-  const [mode, setMode] = useState<EvidenceMode>('all');
+  const [mode, setMode] = useState<EvidenceMode>(() => {
+    const value = initialParams.get('mode');
+    return value === 'edition' || value === 'tradition' || value === 'independent' ? value : 'all';
+  });
   const [tab, setTab] = useState<DetailTab>(() => {
     const value = new URLSearchParams(window.location.search).get('tab');
     return value === 'hymns' || value === 'chronology' || value === 'evidence' ? value : 'visits';
