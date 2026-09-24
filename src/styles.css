@@ -678,6 +678,16 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:1px solid 
 }
 .authority-box b{color:#c0a7db;font:600 9px "Cormorant Garamond",serif}
 .authority-box p{margin:3px 0 0;color:#829993;font-size:6.7px;line-height:1.4}
+.app[data-locale="ta"] .authority-box b{
+  font-family:"Noto Serif Tamil",serif;
+  font-size:8.7px;
+  line-height:1.7;
+}
+.app[data-locale="ta"] .authority-box p,
+.app[data-locale="ta"] .authority-box .literary-section-grid span{
+  font-family:"Noto Sans Tamil",system-ui,sans-serif;
+  line-height:1.75;
+}
 
 /* ---------- map ---------- */
 .map-card{min-height:570px;background:#061b24}
