@@ -56,6 +56,22 @@ Nayanmar Trails uses explicit reader modes rather than mixing Tamil and English 
 ## Saint curiosity layer
 
 `public/data/pramana-saint-curiosities-v1.json` contains one bilingual curiosity hook for each of the 63 Nayanmars. These are concise reader-facing retellings of the Periya Puranam traditional narrative layer. The Tamil hooks are independently edited as native Tamil prose rather than mechanically aligned translations of the English hooks. They are explicitly scoped as `traditional_reference` and are not presented as independently verified historical biography. Product verification requires exactly 63 records, English + Tamil copy for each record, and an exact match to the Pramāṇa 63-saint registry.
+## Quest experience
+
+The interactive learning/game layer is specified in `docs/nayanmar-quest-master-design.md`.
+
+Quest is additive to the Explorer: it gamifies story discovery, memory, sacred geography and source literacy without scoring devotion or ranking saints. Pramāṇa remains the evidence authority. English and Tamil are separately authored reader experiences.
+
+The v0.1 production vertical slice is a Kannappar quest with:
+- prediction / curiosity hook;
+- grounded traditional story reveal;
+- memory challenge;
+- traditional-place challenge;
+- Pramāṇa Detective;
+- “Who am I?”;
+- unscored reflection;
+- local Memory Shrine unlock.
+
 ## v1 production contract
 
 Nayanmar Trails v1 is organized around a simple reader loop: **discover → become curious → read a story → explore a place → inspect the source trail → share**.
