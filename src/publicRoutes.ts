@@ -7,6 +7,7 @@ export type PublicRoute =
   | { kind: 'home'; locale: Locale }
   | { kind: 'saint'; locale: Locale; ordinal: number }
   | { kind: 'story'; locale: Locale; ordinal: number }
+  | { kind: 'companion'; locale: Locale; companion: 'manikkavasakar' }
   | { kind: 'sthalam'; locale: Locale; siteId: string };
 
 export function slugify(value: string) {
@@ -40,6 +41,10 @@ export function sitePath(locale: Locale, site: Site) {
   return `/${locale}/sthalam/${siteSlug(site)}/`;
 }
 
+export function companionPath(locale: Locale) {
+  return `/${locale}/naalvar/manikkavasakar/`;
+}
+
 export function homePath(locale: Locale) {
   return `/${locale}/`;
 }
@@ -59,6 +64,10 @@ export function parsePublicRoute(pathname: string): PublicRoute | null {
     const ordinal = Number(parts[2].match(/^(\d{1,2})/)?.[1] ?? NaN);
     if (!Number.isFinite(ordinal) || ordinal < 1 || ordinal > 63) return null;
     return { kind: parts[1] === 'story' ? 'story' : 'saint', locale, ordinal };
+  }
+
+  if (parts[1] === 'naalvar' && parts[2] === 'manikkavasakar') {
+    return { kind: 'companion', locale, companion: 'manikkavasakar' };
   }
 
   if (parts[1] === 'sthalam' && parts[2]) {
