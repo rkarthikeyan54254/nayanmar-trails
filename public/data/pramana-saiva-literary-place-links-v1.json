@@ -2,7 +2,7 @@
   "meta": {
     "export_version": "pramana-saiva-literary-place-product-v1",
     "source_repo": "rkarthikeyan54254/pramana",
-    "source_commit": "0f01a1db8f94db489125df8c57cebb294b7529d6",
+    "source_commit": "6ecad2e70906039c5e30cd562c1e04fc1acf5a1b",
     "source_path": "data/review/saiva_literary_place_links_v1.json",
     "authority_semantics": {
       "source_header_composition_locus": "Edition/source metadata only; not independent historical proof.",
@@ -38,9 +38,36 @@
       ],
       "tevaram_site_catalogue_member": false,
       "geometry_status": "not_curated_in_tevaram_product_geometry"
+    },
+    {
+      "id": "saiva_place.tirupperunturai",
+      "label": "Tirupperunturai",
+      "label_ta": "திருப்பெருந்துறை",
+      "aliases": [
+        "Tirupperunthurai",
+        "Thiruperundurai",
+        "Thirupperundurai",
+        "திருப்பெருந்துறை"
+      ],
+      "tevaram_site_catalogue_member": false,
+      "geometry_status": "not_curated_in_tevaram_product_geometry"
     }
   ],
   "links": [
+    {
+      "id": "literary-place.tevaram.2_85.kt125",
+      "subject": "tevaram.ifp.2.85",
+      "predicate": "TRADITIONAL_CHRONOLOGY_LOCUS",
+      "object": "tevaram_site.KT125",
+      "authority_scope": "traditional_reference",
+      "historical_verified": false,
+      "source_key": "shaivam-sambandar-varalatru-murai",
+      "locator": "chronology row 253",
+      "formal_tevaram_sthalam_classification": "POTU",
+      "traditional_place_ta": "திருமறைக்காடு",
+      "modern_name_in_ifp_catalogue": "Vedaranyam",
+      "display_note": "Shaivam's traditional historical-order table places Kolaru Pathigam 2.085 at Tirumaraikadu. The IFP/PIFI edition separately classifies the hymn as POTU; this link does not rewrite formal Tēvāram sthalam metadata."
+    },
     {
       "id": "literary-place.tiruvacakam.s02.uttarakosamangai",
       "subject": "tirumurai8.tiruvacakam.s02",
@@ -64,6 +91,19 @@
       "locator": "section 6; cumulative 105-154",
       "source_note_ta": "(திருஉத்தரகோசமங்கையில் அருளியது- கட்டளைக் கலித்துறை)",
       "display_note": "The pinned Project Madurai edition explicitly preserves Uttarakosamangai in the section-6 source heading. This is edition/source metadata, not independent proof of a historical composition event."
+    },
+    {
+      "id": "literary-place.tiruvacakam.s07.tiruvannamalai",
+      "subject": "tirumurai8.tiruvacakam.s07",
+      "predicate": "SOURCE_HEADER_COMPOSITION_LOCUS",
+      "object": "tevaram_site.NA22",
+      "authority_scope": "primary_text_metadata",
+      "historical_verified": false,
+      "source_key": "pm-tiruvacakam-p1",
+      "locator": "section 7; cumulative 155-174",
+      "source_note_ta": "(திருவண்ணாமலையில் அருளியது - சக்தியை வியந்தது)",
+      "formal_tevaram_site_catalogue_member": true,
+      "display_note": "The pinned Project Madurai edition explicitly preserves Tiruvannamalai in the Tiruvempavai section-7 source heading. This is edition/source metadata for the composition locus, not independent proof of a historical composition event or itinerary."
     },
     {
       "id": "literary-place.tiruvacakam.s13.uttarakosamangai",
@@ -129,6 +169,18 @@
       "display_note": "Section 19 explicitly names Uttarakosamangai as the Lord's town at cumulative 360, while the edition header places composition at Tillai."
     },
     {
+      "id": "literary-place.tiruvacakam.s20.tirupperunturai",
+      "subject": "tirumurai8.tiruvacakam.s20",
+      "predicate": "SOURCE_HEADER_COMPOSITION_LOCUS",
+      "object": "saiva_place.tirupperunturai",
+      "authority_scope": "primary_text_metadata",
+      "historical_verified": false,
+      "source_key": "pm-tiruvacakam-p2",
+      "locator": "section 20; cumulative 368-377",
+      "source_note_ta": "(திருப்பெருந்துறையில் அருளியது -எண்சீர் கழி நெழிலடி ஆசிரிய விருத்தம் )",
+      "display_note": "The pinned Project Madurai edition explicitly preserves Tirupperunturai in the Tiruppalliyezhuchi section-20 source heading. This is edition/source metadata for the composition locus, not independent proof of a historical composition event or itinerary."
+    },
+    {
       "id": "literary-place.tiruvacakam.s20.uttarakosamangai",
       "subject": "tirumurai8.tiruvacakam.s20",
       "predicate": "TEXTUALLY_REFERENCES_STHALAM",
@@ -151,20 +203,6 @@
       "locator": "section 48; cumulative 628-634",
       "source_header_composition_place_ta": "திருப்பெருந்துறை",
       "display_note": "Section 48 explicitly names Uttarakosamangai at cumulative 632, while the edition header places composition at Tirupperunturai."
-    },
-    {
-      "id": "literary-place.tevaram.2_85.kt125",
-      "subject": "tevaram.ifp.2.85",
-      "predicate": "TRADITIONAL_CHRONOLOGY_LOCUS",
-      "object": "tevaram_site.KT125",
-      "authority_scope": "traditional_reference",
-      "historical_verified": false,
-      "source_key": "shaivam-sambandar-varalatru-murai",
-      "locator": "chronology row 253",
-      "formal_tevaram_sthalam_classification": "POTU",
-      "traditional_place_ta": "திருமறைக்காடு",
-      "modern_name_in_ifp_catalogue": "Vedaranyam",
-      "display_note": "Shaivam's traditional historical-order table places Kolaru Pathigam 2.085 at Tirumaraikadu. The IFP/PIFI edition separately classifies the hymn as POTU; this link does not rewrite formal Tēvāram sthalam metadata."
     }
   ]
 }

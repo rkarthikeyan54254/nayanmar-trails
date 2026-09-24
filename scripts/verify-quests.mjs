@@ -77,6 +77,20 @@ expect(tirumurai8.works.tiruvacakam.sections === 51, 'Tiruvacakam section count 
 expect(tirumurai8.works.tiruvacakam.source_units === 661, 'Tiruvacakam source-unit count changed');
 expect(tirumurai8.works.tirukkovaiyar.source_order_units === 400, 'Tirukkovaiyar source-order count changed');
 
+const tiruvempavai = tirumurai8.loci.find((locus) => locus.id === 'tirumurai8.locus.tiruvannamalai.tiruvempavai');
+const tiruppalliyezhuchi = tirumurai8.loci.find((locus) => locus.id === 'tirumurai8.locus.tirupperunturai.tiruppalliyezhuchi');
+expect(Boolean(tiruvempavai), 'Tiruvempavai/Tiruvannamalai source-header locus missing');
+expect(tiruvempavai.site_id === 'NA22', 'Tiruvempavai must map to Tiruvannamalai NA22');
+expect(tiruvempavai.section_numbers.includes(7), 'Tiruvempavai section 7 locus changed');
+expect(tiruvempavai.authority_scope.startsWith('primary_text_metadata'), 'Tiruvempavai locus authority changed');
+expect(Boolean(tiruppalliyezhuchi), 'Tiruppalliyezhuchi/Tirupperunturai source-header locus missing');
+expect(tiruppalliyezhuchi.site_entity_id === 'saiva_place.tirupperunturai', 'Tiruppalliyezhuchi locus must remain Tirupperunturai');
+expect(tiruppalliyezhuchi.section_numbers.includes(20), 'Tiruppalliyezhuchi section 20 locus changed');
+expect(tiruppalliyezhuchi.authority_scope === 'primary_text_metadata', 'Tiruppalliyezhuchi locus authority changed');
+expect(tiruvempavai.site_entity_id !== tiruppalliyezhuchi.site_entity_id, 'The two source-header loci must remain distinct');
+expect(catalogSource.includes("Tiruvempavai → Tiruvannamalai"), 'Manikkavasakar Quest missing Tiruvempavai/Tiruvannamalai pairing');
+expect(catalogSource.includes("Tiruppalliyezhuchi → Tirupperunturai"), 'Manikkavasakar Quest missing Tiruppalliyezhuchi/Tirupperunturai pairing');
+
 const chidambaram = tirumurai8.loci.find((locus) => locus.site_id === 'KV01');
 const kazhukkunram = tirumurai8.loci.find((locus) => locus.site_id === 'TO28');
 expect(Boolean(chidambaram), 'Tirumurai 8 Koyil/Chidambaram locus missing');
@@ -88,9 +102,13 @@ const uttara = literary.places.find((place) => place.id === 'saiva_place.tiru_ut
 expect(Boolean(uttara), 'Uttarakosamangai literary place missing');
 expect(uttara.tevaram_site_catalogue_member === false, 'Uttarakosamangai was promoted into formal Tevaram membership');
 expect(literary.links.some((link) => link.object === uttara.id), 'Uttarakosamangai textual links missing');
+const s7Header = literary.links.find((link) => link.id === 'literary-place.tiruvacakam.s07.tiruvannamalai');
+const s20Header = literary.links.find((link) => link.id === 'literary-place.tiruvacakam.s20.tirupperunturai');
+expect(Boolean(s7Header) && s7Header.historical_verified === false, 'Tiruvempavai source-header link missing or overclaimed');
+expect(Boolean(s20Header) && s20Header.historical_verified === false, 'Tiruppalliyezhuchi source-header link missing or overclaimed');
 
 expect(catalogSource.includes("registryKind: 'naalvar_companion'"), 'Manikkavasakar companion rule missing from catalog');
 
 console.log(
-  'PASS Quest cohort grounding: 6 numbered Nayanmar quests + Manikkavasakar companion; bilingual story hooks; traditional-place semantics; Muvar Tevaram counts; Tirumurai 8 locus/registry protections; Uttarakosamangai remains outside formal 276-site membership.',
+  'PASS Quest cohort grounding: 6 numbered Nayanmar quests + Manikkavasakar companion; bilingual story hooks; traditional-place semantics; Muvar Tevaram counts; Tiruvempavai→Tiruvannamalai and Tiruppalliyezhuchi→Tirupperunturai remain distinct source-header loci; Uttarakosamangai remains outside formal 276-site membership.',
 );

@@ -2,10 +2,11 @@
   "meta": {
     "export_version": "pramana-tirumurai8-product-metadata-v1",
     "source_repo": "rkarthikeyan54254/pramana",
-    "source_commit": "1f2cec34c5b4412fe3178884a38a51dbca6eb452",
+    "source_commit": "6ecad2e70906039c5e30cd562c1e04fc1acf5a1b",
     "source_paths": [
       "data/release/tirumurai8_v1_beta_status.json",
-      "data/review/tirumurai8_v1_section_catalog.json"
+      "data/review/tirumurai8_v1_section_catalog.json",
+      "data/review/saiva_literary_place_links_v1.json"
     ],
     "release_id": "pramana-tirumurai8-v1.0-beta",
     "release_class": "BETA",
@@ -46,6 +47,42 @@
   },
   "loci": [
     {
+      "id": "tirumurai8.locus.tiruvannamalai.tiruvempavai",
+      "site_id": "NA22",
+      "site_entity_id": "tevaram_site.NA22",
+      "display_name": "Tiruvannamalai",
+      "label_ta": "திருவண்ணாமலை",
+      "section_numbers": [
+        7
+      ],
+      "section_titles_ta": [
+        "திருவெம்பாவை"
+      ],
+      "locus_kind": "source_header_composition_locus",
+      "source_note_ta": "(திருவண்ணாமலையில் அருளியது - சக்தியை வியந்தது)",
+      "locus_basis": "The pinned Project Madurai edition explicitly preserves Tiruvannamalai in the Tiruvempavai section-7 source heading. This is edition/source metadata, not independent historical proof of a composition event or itinerary.",
+      "authority_scope": "primary_text_metadata_plus_product_geometry",
+      "playback_rank": 1
+    },
+    {
+      "id": "tirumurai8.locus.tirupperunturai.tiruppalliyezhuchi",
+      "site_id": null,
+      "site_entity_id": "saiva_place.tirupperunturai",
+      "display_name": "Tirupperunturai",
+      "label_ta": "திருப்பெருந்துறை",
+      "section_numbers": [
+        20
+      ],
+      "section_titles_ta": [
+        "திருப்பள்ளியெழுச்சி - திரோதான சுத்தி"
+      ],
+      "locus_kind": "source_header_composition_locus",
+      "source_note_ta": "(திருப்பெருந்துறையில் அருளியது -எண்சீர் கழி நெழிலடி ஆசிரிய விருத்தம் )",
+      "locus_basis": "The pinned Project Madurai edition explicitly preserves Tirupperunturai in the Tiruppalliyezhuchi section-20 source heading. This is edition/source metadata, not independent historical proof of a composition event or itinerary. No map geometry is asserted in this product snapshot.",
+      "authority_scope": "primary_text_metadata",
+      "playback_rank": 2
+    },
+    {
       "id": "tirumurai8.locus.koil",
       "site_id": "KV01",
       "site_entity_id": "tevaram_site.KV01",
@@ -59,9 +96,10 @@
         "கோயில் மூத்த திருப்பதிகம் - அநாதியாகிய சற்காரியம்",
         "கோயில் திருப்பதிகம் - அனுபோக இலக்கணம்"
       ],
+      "locus_kind": "qualified_product_identification",
       "locus_basis": "Tiruvacakam section titles use Kōyil; product mapping follows the conventional Saiva identification with Chidambaram and is not independent historical proof.",
       "authority_scope": "edition_metadata_plus_product_traditional_identification",
-      "playback_rank": 1
+      "playback_rank": 3
     },
     {
       "id": "tirumurai8.locus.tirukkazhukkunram",
@@ -75,9 +113,10 @@
       "section_titles_ta": [
         "திருக்கழுக்குன்றப் பதிகம் - குரு தரிசனம்"
       ],
+      "locus_kind": "source_preserved_edition_locus",
       "locus_basis": "The Tiruvacakam section title explicitly names Tirukkazhukkunram; the modern centroid remains product presentation geometry.",
       "authority_scope": "source_preserved_edition_locus_plus_product_geometry",
-      "playback_rank": 2
+      "playback_rank": 4
     }
   ]
 }
