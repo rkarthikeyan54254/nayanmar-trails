@@ -3776,6 +3776,9 @@ body{font-size:15px}
 
 /* English mobile hero keeps the cinematic split while restoring readable line lengths. */
 @media(max-width:900px){
+  .hero{
+    grid-template-columns:minmax(0,1fr)!important;
+  }
   .app[data-locale="en"] .hero{
     min-height:246px!important;
   }
