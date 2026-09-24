@@ -416,8 +416,9 @@ export default function App() {
   const [storyOpen, setStoryOpen] = useState(
     () => initialRoute?.kind === 'story' || initialParams.get('story') === '1',
   );
+  const questInitialKey = initialParams.get('quest');
   const [questOpen, setQuestOpen] = useState(
-    () => initialParams.get('quest') === 'kannappar',
+    () => Boolean(questInitialKey),
   );
   const questInitialStep = Math.max(0, Number(initialParams.get('questStep') || 0) || 0);
   const [query, setQuery] = useState('');
@@ -1933,6 +1934,7 @@ export default function App() {
       <QuestMode
         locale={locale}
         open={questOpen}
+        initialQuestKey={questInitialKey}
         initialStep={questInitialStep}
         onClose={() => setQuestOpen(false)}
       />
