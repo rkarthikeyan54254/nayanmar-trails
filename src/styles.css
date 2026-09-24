@@ -3856,3 +3856,525 @@ body{font-size:15px}
   }
   .app[data-locale="en"] .hero-mobile-break{display:block}
 }
+
+
+/* ---------- mobile UX v2: intentional phone composition ---------- */
+@media(max-width:900px){
+  html,body,#root,.app{overflow-x:hidden}
+  body{font-size:16px}
+
+  /* 1. Header */
+  .topbar{
+    min-height:64px;
+    height:auto;
+    grid-template-columns:minmax(0,1fr) auto!important;
+    gap:10px;
+    padding:9px 11px!important;
+  }
+  .brand{gap:10px}
+  .brand-mark{width:44px;height:44px}
+  .brand-mark svg{width:26px;height:31px}
+  .brand strong{font-size:23px}
+  .brand small{font-size:7px;letter-spacing:.12em}
+  .language-switcher{padding:3px}
+  .language-switcher button{
+    min-width:42px;
+    min-height:36px;
+    height:36px;
+    font-size:9px;
+  }
+  .topbar nav,.header-search,.header-motto{display:none!important}
+
+  /* 2. Compact cinematic hero */
+  .hero{
+    width:100%;
+    height:auto!important;
+    min-height:228px!important;
+    grid-template-columns:minmax(0,1fr)!important;
+    padding:18px 12px 20px!important;
+    align-items:center;
+    overflow:hidden;
+  }
+  .hero-photo{
+    inset:0!important;
+    width:100%;
+    height:100%!important;
+    object-position:62% 48%;
+    opacity:.62;
+    filter:sepia(.2) saturate(.9) contrast(1.08) brightness(.54);
+  }
+  .hero-photo-shade{
+    background:
+      linear-gradient(90deg,rgba(3,21,28,.82),rgba(3,23,30,.5) 55%,rgba(3,21,28,.28)),
+      linear-gradient(180deg,rgba(3,20,27,.08),rgba(2,18,25,.62));
+  }
+  .hero-copy{
+    width:100%;
+    max-width:390px;
+    margin:0 auto;
+    padding:12px 10px!important;
+    text-align:center!important;
+  }
+  .hero-copy>span{
+    width:auto!important;
+    color:#e3b75f;
+    font-size:8px!important;
+    line-height:1.45!important;
+    letter-spacing:.16em;
+    text-align:center!important;
+  }
+  .hero h1{
+    width:100%!important;
+    max-width:370px!important;
+    margin:8px auto 7px!important;
+    color:#f6d58f;
+    font-size:28px!important;
+    line-height:1.13!important;
+    text-align:center!important;
+  }
+  .hero p{
+    width:100%!important;
+    max-width:350px!important;
+    margin:0 auto!important;
+    color:#d3dad3;
+    font-size:11.2px!important;
+    line-height:1.5!important;
+    text-align:center!important;
+  }
+  .hero-tower,.hero-quote,.hero-lamp,.hero-mountain{display:none!important}
+  .hero-credit{font-size:6px}
+
+  /* 3. Start Here */
+  .start-here{padding:17px 10px 18px}
+  .start-here-head{
+    display:block;
+    margin-bottom:12px;
+  }
+  .start-here-head small{font-size:8px}
+  .start-here-head h2{font-size:26px;line-height:1.12}
+  .start-here-head p{
+    max-width:none;
+    margin-top:6px;
+    color:#a5b5ae;
+    font-size:10.5px;
+    line-height:1.5;
+    text-align:left;
+  }
+  .start-here-grid{
+    grid-template-columns:minmax(0,1fr)!important;
+    gap:9px;
+  }
+  .start-card{
+    min-height:172px;
+    padding:15px 16px;
+  }
+  .start-card.with-media::after{width:48%;opacity:.72}
+  .start-card.with-media::before{
+    background:
+      linear-gradient(90deg,#082832 0%,#082832 48%,rgba(8,40,50,.86) 65%,rgba(6,31,40,.12) 100%),
+      linear-gradient(180deg,rgba(2,18,25,.02),rgba(2,18,25,.55));
+  }
+  .start-card>*{max-width:61%}
+  .start-card-icon{width:32px;height:32px}
+  .start-card small{font-size:7.5px}
+  .start-card b{font-size:18px;line-height:1.18}
+  .start-card p{
+    margin:7px 0 9px;
+    color:#d0d6cf;
+    font-size:10.6px;
+    line-height:1.52;
+  }
+  .start-card em{font-size:9.5px}
+  .start-card-credit{display:none}
+
+  /* 4. Filters as thumb-friendly controls */
+  .filters{
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr)!important;
+    gap:8px;
+    padding:9px 8px!important;
+    overflow:visible!important;
+  }
+  .filter:first-child{
+    width:100%;
+    min-width:0!important;
+    height:auto;
+    min-height:48px;
+    padding:4px 8px;
+    font-size:10px;
+  }
+  .filter select{min-height:40px;font-size:10px}
+  .filter:not(:first-child){display:none}
+  .naalvar-switcher{display:none}
+  .mode-pills{
+    width:100%;
+    margin:0!important;
+    display:grid!important;
+    grid-template-columns:repeat(4,minmax(0,1fr));
+    gap:6px;
+  }
+  .mode-label{
+    grid-column:1/-1;
+    padding:0 2px;
+    font-size:9px;
+  }
+  .mode-pills button{
+    min-width:0;
+    min-height:44px;
+    padding:7px 4px;
+    font-size:9px;
+    line-height:1.25;
+  }
+
+  /* 5–7. Map, saint, sthalam — deliberate single-column order */
+  .workspace{
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr)!important;
+    gap:9px;
+    padding:9px 7px 0!important;
+  }
+  .workspace>.map-card{order:1}
+  .workspace>.saint-card{order:2}
+  .workspace>.detail-card{order:3}
+  .map-card{
+    min-height:555px!important;
+    width:100%;
+  }
+  .map-toolbar{
+    top:9px;
+    width:calc(100% - 18px);
+    min-height:44px;
+    display:grid;
+    grid-template-columns:minmax(0,1fr) auto;
+    gap:8px;
+    padding:7px 9px;
+    font-size:7.7px;
+  }
+  .map-toolbar-left{min-width:0}
+  .map-toolbar-left span{
+    min-width:0;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+  }
+  .map-toolbar-stats{gap:7px;font-size:7.2px}
+  .map-toolbar-stats span:nth-child(3){display:none}
+  .map-compass{right:12px;top:61px}
+  .map-region-title{font-size:17px;letter-spacing:.13em}
+  .map-neighbor-label{font-size:7.4px;letter-spacing:.1em}
+  .map-sea-label{font-size:7.4px;letter-spacing:.11em}
+  .map-legend{
+    left:8px;
+    bottom:9px;
+    width:min(230px,calc(100% - 74px));
+    padding:8px;
+    gap:4px;
+    font-size:7px;
+    line-height:1.35;
+  }
+  .map-legend>b{font-size:10px}
+  .map-source-note{font-size:5.7px}
+  .map-temple-marker{width:54px;height:42px}
+  .marker-tower{width:20px;height:26px;bottom:12px}
+  .marker-tower svg{width:20px;height:26px}
+  .marker-glow{width:22px;height:22px;bottom:11px;opacity:.28}
+  .map-temple-marker.linked .marker-glow{opacity:.52}
+  .map-temple-marker.selected .marker-glow{opacity:.78}
+  .marker-label{
+    max-width:76px;
+    font-size:7.2px;
+    padding:1px 3px;
+  }
+  .map-temple-marker:not(.selected):not(.featured) .marker-label{display:none}
+  .map-district-marker{width:48px;height:38px;opacity:.55}
+  .district-marker-glow{width:28px;height:28px}
+  .district-marker-count{
+    min-width:13px;height:13px;
+    font-size:6px;
+  }
+
+  .saint-card{
+    min-height:0!important;
+    padding:11px!important;
+  }
+  .saint-visual{height:248px}
+  .saint-heading h2{font-size:29px;line-height:1.05}
+  .identity-line{font-size:9px}
+  .saint-story-source small{font-size:8px}
+  .saint-story-source b{font-size:11.5px}
+  .saint-curiosity{padding:12px}
+  .saint-curiosity-head small{font-size:7.5px}
+  .saint-curiosity-head span{font-size:7px}
+  .saint-curiosity p{
+    color:#d9ddd5;
+    font-size:11.5px;
+    line-height:1.6;
+  }
+  .saint-curiosity-source b{font-size:8.8px}
+  .saint-curiosity-source small{font-size:8px;line-height:1.45}
+  .saint-curiosity-actions{gap:8px}
+  .saint-curiosity-actions button{
+    min-height:50px;
+    font-size:12px;
+    line-height:1.25;
+  }
+  .saint-curiosity-actions button:last-child{
+    background:rgba(4,25,33,.72);
+    border-color:rgba(220,171,78,.48);
+    color:#d8b369;
+    box-shadow:none;
+  }
+  .stat-grid{gap:7px}
+  .stat{min-height:58px;padding:9px}
+  .stat b{font-size:22px}
+  .stat small{font-size:8.5px}
+  .major-temples button{
+    min-height:38px;
+    font-size:9.6px;
+  }
+  .major-temples small{font-size:8px}
+  .authority-box p{font-size:9px;line-height:1.55}
+
+  .detail-card{min-height:0!important}
+  .tabs button{
+    min-height:44px;
+    padding:10px 3px;
+    font-size:9.5px;
+  }
+  .detail{padding:11px}
+  .temple-visual{height:190px}
+  .temple-title>small{font-size:7.5px}
+  .temple-title h2{font-size:29px}
+  .temple-title p{font-size:11.5px}
+  .chips span{font-size:8.8px;padding:5px 7px}
+  .detail-card .text{
+    font-size:11.2px;
+    line-height:1.62;
+  }
+  .detail-lead{font-size:10.8px!important;line-height:1.58}
+  .visitor-info-grid{
+    grid-template-columns:minmax(0,1fr)!important;
+    gap:7px;
+  }
+  .visitor-info-grid>div{min-height:68px;padding:10px}
+  .visitor-info-grid small,.sung-here>small,.tirumurai-spread>small{
+    font-size:7.4px;
+  }
+  .visitor-info-grid b{font-size:10px}
+  .visitor-info-grid span{font-size:8.8px}
+  .sung-here>div>span{min-width:95px;padding:7px 8px}
+  .sung-here b{font-size:9px}
+  .sung-here em{font-size:8px}
+  .tirumurai-spread span{font-size:8.3px;padding:5px 7px}
+  .reader-note{font-size:8.8px!important;line-height:1.55}
+  .temple-facts{
+    grid-template-columns:minmax(0,1fr)!important;
+    gap:4px;
+  }
+  .fact{
+    min-height:58px;
+    padding:9px 8px;
+    font-size:9.4px;
+  }
+  .fact small{font-size:7.8px}
+  .focus{
+    min-height:48px;
+    font-size:10px;
+  }
+
+  /* 8–11. Lower modules are full-width cards; totals are a 2×2 grid */
+  .bottom{
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr)!important;
+    gap:9px!important;
+    padding:9px 7px 12px!important;
+  }
+  .bottom>.panel{
+    width:100%;
+    min-width:0;
+    min-height:0!important;
+    padding:13px!important;
+  }
+  .timeline{min-height:235px!important}
+  .section-head{align-items:flex-start}
+  .section-head h3,.bottom h3{font-size:18px}
+  .section-head p{
+    margin-top:4px;
+    font-size:9px;
+    line-height:1.5;
+  }
+  .play-row{
+    grid-template-columns:48px minmax(0,1fr)!important;
+    gap:10px;
+    margin-top:18px;
+  }
+  .play{width:44px;height:44px}
+  .now{
+    grid-column:1/-1!important;
+    margin-left:58px;
+  }
+  .now b{font-size:13px}
+  .now small{font-size:9px}
+  .timeline-labels{
+    display:flex!important;
+    margin:11px 4px 0 58px;
+    gap:7px;
+    overflow:hidden;
+    font-size:6.7px;
+  }
+  .saint-registry{
+    margin:12px 0 0!important;
+    grid-template-columns:minmax(0,1fr)!important;
+    gap:9px;
+  }
+  .registry-copy b{font-size:10px}
+  .registry-copy small{font-size:8px}
+  .naalvar-mini button{
+    min-height:32px;
+    padding:5px 8px;
+    font-size:7.5px;
+  }
+  .registry-dots{gap:5px}
+  .registry-dots button{width:6px;height:6px}
+  .registry-dots button.selected{width:10px;height:10px}
+
+  .graph-mini,.density-card{min-height:225px!important}
+  .graph-expand{
+    min-height:34px;
+    padding:5px 9px;
+    font-size:8.5px;
+  }
+  .graph-preview-button{
+    width:100%;
+    min-height:168px;
+    padding:0;
+  }
+  .network{width:100%;height:164px}
+  .network .node-label{font-size:8.5px}
+  .network .center-text{font-size:11px}
+
+  .density-map{
+    width:100%;
+    height:174px;
+    grid-template-columns:minmax(0,1fr) 28px;
+    gap:8px;
+  }
+  .density-map svg{
+    width:100%;
+    height:168px;
+  }
+  .density-map text{font-size:7.6px}
+  .density-caption{
+    height:146px;
+    font-size:6.5px;
+  }
+  .density-caption i{height:82px}
+
+  .totals{
+    display:grid!important;
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    gap:8px!important;
+    text-align:center;
+  }
+  .totals .stat{
+    min-height:82px;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    padding:12px 7px;
+  }
+  .totals .stat b{font-size:27px}
+  .totals .stat small{font-size:9px}
+
+  /* 12. Footer */
+  footer{
+    min-height:72px;
+    display:grid;
+    grid-template-columns:1fr auto;
+    gap:8px 12px;
+    padding:12px;
+    font-size:7.5px;
+  }
+  footer strong{font-size:16px}
+  .footer-source-link{
+    min-height:36px;
+    font-size:8px;
+  }
+  footer>span{
+    grid-column:1/-1;
+    text-align:left;
+    font-size:7px;
+  }
+}
+
+@media(max-width:520px){
+  .app[data-locale="en"] .hero{min-height:238px!important}
+  .app[data-locale="en"] .hero h1{
+    max-width:350px!important;
+    font-size:27px!important;
+    line-height:1.16!important;
+  }
+  .app[data-locale="en"] .hero p{font-size:10.8px!important}
+
+  .app[data-locale="ta"] .hero{
+    min-height:262px!important;
+    padding:18px 12px 20px!important;
+  }
+  .app[data-locale="ta"] .hero-copy{
+    max-width:365px;
+    padding:12px 8px!important;
+  }
+  .app[data-locale="ta"] .hero-copy>span{
+    font-size:7.4px!important;
+    line-height:1.55!important;
+    letter-spacing:.06em;
+  }
+  .app[data-locale="ta"] .hero h1{
+    max-width:350px!important;
+    margin:8px auto 7px!important;
+    font-size:23px!important;
+    line-height:1.5!important;
+  }
+  .app[data-locale="ta"] .hero p{
+    max-width:350px!important;
+    font-size:9.8px!important;
+    line-height:1.7!important;
+  }
+
+  .app[data-locale="ta"] .start-card{
+    min-height:196px;
+  }
+  .app[data-locale="ta"] .start-card b{
+    font-size:16px;
+    line-height:1.5;
+  }
+  .app[data-locale="ta"] .start-card p{
+    font-size:9.7px;
+    line-height:1.68;
+  }
+  .app[data-locale="ta"] .mode-pills button{
+    min-height:48px;
+    font-size:8px;
+    line-height:1.5;
+  }
+  .app[data-locale="ta"] .saint-heading h2{
+    font-size:24px;
+    line-height:1.45;
+  }
+  .app[data-locale="ta"] .saint-curiosity p{
+    font-size:10.4px;
+    line-height:1.8;
+  }
+  .app[data-locale="ta"] .detail-card .text{
+    font-size:10.5px;
+    line-height:1.8;
+  }
+
+  .start-card.with-media::after{width:46%}
+  .start-card>*{max-width:65%}
+  .map-toolbar-stats span:nth-child(2){display:none}
+  .map-legend{width:min(215px,calc(100% - 68px));font-size:6.6px}
+  .saint-curiosity-actions{grid-template-columns:1fr 1fr}
+  .timeline-labels{display:none!important}
+  .now{margin-left:0}
+}
