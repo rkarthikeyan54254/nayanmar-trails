@@ -4378,3 +4378,100 @@ body{font-size:15px}
   .timeline-labels{display:none!important}
   .now{margin-left:0}
 }
+
+
+/* ---------- tradition map notice: informative, never modal ---------- */
+.map-fallback-note{
+  left:14px;
+  right:auto;
+  top:62px;
+  transform:none;
+  width:min(470px,calc(100% - 100px));
+  min-width:0;
+  display:grid;
+  grid-template-columns:auto minmax(0,1fr);
+  grid-template-areas:
+    "badge title"
+    "badge body";
+  column-gap:10px;
+  row-gap:2px;
+  align-items:start;
+  padding:9px 11px;
+  border-color:rgba(219,173,91,.3);
+  border-radius:9px;
+  background:rgba(4,24,34,.84);
+  backdrop-filter:blur(6px);
+  box-shadow:0 8px 22px rgba(0,0,0,.22);
+  text-align:left;
+  pointer-events:none;
+}
+.map-fallback-note>.badge{
+  grid-area:badge;
+  align-self:center;
+  margin:0;
+  white-space:nowrap;
+}
+.map-fallback-note>b{
+  grid-area:title;
+  margin:0;
+  color:#e6c57f;
+  font:700 12px/1.2 "Cormorant Garamond","Noto Serif Tamil",serif;
+}
+.map-fallback-note p{
+  grid-area:body;
+  margin:1px 0 0;
+  color:#91a59e;
+  font-size:8px;
+  line-height:1.4;
+}
+
+/* The generic center layer message was intentionally removed from the map.
+   Keep this selector non-disruptive for any stale cached markup. */
+.map-layer-message{display:none!important}
+
+@media(max-width:900px){
+  .map-fallback-note{
+    left:9px;
+    top:62px;
+    width:min(360px,calc(100% - 70px));
+    padding:8px 9px;
+    column-gap:8px;
+    background:rgba(4,24,34,.8);
+  }
+  .map-fallback-note>.badge{
+    font-size:6.8px;
+    padding:3px 5px;
+  }
+  .map-fallback-note>b{
+    font-size:11.5px;
+    line-height:1.25;
+  }
+  .map-fallback-note p{
+    font-size:8.2px;
+    line-height:1.38;
+  }
+}
+@media(max-width:520px){
+  .map-fallback-note{
+    left:8px;
+    top:61px;
+    width:calc(100% - 64px);
+    grid-template-columns:minmax(0,1fr);
+    grid-template-areas:
+      "badge"
+      "title"
+      "body";
+    row-gap:3px;
+    padding:8px 9px;
+  }
+  .map-fallback-note>.badge{
+    justify-self:start;
+    font-size:6.5px;
+  }
+  .map-fallback-note>b{
+    font-size:11px;
+  }
+  .map-fallback-note p{
+    font-size:8px;
+  }
+}

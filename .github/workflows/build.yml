@@ -82,6 +82,8 @@ jobs:
           capture_at "tamil-header-laptop" "http://127.0.0.1:4173/?saint=nayanmar.20&lang=ta" "1366,850"
           capture_at "mobile-400-en" "http://127.0.0.1:4173/?saint=nayanmar.20&lang=en" "400,850"
           capture_at "mobile-400-ta" "http://127.0.0.1:4173/?saint=nayanmar.20&lang=ta" "400,850"
+          capture_at "mobile-tradition-400-en" "http://127.0.0.1:4173/?saint=nayanmar.50&lang=en&mode=tradition" "400,900"
+          capture_at "mobile-tradition-375-ta" "http://127.0.0.1:4173/?saint=nayanmar.50&lang=ta&mode=tradition" "375,900"
           capture_at "mobile-375-en" "http://127.0.0.1:4173/?saint=nayanmar.09&lang=en" "375,812"
           capture_at "mobile-375-ta" "http://127.0.0.1:4173/?saint=nayanmar.09&lang=ta" "375,812"
           capture_at "v1-start-here-mobile-en" "http://127.0.0.1:4173/en/" "400,900"

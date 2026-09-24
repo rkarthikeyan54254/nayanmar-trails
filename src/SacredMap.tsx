@@ -492,16 +492,6 @@ export default function SacredMap({
       <div className="map-region-title">{locale === 'ta' ? 'தமிழ்நாடு' : 'TAMIL NADU'}</div>
       <div className="map-sea-label east">{locale === 'ta' ? 'வங்காள விரிகுடா' : 'BAY OF BENGAL'}</div>
       <div className="map-sea-label south">{locale === 'ta' ? 'இந்தியப் பெருங்கடல்' : 'INDIAN OCEAN'}</div>
-      {mode === 'tradition' && (
-        <div className="map-layer-message">
-          <strong>{locale === 'ta' ? 'மரபில் வரும் தலங்கள்' : 'Tradition layer'}</strong>
-          <p>
-            {locale === 'ta'
-              ? 'மரபில் தொடர்புடையதாகச் சொல்லப்படும் தலங்களை மட்டும் காட்டுகிறோம்; தெரியாத இடங்களை ஊகித்து வரைபடத்தில் புள்ளியாகச் சேர்ப்பதில்லை.'
-              : 'Traditional place associations are shown without fabricating precise coordinates for them.'}
-          </p>
-        </div>
-      )}
     </div>
   );
 }
