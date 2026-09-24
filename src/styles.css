@@ -5458,3 +5458,294 @@ body{font-size:15px}
   .memory-shrine-art{height:155px}
   .quest-complete-actions{grid-template-columns:1fr}
 }
+
+
+/* ---------- Quest cohort seven ---------- */
+.quest-stage-hub{padding:24px 26px 32px}
+.quest-hub{
+  width:min(1040px,100%);
+  margin:0 auto;
+}
+.quest-hub>h1{
+  max-width:800px;
+  margin:7px 0 6px;
+  color:#f3d292;
+  font:700 42px/1 "Cormorant Garamond","Noto Serif Tamil",serif;
+}
+.quest-hub>p{
+  max-width:800px;
+  margin:0;
+  color:#aab9b3;
+  font:500 14px/1.55 "Cormorant Garamond","Noto Serif Tamil",serif;
+}
+.quest-hub-progress{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:9px;
+  margin:18px 0 24px;
+}
+.quest-hub-progress>div{
+  min-height:74px;
+  display:flex;
+  align-items:center;
+  gap:12px;
+  padding:11px 13px;
+  border:1px solid rgba(70,138,146,.25);
+  border-radius:10px;
+  background:rgba(6,31,40,.72);
+}
+.quest-hub-progress b{
+  color:#efbd67;
+  font:700 25px/1 "Cormorant Garamond","Noto Serif Tamil",serif;
+}
+.quest-hub-progress span{
+  color:#829992;
+  font-size:8px;
+  line-height:1.4;
+}
+.quest-hub-group{margin-top:20px}
+.quest-hub-group-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:8px;
+}
+.quest-hub-group-head h3{
+  margin:0;
+  color:#dabb79;
+  font:700 17px "Cormorant Garamond","Noto Serif Tamil",serif;
+}
+.quest-hub-group-head span{
+  min-width:28px;
+  height:23px;
+  display:grid;
+  place-items:center;
+  border:1px solid rgba(215,169,82,.24);
+  border-radius:999px;
+  color:#aa915f;
+  font-size:7px;
+}
+.quest-hub-grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:9px;
+}
+.quest-hub-card{
+  min-height:145px;
+  display:grid;
+  grid-template-columns:124px minmax(0,1fr);
+  gap:13px;
+  padding:9px;
+  border:1px solid rgba(70,138,148,.28);
+  border-radius:11px;
+  background:
+    linear-gradient(110deg,rgba(8,43,52,.92),rgba(5,29,38,.9));
+  color:inherit;
+  text-align:left;
+  cursor:pointer;
+  transition:transform .15s ease,border-color .15s ease,box-shadow .15s ease;
+}
+.quest-hub-card:hover{
+  transform:translateY(-2px);
+  border-color:rgba(220,171,83,.5);
+  box-shadow:0 12px 26px rgba(0,0,0,.2);
+}
+.quest-hub-card.completed{
+  border-color:rgba(84,184,151,.35);
+  background:
+    radial-gradient(circle at 10% 0,rgba(77,177,145,.08),transparent 35%),
+    linear-gradient(110deg,rgba(8,43,52,.92),rgba(5,29,38,.9));
+}
+.quest-hub-art{
+  height:126px;
+  position:relative;
+  overflow:hidden;
+  border-radius:8px;
+  background:linear-gradient(145deg,#183f3c,#092a34);
+}
+.quest-hub-art img{
+  width:100%;height:100%;
+  object-fit:cover;
+  object-position:center 24%;
+  filter:sepia(.22) saturate(.8) contrast(1.05) brightness(.74);
+}
+.quest-hub-art::after{
+  content:"";
+  position:absolute;inset:0;
+  background:linear-gradient(180deg,transparent 42%,rgba(3,20,28,.66));
+}
+.quest-hub-art>i{
+  width:28px;height:28px;
+  position:absolute;z-index:3;left:7px;top:7px;
+  display:grid;place-items:center;
+  border:1px solid rgba(243,194,104,.75);
+  border-radius:50%;
+  background:rgba(141,94,38,.88);
+  color:#ffe9ad;
+  font:700 9px "Cormorant Garamond",serif;
+}
+.quest-hub-art>b{
+  width:25px;height:25px;
+  position:absolute;z-index:4;right:7px;top:7px;
+  display:grid;place-items:center;
+  border-radius:50%;
+  background:#55b79d;
+  color:#06232c;
+  font-size:11px;
+  box-shadow:0 0 10px rgba(85,183,157,.45);
+}
+.quest-hub-art-fallback,
+.quest-symbolic-art{
+  width:100%;height:100%;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:7px;
+  position:relative;
+  color:#d9a54d;
+  background:
+    radial-gradient(circle at 50% 42%,rgba(220,164,72,.15),transparent 30%),
+    linear-gradient(145deg,#173f3c,#082733 72%);
+}
+.quest-hub-art-fallback svg{width:44px;height:54px}
+.quest-hub-art-fallback span,
+.quest-symbolic-art>span{
+  color:#ffd277;
+  text-shadow:0 0 13px rgba(255,187,64,.7);
+}
+.quest-hub-card-copy{padding:5px 5px 4px 0}
+.quest-hub-card-copy>small{
+  color:#8f9f96;
+  font-size:6.7px;
+  letter-spacing:.09em;
+}
+.quest-hub-card-copy h4{
+  margin:4px 0 4px;
+  color:#efc879;
+  font:700 20px/1.08 "Cormorant Garamond","Noto Serif Tamil",serif;
+}
+.quest-hub-card-copy p{
+  margin:0 0 8px;
+  color:#a6b5ae;
+  font-size:8.3px;
+  line-height:1.48;
+}
+.quest-hub-card-copy>span{
+  color:#d7a84f;
+  font-size:7.5px;
+  font-weight:700;
+}
+.quest-hub-link{
+  justify-self:start;
+  padding:5px 8px;
+  border:1px solid rgba(69,139,148,.24);
+  border-radius:999px;
+  background:#082b36;
+  color:#92a69f;
+  font-size:7px;
+  cursor:pointer;
+}
+.quest-intro-art-fallback,
+.quest-story-art-fallback,
+.memory-shrine-art-fallback{
+  background:linear-gradient(145deg,#173f3c,#082733);
+}
+.quest-symbolic-art svg{
+  width:88px;height:105px;
+  color:#dba44b;
+}
+.quest-symbolic-art p{
+  max-width:190px;
+  margin:0;
+  color:#98aaa3;
+  text-align:center;
+  font:600 13px/1.35 "Cormorant Garamond","Noto Serif Tamil",serif;
+}
+.quest-story-art-fallback .quest-symbolic-art{min-height:455px}
+.memory-shrine-art-fallback .quest-symbolic-art{min-height:190px}
+.memory-shrine-art-fallback .quest-symbolic-art svg{width:55px;height:68px}
+.memory-shrine-art-fallback .quest-symbolic-art>span{font-size:20px}
+
+.app[data-locale="ta"] .quest-hub>h1,
+.app[data-locale="ta"] .quest-hub-group-head h3,
+.app[data-locale="ta"] .quest-hub-card-copy h4{
+  font-family:"Noto Serif Tamil",serif;
+}
+.app[data-locale="ta"] .quest-hub>h1{font-size:32px;line-height:1.48}
+.app[data-locale="ta"] .quest-hub>p,
+.app[data-locale="ta"] .quest-hub-card-copy p{
+  font-family:"Noto Sans Tamil",system-ui,sans-serif;
+  line-height:1.75;
+}
+
+@media(max-width:900px){
+  .quest-stage-hub{padding:18px 11px 28px}
+  .quest-hub>h1{
+    font-size:32px;
+    line-height:1.06;
+  }
+  .quest-hub>p{
+    font-size:12px;
+    line-height:1.55;
+  }
+  .quest-hub-progress{
+    grid-template-columns:1fr 1fr;
+    gap:7px;
+    margin:14px 0 20px;
+  }
+  .quest-hub-progress>div:last-child{grid-column:1/-1}
+  .quest-hub-progress>div{min-height:66px;padding:9px 10px}
+  .quest-hub-progress b{font-size:22px}
+  .quest-hub-progress span{font-size:7.5px}
+  .quest-hub-grid{
+    grid-template-columns:1fr;
+    gap:8px;
+  }
+  .quest-hub-card{
+    min-height:132px;
+    grid-template-columns:105px minmax(0,1fr);
+    gap:10px;
+    padding:8px;
+  }
+  .quest-hub-art{height:116px}
+  .quest-hub-card-copy h4{font-size:19px}
+  .quest-hub-card-copy p{font-size:8.4px}
+  .quest-hub-link{
+    font-size:6.5px;
+    max-width:76px;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+  }
+  .quest-symbolic-art svg{width:68px;height:82px}
+  .quest-symbolic-art p{font-size:11px}
+  .quest-story-art-fallback .quest-symbolic-art{min-height:260px}
+
+  .app[data-locale="ta"] .quest-hub>h1{
+    font-size:27px;
+    line-height:1.5;
+  }
+  .app[data-locale="ta"] .quest-hub>p{
+    font-size:10px;
+    line-height:1.8;
+  }
+  .app[data-locale="ta"] .quest-hub-card-copy h4{
+    font-size:16px;
+    line-height:1.5;
+  }
+  .app[data-locale="ta"] .quest-hub-card-copy p{
+    font-size:8px;
+    line-height:1.8;
+  }
+}
+@media(max-width:430px){
+  .quest-hub-progress{grid-template-columns:1fr}
+  .quest-hub-progress>div:last-child{grid-column:auto}
+  .quest-hub-card{
+    grid-template-columns:92px minmax(0,1fr);
+  }
+  .quest-hub-art{height:108px}
+  .quest-hub-card-copy h4{font-size:18px}
+  .quest-complete-actions{grid-template-columns:1fr!important}
+}
