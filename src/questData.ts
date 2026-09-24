@@ -123,7 +123,7 @@ export const KANNAPPAR_QUEST: QuestDefinition = {
     {
       id: 'traditional_place.shaivam.95291070bb06',
       role: 'birthplace_tradition',
-      labelEn: 'Uduppur',
+      labelEn: 'Uduppur · உடுப்பூர்',
       labelTa: 'உடுப்பூர்',
       authorityScope: 'traditional_reference',
       historicalVerified: false,
@@ -131,7 +131,7 @@ export const KANNAPPAR_QUEST: QuestDefinition = {
     {
       id: 'traditional_place.shaivam.1da256717d81',
       role: 'mukti_place_tradition',
-      labelEn: 'Tirukkalatti',
+      labelEn: 'Tirukkalatti · திருக்காளத்தி',
       labelTa: 'திருக்காளத்தி',
       authorityScope: 'traditional_reference',
       historicalVerified: false,
